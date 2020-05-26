@@ -4,14 +4,21 @@ This is a boilerplate project used for starting new projects!
 
 ## Set up
 
-Complete the following steps to start a new project (NEW-PROJECT-NAME):
+If using postgres user `postgres`:
 
-1. Clone this repository to your local machine `git clone BOILERPLATE-URL NEW-PROJECTS-NAME`
-2. `cd` into the cloned repository
-3. Make a fresh start of the git history for this project with `rm -rf .git && git init`
-4. Install the node dependencies `npm install`
-5. Move the example Environment file to `.env` that will be ignored by git and read by the express server `mv example.env .env`
-6. Edit the contents of the `package.json` to use NEW-PROJECT-NAME instead of `"name": "express-boilerplate",`
+```
+mv example.env .env
+createdb -U postgres dev-lft
+createdb -U psotgres dev-lft-test
+```
+
+If your `postgres` user has a password be sure to set it in `.env` for all appropriate fields. Or if using a different user, update appropriately.
+
+```
+npm install
+npm run migrate
+env MIGRATION_DB_NAME=dev-lft-test npm run migrate
+```
 
 ## Scripts
 
