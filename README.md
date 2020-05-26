@@ -1,6 +1,5 @@
-# Express Boilerplate!
+# Dev LFT
 
-This is a boilerplate project used for starting new projects!
 
 ## Set up
 
