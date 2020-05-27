@@ -1,6 +1,5 @@
 # Dev LFT
 
-
 ## Set up
 
 If using postgres user `postgres`:

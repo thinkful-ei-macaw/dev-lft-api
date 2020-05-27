@@ -5,8 +5,8 @@ CREATE TABLE projects (
     name TEXT NOT NULL,
     creator_id INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL,
     description TEXT NOT NULL,
-    live BOOLEAN default FALSE,
     tags TEXT ARRAY,
+    live_url TEXT,
     trello_url TEXT,
     github_url TEXT,
     date_created TIMESTAMPTZ DEFAULT now() NOT NULL
