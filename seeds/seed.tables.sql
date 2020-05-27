@@ -1,5 +1,7 @@
 BEGIN;
 
+TRUNCATE "vacancies", "projects", "users" CASCADE;
+
 -- all the seed users passwords are 'pass'
 INSERT INTO "users" ("id", "username", "password", "first_name", "last_name", "github_url", "linkedin_url")
 VALUES
