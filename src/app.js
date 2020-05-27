@@ -16,13 +16,21 @@ app.use(cors());
 // import routers
 const authRouter = require('./auth/auth-router');
 const usersRouter = require('./users/users-router');
+<<<<<<< HEAD
 const vacancyRouter = require('./vacancies/vacancies-router');
+=======
+const projectsRouter = require('./projects/projects-router');
+>>>>>>> a150eaa70bc9e2ebbcdc4d39645fe63ee93e899b
 
 // set up routes
 const routes = [
   { url: '/api/auth', router: authRouter },
   { url: '/api/users', router: usersRouter },
+<<<<<<< HEAD
   { url: '/api/vacancies', router: vacancyRouter}
+=======
+  { url: '/api/projects', router: projectsRouter }
+>>>>>>> a150eaa70bc9e2ebbcdc4d39645fe63ee93e899b
 ];
 
 // add routes to app
