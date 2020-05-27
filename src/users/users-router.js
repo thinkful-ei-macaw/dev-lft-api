@@ -1,6 +1,7 @@
 const express = require('express');
 const UsersService = require('./users-service');
 const AuthService = require('../auth/auth-service');
+const { requireAuth } = require('../middleware/jwt-auth');
 
 /**
  * Router to handle all requests to /api/users
@@ -86,7 +87,7 @@ usersRouter.get('/', (req, res, next) => {
 });
 
 // GET `/users/:user_id` to get a user's info (not the credentials tho)
-usersRouter.get('/:user_id', (req, res, next) => {
+usersRouter.get('/:user_id', requireAuth, (req, res, next) => {
   const db = req.app.get('db');
   const { user_id } = req.params;
 
@@ -114,7 +115,7 @@ usersRouter.get('/:user_id', (req, res, next) => {
 })
 
 // PATCH `/users/:user_id` to update a user's info in the database
-usersRouter.patch('/:user_id', (req, res, next) => {
+usersRouter.patch('/:user_id', requireAuth, (req, res, next) => {
   const db = req.app.get('db');
   const { user_id } = req.params;
   const { first_name, last_name, github_url, linkedin_url, twitter_url } = req.body;
