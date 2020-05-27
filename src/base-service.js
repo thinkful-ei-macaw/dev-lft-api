@@ -35,7 +35,7 @@ class Service {
   }
 
   /**
-   * returns a single item at the specified ID from the table
+   * returns a single item by checking a specified field from the table
    * @param {{}} db an instance of the Knex database object
    * @param {string} field the name of the field to match
    * @param {string} value the value to match for in the field
