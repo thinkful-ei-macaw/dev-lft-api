@@ -130,4 +130,10 @@ VALUES
     ARRAY [ 'Communication', 'Adaptability', 'Strong attention to detail' ]
   );
 
+-- because we explicitly set the id fields
+-- update the sequencer for future automatic id setting
+SELECT setval('users_id_seq', (SELECT MAX(id) from "users"));
+SELECT setval('projects_id_seq', (SELECT MAX(id) from "projects"));
+SELECT setval('vacancies_id_seq', (SELECT MAX(id) from "vacancies"));
+
 COMMIT;

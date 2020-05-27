@@ -4,7 +4,6 @@ const morgan = require('morgan');
 const cors = require('cors');
 const helmet = require('helmet');
 const { NODE_ENV } = require('./config');
-const projectsRouter = require('./projects/projects-router');
 
 const app = express();
 
@@ -14,8 +13,24 @@ app.use(morgan(morganOption));
 app.use(helmet());
 app.use(cors());
 
-app.use('/api/projects', projectsRouter);
+// import routers
+const authRouter = require('./auth/auth-router');
+const usersRouter = require('./users/users-router');
+const projectsRouter = require('./projects/projects-router');
 
+// set up routes
+const routes = [
+  { url: '/api/auth', router: authRouter },
+  { url: '/api/users', router: usersRouter },
+  { url: '/api/projects', router: projectsRouter }
+];
+
+// add routes to app
+routes.forEach(({ url, router }) => {
+  app.use(url, router);
+});
+
+// base route for happiness
 app.get('/', (req, res) => {
   res.send('Hello, world!');
 });

@@ -1,5 +1,6 @@
 const express = require('express');
 const ProjectsService = require('./projects-service');
+const { requireAuth } = require('../middleware/jwt-auth');
 
 const projectsRouter = express.Router();
 const bodyParser = express.json();
@@ -17,7 +18,7 @@ projectsRouter
       next(e);
     }
   })
-  .post(bodyParser, async (req, res, next) => {
+  .post(requireAuth, bodyParser, async (req, res, next) => {
     const {
       name,
       description,
@@ -63,29 +64,52 @@ projectsRouter
     }
   });
 
-projectsRouter.route('/:user_id').get(async (req, res, next) => {
-  const { user_id } = req.params;
+projectsRouter
+  .route('/user')
+  .all(requireAuth)
+  .get(async (req, res, next) => {
+    const user_id = req.user.id;
 
-  try {
-    const allUserProjects = await ProjectsService.getAllUserProjects(
-      req.app.get('db'),
-      user_id
-    );
+    try {
+      const allUserProjects = await ProjectsService.getAllUserProjects(
+        req.app.get('db'),
+        user_id
+      );
 
-    if (!allUserProjects) {
-      return res
-        .status(404)
-        .json({ error: `No projects found for user with id ${user_id}` });
+      if (!allUserProjects) {
+        return res
+          .status(404)
+          .json({ error: `No projects found for user with id ${user_id}` });
+      }
+
+      res.json(allUserProjects);
+    } catch (e) {
+      next(e);
     }
-
-    res.json(allUserProjects);
-  } catch (e) {
-    next(e);
-  }
-});
+  });
 
 projectsRouter
   .route('/:project_id')
+  .all(requireAuth)
+  .get(async (req, res, next) => {
+    const { project_id } = req.params;
+    try {
+      const project = await ProjectsService.getProjectById(
+        req.app.get('db'),
+        project_id
+      );
+
+      if (!project) {
+        return res
+          .status(404)
+          .json({ error: `No project found with id ${project_id}` });
+      }
+
+      res.status(200).json({ project });
+    } catch (e) {
+      next(e);
+    }
+  })
   .patch(bodyParser, async (req, res, next) => {
     const {
       name,
@@ -98,9 +122,28 @@ projectsRouter
 
     const { project_id } = req.params;
 
-    // TODO: Check that user is authorized to modify the project
-    // req.user.id should match creator_id in projects table
-    // const creator_id = req.user.id;
+    // Check the the currently auth user
+    // is the one who created this post
+    const creator_id = req.user.id;
+
+    try {
+      const project = await ProjectsService.getProjectById(
+        req.app.get('db'),
+        project_id
+      );
+
+      // First make sure project with this id exists
+      if (!project) {
+        return res.status(404).json({ error: `No project found with that id` });
+      }
+
+      // Make sure this is their project
+      if (project.creator_id !== creator_id) {
+        return res.status(401).json({ error: 'Unauthorized request' });
+      }
+    } catch (e) {
+      next(e);
+    }
 
     const requiredFields = {
       name,
@@ -138,9 +181,28 @@ projectsRouter
   .delete(async (req, res, next) => {
     const { project_id } = req.params;
 
-    // TODO: Check that user is authorized to delete the project
-    // req.user.id should match creator_id in projects table
-    // const creator_id = req.user.id;
+    // We will the the currently auth user
+    // is the one who created this post
+    const creator_id = req.user.id;
+
+    try {
+      const project = await ProjectsService.getProjectById(
+        req.app.get('db'),
+        project_id
+      );
+
+      // First make sure a project with this id exists
+      if (!project) {
+        return res.status(404).json({ error: `No project found with that id` });
+      }
+
+      // Make sure this is their project
+      if (project.creator_id !== creator_id) {
+        return res.status(401).json({ error: 'Unauthorized request' });
+      }
+    } catch (e) {
+      next(e);
+    }
 
     try {
       await ProjectsService.deleteProject(req.app.get('db'), project_id);
