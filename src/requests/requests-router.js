@@ -29,11 +29,11 @@ requestsRouter.post('/:vacancy_id', requireAuth, (req, res, next) => {
   RequestsService.getAllItems(db)
     .then(requests => {
 
-      console.log(requests.filter(r => r.user_id === user_id && r.vacancy_id == vacancy_id));
+      const requestExists = requests.filter(r => r.user_id === user_id && r.vacancy_id === parseInt(vacancy_id)).length;
 
       // check the requests for the vacancy and user id
       // if one exists, user already requested to join the team
-      if (requests.filter(request => request.user_id === user_id && request.vacancy_id === vacancy_id).length)
+      if (requestExists)
         return res.status(400).json({
           error: `Request for same vacancy by this user already exists`
         });
@@ -115,7 +115,7 @@ requestsRouter.get('/:project_id', requireAuth, (req, res, next) => {
         .then(requests => {
 
           // get only requests with matching project id
-          const projectRequests = requests.filter(request => request.project_id === project_id);
+          const projectRequests = requests.filter(request => request.project_id === parseInt(project_id));
 
           return res.status(200).json(projectRequests);
 
