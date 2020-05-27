@@ -16,11 +16,13 @@ app.use(cors());
 // import routers
 const authRouter = require('./auth/auth-router');
 const usersRouter = require('./users/users-router');
+const projectsRouter = require('./projects/projects-router');
 
 // set up routes
 const routes = [
   { url: '/api/auth', router: authRouter },
-  { url: '/api/users', router: usersRouter }
+  { url: '/api/users', router: usersRouter },
+  { url: '/api/projects', router: projectsRouter }
 ];
 
 // add routes to app
