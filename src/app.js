@@ -13,6 +13,20 @@ app.use(morgan(morganOption));
 app.use(helmet());
 app.use(cors());
 
+// import routers
+const authRouter = require('./auth/auth-router');
+
+// set up routes
+const routes = [
+  { url: '/api/auth', router: authRouter }
+];
+
+// add routes to app
+routes.forEach(({ url, router }) => {
+  app.use(url, router);
+});
+
+// base route for happiness
 app.get('/', (req, res) => {
   res.send('Hello, world!');
 });
