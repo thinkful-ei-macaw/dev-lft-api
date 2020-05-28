@@ -53,13 +53,14 @@ vacancyRouter
 
 vacancyRouter
   .route('/:vacancy_id')
-  .patch(requireAuth, jsonParser, async (req, res, next) => {
+  .patch(jsonParser, async (req, res, next) => {
     try {
       const { title, description, skills, user_id } = req.body;
       const { vacancy_id } = req.params;
       const newVacancy = { title, description, skills, user_id };
 
-      const numVals = Object.values(newVacancy).filter(Boolean).length;
+      const numVals = Object.values(newVacancy).filter(val => val !== undefined)
+        .length;
       if (numVals === 0)
         return res.status(400).json({
           error: `Request body must contain at least one of 'title', 'description', 'skills', or 'user_id'`
