@@ -1,5 +1,6 @@
 const Service = require('../base-service');
 const bcrypt = require('bcryptjs');
+const xss = require('xss');
 
 const REGEX_ALPHA_NO_SPACES_OR_NUMBERS = /^[A-Za-z'-]+$/;
 const REGEX_UPPER_LOWER_NUMBER = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])+/;
@@ -48,16 +49,14 @@ class UsersService extends Service {
   }
 
   serializeUser(user) {
-    const { id, username, first_name, last_name, github_url, linkedin_url, twitter_url } = user;
-
     return {
-      id,
-      username,
-      first_name,
-      last_name,
-      github_url,
-      linkedin_url,
-      twitter_url,
+      id: user.id,
+      username: xss(user.username),
+      first_name: xss(user.first_name),
+      last_name: xss(user.last_name),
+      github_url: xss(user.github_url),
+      linkedin_url: xss(user.linkedin_url),
+      twitter_url: xss(user.twitter_url),
       date_created: new Date(user.date_created).toISOString()
     };
   }
