@@ -59,7 +59,8 @@ vacancyRouter
       const { vacancy_id } = req.params;
       const newVacancy = { title, description, skills, user_id };
 
-      const numVals = Object.values(newVacancy).filter(Boolean).length;
+      const numVals = Object.values(newVacancy).filter(val => val !== undefined)
+        .length;
       if (numVals === 0)
         return res.status(400).json({
           error: `Request body must contain at least one of 'title', 'description', 'skills', or 'user_id'`
