@@ -3,7 +3,8 @@ const ProjectsService = {
     return db
       .raw(
         `
-        SELECT
+        SELECT * FROM (
+          SELECT DISTINCT ON (p.id)
         p.id,
         p.name,
         p.creator_id,
@@ -20,6 +21,7 @@ const ProjectsService = {
            ON v.project_id = p.id 
      WHERE
         v.user_id IS NULL
+        ) t ORDER BY date_created DESC;
       `
       )
       .then(results => results.rows);
