@@ -20,7 +20,7 @@ authRouter.post('/login', (req, res, next) => {
       });
 
   // find user with matching username
-  AuthService.getItemByField(db, 'username', username)
+  AuthService.getItemWhere(db, { username })
     .then(dbUser => {
       if (!dbUser)
         return res.status(400).json({

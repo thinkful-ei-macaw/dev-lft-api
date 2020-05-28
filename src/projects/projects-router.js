@@ -13,7 +13,7 @@ projectsRouter
         req.app.get('db')
       );
 
-      res.json(allWithVacancies);
+      res.status(200).json(allWithVacancies);
     } catch (e) {
       next(e);
     }
