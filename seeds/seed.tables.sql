@@ -1,6 +1,6 @@
 BEGIN;
 
-TRUNCATE "vacancies", "projects", "users" CASCADE;
+TRUNCATE "requests", "vacancies", "projects", "users" RESTART IDENTITY CASCADE;
 
 -- all the seed users passwords are 'pass'
 INSERT INTO "users" ("id", "username", "password", "first_name", "last_name", "github_url", "linkedin_url")

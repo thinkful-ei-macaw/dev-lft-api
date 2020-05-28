@@ -1,0 +1,9 @@
+BEGIN;
+
+ALTER TABLE IF EXISTS requests
+RENAME COLUMN vacancies_id TO vacancy_id;
+
+ALTER TABLE IF EXISTS requests
+ADD COLUMN project_id INTEGER REFERENCES projects(id) ON DELETE CASCADE NOT NULL;
+
+COMMIT;
