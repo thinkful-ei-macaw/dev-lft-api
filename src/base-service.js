@@ -35,16 +35,24 @@ class Service {
   }
 
   /**
-   * returns a single item by checking a specified field from the table
+   * returns a list of items by checking multiple fields from the table
    * @param {{}} db an instance of the Knex database object
-   * @param {string} field the name of the field to match
-   * @param {string} value the value to match for in the field
+   * @param {{}} criteria key-value pairs to check the table for
    */
-  getItemByField(db, field, value) {
+  getItemsWhere(db, criteria) {
     return db
       .from(this.table)
       .select()
-      .where({ [field]: value })
+      .where(criteria)
+  }
+
+  /**
+   * returns a single item by checking specified fields from the table
+   * @param {{}} db an instance of the Knex database object
+   * @param {{}} criteria key-value pairs to check the table for
+   */
+  getItemWhere(db, criteria) {
+    return this.getItemsWhere(db, criteria)
       .first();
   }
 

@@ -34,7 +34,7 @@ usersRouter.post('/', (req, res, next) => {
     return res.status(400).json({ error: passwordError });
 
   // check if username exists
-  UsersService.getItemByField(db, 'username', username)
+  UsersService.getItemWhere(db, { username })
     .then(user => {
       if (user)
         return res.status(400).json({
