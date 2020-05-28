@@ -93,12 +93,19 @@ chatsRouter
   .get(async (req, res, next) => {
     // Get all the messages from a specific chat
     const { chat_id } = req.params;
+    const user_id = req.user.id;
 
     try {
-      const allMessages = await ChatsService.getAllChatMessages(
+      const allMessagesNoAuthorStatus = await ChatsService.getAllChatMessages(
         req.app.get('db'),
         chat_id
       );
+      const allMessages = allMessagesNoAuthorStatus.map(message => {
+        return {
+          ...message,
+          isAuthor: message.author_id === user_id
+        };
+      });
       return res.status(200).json({ allMessages });
     } catch (e) {
       next(e);
