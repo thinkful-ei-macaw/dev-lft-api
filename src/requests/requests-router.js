@@ -26,14 +26,11 @@ requestsRouter.post('/:vacancy_id', requireAuth, (req, res, next) => {
   }
 
   // check if request by user already exists for given vacancy
-  RequestsService.getAllItems(db)
-    .then(requests => {
+  RequestsService.getItemWhere(db, { user_id, vacancy_id })
+    .then(request => {
 
-      const requestExists = requests.filter(r => r.user_id === user_id && r.vacancy_id === parseInt(vacancy_id)).length;
-
-      // check the requests for the vacancy and user id
       // if one exists, user already requested to join the team
-      if (requestExists)
+      if (request)
         return res.status(400).json({
           error: `Request for same vacancy by this user already exists`
         });
@@ -66,13 +63,21 @@ requestsRouter.patch('/:request_id', requireAuth, (req, res, next) => {
   const db = req.app.get('db');
   const { request_id } = req.params;
   const { status } = req.body;
-  const updatedRequest = { status };
 
-  const numberOfValues = Object.values(updatedRequest).filter(Boolean).length;
-  if (numberOfValues === 0)
+  // check that a status was provided
+  if (!status)
     return res.status(400).json({
       error: 'Request body must contain status'
     });
+
+  const updatedRequest = { status: status.toLowerCase() };
+
+  // check the validity of the status provided
+  if (updatedRequest.status !== 'approved' && updatedRequest.status !== 'denied') {
+    return res.status(400).send({
+      error: `Status must be either 'approved' or 'denied'`
+    });
+  }
 
   RequestsService.getItemById(db, request_id)
     .then(request => {
@@ -111,13 +116,10 @@ requestsRouter.get('/:project_id', requireAuth, (req, res, next) => {
         });
 
       // send 'em a list
-      RequestsService.getAllItems(db)
+      RequestsService.getItemsWhere(db, { project_id })
         .then(requests => {
 
-          // get only requests with matching project id
-          const projectRequests = requests.filter(request => request.project_id === parseInt(project_id));
-
-          return res.status(200).json(projectRequests);
+          return res.status(200).json(requests);
 
         })
 
