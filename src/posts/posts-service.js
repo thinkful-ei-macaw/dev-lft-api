@@ -1,3 +1,5 @@
+const xss = require('xss');
+
 const PostsService = {
   getPostByProjects(db, project_id) {
     return db
@@ -25,9 +27,7 @@ const PostsService = {
   },
 
   getPostById(db, id) {
-    return db('posts')
-    .where({ id })
-    .first();
+    return db('posts').where({ id }).first();
   },
 
   insertNewPost(db, newPost) {
@@ -40,12 +40,22 @@ const PostsService = {
   },
 
   updatePost(db, id, message) {
-    return db 
+    return db
       .from('posts')
-      .where({id})
-      .update({message})
+      .where({ id })
+      .update({ message })
       .returning('*')
-      .then(rows => rows[0])
+      .then(rows => rows[0]);
+  },
+  serializePost(post) {
+    return {
+      id: post.id,
+      user_id: post.user_id,
+      message: xss(post.message),
+      date_created: post.date_created,
+      first_name: post.first_name,
+      last_name: post.last_name
+    };
   }
 };
 

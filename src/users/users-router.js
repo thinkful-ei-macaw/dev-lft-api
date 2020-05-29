@@ -30,8 +30,7 @@ usersRouter.post('/', (req, res, next) => {
 
   // check password validity
   const passwordError = UsersService.validatePassword(password);
-  if (passwordError)
-    return res.status(400).json({ error: passwordError });
+  if (passwordError) return res.status(400).json({ error: passwordError });
 
   // check if username exists
   UsersService.getItemWhere(db, { username })
@@ -42,28 +41,25 @@ usersRouter.post('/', (req, res, next) => {
         });
 
       // hash the password
-      return UsersService.hashPassword(password)
-        .then(hashedPassword => {
-          const newUser = {
-            username,
-            first_name,
-            last_name,
-            password: hashedPassword,
-            date_created: 'now()'
-          };
+      return UsersService.hashPassword(password).then(hashedPassword => {
+        const newUser = {
+          username,
+          first_name,
+          last_name,
+          password: hashedPassword,
+          date_created: 'now()'
+        };
 
-          // store the user data
-          return UsersService.insertItem(db, newUser)
-            .then(user => {
-
-              // send 'em a token
-              const sub = username;
-              const payload = { user_id: user.id };
-              return res.status(201).json({
-                authToken: AuthService.createJwt(sub, payload)
-              });
-            });
+        // store the user data
+        return UsersService.insertItem(db, newUser).then(user => {
+          // send 'em a token
+          const sub = username;
+          const payload = { user_id: user.id };
+          return res.status(201).json({
+            authToken: AuthService.createJwt(sub, payload)
+          });
         });
+      });
     })
     .catch(next);
 });
@@ -75,15 +71,12 @@ usersRouter.get('/', (req, res, next) => {
   // get all the users from the table
   UsersService.getAllItems(db)
     .then(users => {
-
       // send 'em the number
       return res.status(200).json({
         count: users.length
       });
-
     })
     .catch(next);
-
 });
 
 // GET `/users/:user_id` to get a user's info (not the credentials tho)
@@ -100,7 +93,6 @@ usersRouter.get('/:user_id', requireAuth, (req, res, next) => {
 
   UsersService.getItemById(db, user_id)
     .then(user => {
-
       // 404 if user doesn't exist
       if (!user)
         return res.status(404).json({
@@ -109,17 +101,28 @@ usersRouter.get('/:user_id', requireAuth, (req, res, next) => {
 
       // send 'em the user
       return res.status(200).json(UsersService.serializeUser(user));
-
     })
     .catch(next);
-})
+});
 
 // PATCH `/users/:user_id` to update a user's info in the database
 usersRouter.patch('/:user_id', requireAuth, (req, res, next) => {
   const db = req.app.get('db');
   const { user_id } = req.params;
-  const { first_name, last_name, github_url, linkedin_url, twitter_url } = req.body;
-  const updatedUser = { first_name, last_name, github_url, linkedin_url, twitter_url };
+  const {
+    first_name,
+    last_name,
+    github_url,
+    linkedin_url,
+    twitter_url
+  } = req.body;
+  const updatedUser = {
+    first_name,
+    last_name,
+    github_url,
+    linkedin_url,
+    twitter_url
+  };
 
   const numberOfValues = Object.values(updatedUser).filter(Boolean).length;
   if (numberOfValues === 0)
@@ -129,7 +132,6 @@ usersRouter.patch('/:user_id', requireAuth, (req, res, next) => {
 
   UsersService.getItemById(db, user_id)
     .then(user => {
-
       // 404 if user doesn't exist
       if (!user)
         return res.status(404).json({
@@ -142,11 +144,8 @@ usersRouter.patch('/:user_id', requireAuth, (req, res, next) => {
           return res.status(204).end();
         })
         .catch(next);
-
     })
     .catch(next);
-
-
 });
 
 module.exports = usersRouter;

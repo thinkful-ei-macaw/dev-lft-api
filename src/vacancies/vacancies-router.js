@@ -10,7 +10,7 @@ vacancyRouter.get('/:project_id', requireAuth, async (req, res, next) => {
       req.app.get('db'),
       req.params.project_id
     );
-    res.status(200).json(vacancies);
+    res.status(200).json(vacancies.map(VacancyService.serializeVacancy));
   } catch (error) {
     next(error);
   }
@@ -40,12 +40,7 @@ vacancyRouter
         req.app.get('db'),
         newVacancy
       );
-      res.status(201).json({
-        title: vacant.title,
-        description: vacant.description,
-        skills: vacant.skills,
-        project_id: vacant.project_id
-      });
+      res.status(201).json(VacancyService.serializeVacancy(vacant));
     } catch (error) {
       next(error);
     }
@@ -57,7 +52,12 @@ vacancyRouter
     try {
       const { title, description, skills, user_id } = req.body;
       const { vacancy_id } = req.params;
-      const newVacancy = { title, description, skills, user_id };
+      const newVacancy = {
+        title,
+        description,
+        skills,
+        user_id
+      };
 
       const numVals = Object.values(newVacancy).filter(val => val !== undefined)
         .length;

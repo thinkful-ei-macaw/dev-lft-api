@@ -1,3 +1,5 @@
+const xss = require('xss');
+
 const ProjectsService = {
   getAllWithVacancies(db) {
     return db
@@ -85,6 +87,19 @@ const ProjectsService = {
   },
   deleteProject(db, id) {
     return db('projects').where({ id }).del();
+  },
+  serializeProject(project) {
+    return {
+      id: project.id,
+      name: project.name,
+      creator: project.creator_id,
+      description: xss(project.description),
+      tags: project.tags,
+      live_url: project.live_url,
+      trello_url: project.trello_url,
+      github_url: project.github_url,
+      date_created: project.date_created 
+    };
   }
 };
 
