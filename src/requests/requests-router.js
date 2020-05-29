@@ -1,9 +1,8 @@
 const express = require('express');
-const Service = require('../base-service');
 const { requireAuth } = require('../middleware/jwt-auth');
 
 const ProjectsService = require('../projects/projects-service');
-const RequestsService = new Service('requests');
+const RequestsService = require('./requests-service');
 
 /**
  * Router to handle all requests to /api/requests
@@ -116,10 +115,10 @@ requestsRouter.get('/:project_id', requireAuth, (req, res, next) => {
         });
 
       // send 'em a list
-      RequestsService.getItemsWhere(db, { project_id })
+      RequestsService.getRequests(db, project_id)
         .then(requests => {
 
-          return res.status(200).json(requests);
+          return res.status(200).json(requests.map(RequestsService.serializeRequest));
 
         })
 
