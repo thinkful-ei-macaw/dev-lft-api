@@ -17,7 +17,7 @@ postsRouter
         project_id
       );
 
-      res.status(200).json({ allPosts });
+      res.status(200).json(allPosts.map(PostsService.serializePost));
     } catch (e) {
       next(e);
     }
@@ -45,7 +45,7 @@ postsRouter
         newPost
       );
 
-      return res.status(201).json({ resultingPost });
+      return res.status(201).json(PostsService.serializePost(resultingPost));
     } catch (e) {
       next(e);
     }
@@ -56,7 +56,6 @@ postsRouter
   .all(requireAuth)
   .patch(bodyParser, async (req, res, next) => {
     const { post_id } = req.params;
-    const user_id = req.user.id;
     const { message } = req.body;
 
     if (!message) {
@@ -72,7 +71,7 @@ postsRouter
         message
       );
 
-      return res.status(201).json({ resultingPost });
+      return res.status(201).json(PostsService.serializePost(resultingPost));
     } catch (e) {
       next(e);
     }

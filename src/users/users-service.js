@@ -51,9 +51,9 @@ class UsersService extends Service {
   serializeUser(user) {
     return {
       id: user.id,
-      username: xss(user.username),
-      first_name: xss(user.first_name),
-      last_name: xss(user.last_name),
+      username: user.username,
+      first_name: user.first_name,
+      last_name: user.last_name,
       github_url: xss(user.github_url),
       linkedin_url: xss(user.linkedin_url),
       twitter_url: xss(user.twitter_url),
