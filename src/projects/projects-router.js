@@ -12,8 +12,9 @@ projectsRouter
       const allWithVacancies = await ProjectsService.getAllWithVacancies(
         req.app.get('db')
       );
-
-      res.status(200).json(allWithVacancies);
+      res
+        .status(200)
+        .json(allWithVacancies.map(ProjectsService.serializeProject));
     } catch (e) {
       next(e);
     }
@@ -58,7 +59,7 @@ projectsRouter
         newProject
       );
 
-      res.status(201).json({ createdProject });
+      res.status(201).json(ProjectsService.serializeProject(createdProject));
     } catch (e) {
       next(e);
     }
@@ -82,7 +83,7 @@ projectsRouter
           .json({ error: `No projects found for user with id ${user_id}` });
       }
 
-      res.json(allUserProjects);
+      res.json(allUserProjects.map(ProjectsService.serializeProject));
     } catch (e) {
       next(e);
     }
@@ -105,7 +106,7 @@ projectsRouter
           .json({ error: `No project found with id ${project_id}` });
       }
 
-      res.status(200).json({ project });
+      res.status(200).json(ProjectsService.serializeProject(project));
     } catch (e) {
       next(e);
     }

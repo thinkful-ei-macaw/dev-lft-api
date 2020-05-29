@@ -1,3 +1,4 @@
+const xss = require('xss');
 const VacancyService = {
   getAllVacancies(knex, project_id) {
     return knex
@@ -21,6 +22,16 @@ const VacancyService = {
   },
   getVacancyById(knex, id) {
     return knex.from('vacancies').select('*').where({ id }).first();
+  },
+  serializeVacancy(vacancy) {
+    return {
+      id: vacancy.id,
+      project_id: vacancy.project_id,
+      user_id: vacancy.user_id,
+      title: vacancy.title,
+      description: xss(vacancy.description),
+      skills: vacancy.skills
+    };
   }
 };
 
