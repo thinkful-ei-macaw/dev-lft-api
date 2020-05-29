@@ -6,9 +6,10 @@ const { requireAuth } = require('../middleware/jwt-auth');
 
 vacancyRouter.get('/:project_id', requireAuth, async (req, res, next) => {
   try {
-    const vacancies = await VacancyService.getAllVacancies(
+    const { project_id } = req.params;
+    const vacancies = await VacancyService.getItemsWhere(
       req.app.get('db'),
-      req.params.project_id
+      { project_id }
     );
     res.status(200).json(vacancies.map(VacancyService.serializeVacancy));
   } catch (error) {
@@ -36,7 +37,7 @@ vacancyRouter
             error: `Missing '${field}' in request body`
           });
 
-      const vacant = await VacancyService.insertVacancy(
+      const vacant = await VacancyService.insertItem(
         req.app.get('db'),
         newVacancy
       );
@@ -66,7 +67,7 @@ vacancyRouter
           error: `Request body must contain at least one of 'title', 'description', 'skills', or 'user_id'`
         });
 
-      const vacancy = await VacancyService.getVacancyById(
+      const vacancy = await VacancyService.getItemById(
         req.app.get('db'),
         vacancy_id
       );
@@ -74,12 +75,13 @@ vacancyRouter
         return res.status(404).json({ error: 'Vacancy does not exist' });
       }
 
-      await VacancyService.updateVacancy(
+      await VacancyService.updateItem(
         req.app.get('db'),
         vacancy_id,
         newVacancy
       );
-      res.status(204).end();
+
+      return res.status(204).end();
     } catch (error) {
       next(error);
     }
@@ -90,14 +92,16 @@ vacancyRouter
   .delete(requireAuth, async (req, res, next) => {
     try {
       const { vacancy_id } = req.params;
-      const vacancy = await VacancyService.getVacancyById(
+      const vacancy = await VacancyService.getItemById(
         req.app.get('db'),
         vacancy_id
       );
+
       if (!vacancy) {
         return res.status(404).json({ error: 'Vacancy does not exist' });
       }
-      await VacancyService.deleteVacancy(req.app.get('db'), vacancy_id);
+
+      await VacancyService.deleteItem(req.app.get('db'), vacancy_id);
       res.status(204).end();
     } catch (error) {
       next(error);
