@@ -9,6 +9,7 @@ class VacancyService extends Service {
   getVacancies(db, project_id) {
     return super
       .getItemsWhere(db, { project_id })
+      .select('vacancies.*', 'users.first_name', 'users.last_name')
       .leftJoin('users', { 'users.id': 'vacancies.user_id' });
   }
 

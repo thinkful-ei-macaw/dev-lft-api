@@ -92,17 +92,17 @@ requestsRouter.patch('/:request_id', requireAuth, (req, res, next) => {
       RequestsService.updateItem(db, request_id, updatedRequest)
         .then(request => {
 
-          // put the user into the vacancy
-          const { user_id, vacancy_id } = request;
-          const updatedVacancy = { user_id };
-          VacanciesService.updateItem(db, vacancy_id, updatedVacancy)
-            .then(() => {
+          // if the status was approved
+          if (status === 'approved') {
+            // put the user into the vacancy
+            const { user_id, vacancy_id } = request;
+            const updatedVacancy = { user_id };
+            VacanciesService.updateItem(db, vacancy_id, updatedVacancy)
+              .catch(next);
+          }
 
-              // send 'em back a thing
-              return res.status(204).end();
-
-            })
-            .catch(next);
+          // send 'em back a thing
+          return res.status(204).end();
 
         })
         .catch(next);
