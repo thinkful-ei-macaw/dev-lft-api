@@ -41,11 +41,13 @@ const ChatsService = {
         SELECT DISTINCT ON (m.chat_id)
         m.chat_id, 
         m.author_id,
-        p.name as project_name, 
         m.body, 
+        p.name as project_name, 
+        p.id as project_id, 
         m.date_created, 
         u.first_name,
         u.last_name, 
+        u.id as recipient_id, 
         c.closed 
         FROM messages m INNER JOIN chats c
         ON m.chat_id = c.id
