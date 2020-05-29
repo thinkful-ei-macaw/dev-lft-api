@@ -92,8 +92,6 @@ requestsRouter.patch('/:request_id', requireAuth, (req, res, next) => {
       RequestsService.updateItem(db, request_id, updatedRequest)
         .then(request => {
 
-          console.log(request);
-
           // put the user into the vacancy
           const { user_id, vacancy_id } = request;
           const updatedVacancy = { user_id };
