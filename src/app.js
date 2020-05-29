@@ -20,7 +20,8 @@ const vacancyRouter = require('./vacancies/vacancies-router');
 const projectsRouter = require('./projects/projects-router');
 const requestsRouter = require('./requests/requests-router');
 const chatsRouter = require('./chats/chats-router');
-const postsRouter = require('./posts/posts-router')
+const postsRouter = require('./posts/posts-router');
+const notificationsRouter = require('./notifications/notifications-router');
 
 // set up routes
 const routes = [
@@ -30,7 +31,8 @@ const routes = [
   { url: '/api/requests', router: requestsRouter },
   { url: '/api/vacancies', router: vacancyRouter },
   { url: '/api/chats', router: chatsRouter },
-  { url: '/api/posts', router: postsRouter }
+  { url: '/api/posts', router: postsRouter },
+  { url: '/api/notifications', router: notificationsRouter }
 ];
 
 // add routes to app
