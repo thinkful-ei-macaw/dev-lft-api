@@ -1,9 +1,9 @@
 const express = require('express');
-const Service = require('../base-service');
 const { requireAuth } = require('../middleware/jwt-auth');
 
 const ProjectsService = require('../projects/projects-service');
-const RequestsService = new Service('requests');
+const VacanciesService = require('../vacancies/vacancies-service');
+const RequestsService = require('./requests-service');
 
 /**
  * Router to handle all requests to /api/requests
@@ -90,8 +90,20 @@ requestsRouter.patch('/:request_id', requireAuth, (req, res, next) => {
 
       // update the request
       RequestsService.updateItem(db, request_id, updatedRequest)
-        .then(() => {
+        .then(request => {
+
+          // if the status was approved
+          if (status === 'approved') {
+            // put the user into the vacancy
+            const { user_id, vacancy_id } = request;
+            const updatedVacancy = { user_id };
+            VacanciesService.updateItem(db, vacancy_id, updatedVacancy)
+              .catch(next);
+          }
+
+          // send 'em back a thing
           return res.status(204).end();
+
         })
         .catch(next);
 
@@ -116,10 +128,10 @@ requestsRouter.get('/:project_id', requireAuth, (req, res, next) => {
         });
 
       // send 'em a list
-      RequestsService.getItemsWhere(db, { project_id })
+      RequestsService.getRequests(db, project_id)
         .then(requests => {
 
-          return res.status(200).json(requests);
+          return res.status(200).json(requests.map(RequestsService.serializeRequest));
 
         })
 
