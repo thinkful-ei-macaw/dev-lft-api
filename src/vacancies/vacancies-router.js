@@ -1,4 +1,5 @@
 const express = require('express');
+const RequestsService = require('../requests/requests-service');
 const VacancyService = require('./vacancies-service');
 const vacancyRouter = express.Router();
 const jsonParser = express.json();
@@ -52,6 +53,7 @@ vacancyRouter
   .route('/:vacancy_id')
   .patch(requireAuth, jsonParser, async (req, res, next) => {
     try {
+      const db = req.app.get('db');
       const { title, description, skills, user_id } = req.body;
       const { vacancy_id } = req.params;
       const newVacancy = {
@@ -68,19 +70,23 @@ vacancyRouter
           error: `Request body must contain at least one of 'title', 'description', 'skills', or 'user_id'`
         });
 
-      const vacancy = await VacancyService.getItemById(
-        req.app.get('db'),
-        vacancy_id
-      );
+      const vacancy = await VacancyService.getItemById(db, vacancy_id);
       if (!vacancy) {
         return res.status(404).json({ error: 'Vacancy does not exist' });
       }
 
-      await VacancyService.updateItem(
-        req.app.get('db'),
-        vacancy_id,
-        newVacancy
-      );
+      // delete the request if the user_id is being set to null
+      if (user_id === null) {
+
+        // find the corresponding request
+        const request = await RequestsService.getItemWhere(db, { vacancy_id, status: 'approved' });
+
+        // delete it
+        await RequestsService.deleteItem(db, request.id);
+
+      }
+
+      await VacancyService.updateItem(db, vacancy_id, newVacancy);
 
       return res.status(204).end();
     } catch (error) {
