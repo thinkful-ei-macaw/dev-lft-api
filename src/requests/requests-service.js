@@ -12,15 +12,14 @@ class RequestsService extends Service {
   }
 
   serializeRequest(request) {
-    const { id, vacancy_id, user_id, status, project_id, first_name, last_name } = request;
     return {
-      id,
-      vacancy_id,
-      user_id,
-      status,
-      project_id,
-      first_name,
-      last_name
+      id: request.id,
+      vacancy_id: request.vacancy_id,
+      user_id: request.user_id,
+      status: request.status,
+      project_id: request.project_id,
+      first_name: request.first_name,
+      last_name: request.last_name
     }
   }
 }
