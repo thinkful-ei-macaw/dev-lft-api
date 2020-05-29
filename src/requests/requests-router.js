@@ -2,6 +2,7 @@ const express = require('express');
 const { requireAuth } = require('../middleware/jwt-auth');
 
 const ProjectsService = require('../projects/projects-service');
+const VacanciesService = require('../vacancies/vacancies-service');
 const RequestsService = require('./requests-service');
 
 /**
@@ -89,8 +90,20 @@ requestsRouter.patch('/:request_id', requireAuth, (req, res, next) => {
 
       // update the request
       RequestsService.updateItem(db, request_id, updatedRequest)
-        .then(() => {
-          return res.status(204).end();
+        .then(request => {
+
+          // put the user into the vacancy
+          const { user_id, vacancy_id } = request;
+          const updatedVacancy = { user_id };
+          VacanciesService.updateItem(db, vacancy_id, updatedVacancy)
+            .then(() => {
+
+              // send 'em back a thing
+              return res.status(204).end();
+
+            })
+            .catch(next);
+
         })
         .catch(next);
 
