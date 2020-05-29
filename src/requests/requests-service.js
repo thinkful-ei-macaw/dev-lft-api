@@ -8,7 +8,7 @@ class RequestsService extends Service {
   getRequests(db, project_id) {
     return super
       .getItemsWhere(db, { 'requests.project_id': project_id, status: 'pending' })
-      .select('requests.*', 'users.*', 'vacancies.title')
+      .select('requests.*', 'users.first_name', 'users.last_name', 'vacancies.title')
       .join('users', { 'users.id': 'requests.user_id' })
       .join('vacancies', { 'vacancies.id': 'requests.vacancy_id' });
   }
