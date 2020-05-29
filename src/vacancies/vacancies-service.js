@@ -6,11 +6,19 @@ class VacancyService extends Service {
     super(table_name);
   }
 
+  getVacancies(db, project_id) {
+    return super
+      .getItemsWhere(db, { project_id })
+      .leftJoin('users', { 'users.id': 'vacancies.user_id' });
+  }
+
   serializeVacancy(vacancy) {
     return {
       id: vacancy.id,
       project_id: vacancy.project_id,
       user_id: vacancy.user_id,
+      first_name: vacancy.first_name,
+      last_name: vacancy.last_name,
       title: vacancy.title,
       description: xss(vacancy.description),
       skills: vacancy.skills

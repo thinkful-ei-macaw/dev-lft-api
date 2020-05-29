@@ -7,9 +7,9 @@ const { requireAuth } = require('../middleware/jwt-auth');
 vacancyRouter.get('/:project_id', requireAuth, async (req, res, next) => {
   try {
     const { project_id } = req.params;
-    const vacancies = await VacancyService.getItemsWhere(
+    const vacancies = await VacancyService.getVacancies(
       req.app.get('db'),
-      { project_id }
+      project_id
     );
     res.status(200).json(vacancies.map(VacancyService.serializeVacancy));
   } catch (error) {
@@ -22,11 +22,12 @@ vacancyRouter
   .post(requireAuth, jsonParser, async (req, res, next) => {
     try {
       const { title, description, skills } = req.body;
+      const { project_id } = req.params;
       const newVacancy = {
         title,
         description,
         skills,
-        project_id: req.params.project_id
+        project_id
       };
 
       const requiredFields = ['title', 'description'];
