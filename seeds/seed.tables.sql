@@ -130,16 +130,16 @@ VALUES
     ARRAY [ 'Communication', 'Adaptability', 'Strong attention to detail' ]
   );
 
-INSERT INTO "requests" ("id", "vacancy_id", "project_id", "user_id", "status")
+INSERT INTO "requests" ("id", "vacancy_id", "user_id", "status")
 VALUES 
-  ( 1, 1, 1, 2, 'approved' ),
-  ( 2, 2, 1, 3, 'approved' ),
-  ( 3, 3, 1, 4, 'denied' ),
-  ( 4, 3, 1, 5, 'pending' ),
-  ( 5, 3, 1, 6, 'pending' ),
-  ( 6, 4, 2, 1, 'denied' ),
-  ( 7, 4, 2, 2, 'pending' ),
-  ( 8, 5, 2, 3, 'pending' );
+  ( 1, 1, 2, 'approved' ),
+  ( 2, 2, 3, 'approved' ),
+  ( 3, 3, 4, 'denied' ),
+  ( 4, 3, 5, 'pending' ),
+  ( 5, 3, 6, 'pending' ),
+  ( 6, 4, 1, 'denied' ),
+  ( 7, 4, 2, 'pending' ),
+  ( 8, 5, 3, 'pending' );
 
 -- because we explicitly set the id fields
 -- update the sequencer for future automatic id setting
