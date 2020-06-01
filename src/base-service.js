@@ -35,7 +35,7 @@ class Service {
   }
 
   /**
-   * returns a list of items by checking multiple fields from the table
+   * returns a list of items that meet given criteria from the table
    * @param {{}} db an instance of the Knex database object
    * @param {{}} criteria key-value pairs to check the table for
    */
@@ -47,7 +47,7 @@ class Service {
   }
 
   /**
-   * returns a single item by checking specified fields from the table
+   * returns a single item that meets given criteria from the table
    * @param {{}} db an instance of the Knex database object
    * @param {{}} criteria key-value pairs to check the table for
    */
@@ -82,6 +82,20 @@ class Service {
       .update(data)
       .returning('*')
       .then(rows => rows[0]);
+  }
+
+  /**
+   * updates items that meet given criteria in the table
+   * @param {{}} db an instance of the Knex database object
+   * @param {{}} criteria key-value pairs to check the table for
+   * @param {{}} data object with data to merge into the current record
+   */
+  updateItemsWhere(db, criteria, data) {
+    return db
+      .from(this.table)
+      .where(criteria)
+      .update(data)
+      .returning('*');
   }
 
   /**

@@ -94,10 +94,16 @@ requestsRouter.patch('/:request_id', requireAuth, (req, res, next) => {
 
           // if the status was approved
           if (status === 'approved') {
+
             // put the user into the vacancy
             const { user_id, vacancy_id } = request;
             const updatedVacancy = { user_id };
             VacanciesService.updateItem(db, vacancy_id, updatedVacancy)
+              .catch(next);
+
+            // deny all other requests for the same vacancy
+            const deniedRequest = { status: 'denied' };
+            RequestsService.updateItemsWhere(db, { vacancy_id }, deniedRequest)
               .catch(next);
           }
 
@@ -134,8 +140,10 @@ requestsRouter.get('/:project_id', requireAuth, (req, res, next) => {
           return res.status(200).json(requests.map(RequestsService.serializeRequest));
 
         })
+        .catch(next)
 
     })
+    .catch(next)
 
 });
 
