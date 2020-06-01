@@ -14,16 +14,8 @@ requestsRouter.use(express.json());
 // POST `/requests` creates a new request
 requestsRouter.post('/:vacancy_id', requireAuth, (req, res, next) => {
   const db = req.app.get('db');
-  const { project_id } = req.body;
   const { vacancy_id } = req.params;
   const user_id = req.user.id;
-
-  // check if a project id is provided
-  if (!project_id) {
-    return res.status(400).json({
-      error: `Missing 'project_id' in request body`
-    })
-  }
 
   // check if request by user already exists for given vacancy
   RequestsService.getItemWhere(db, { user_id, vacancy_id })
@@ -38,7 +30,6 @@ requestsRouter.post('/:vacancy_id', requireAuth, (req, res, next) => {
       // otherwise, create it
       const newRequest = {
         vacancy_id,
-        project_id,
         user_id,
         date_created: 'now()'
       }
