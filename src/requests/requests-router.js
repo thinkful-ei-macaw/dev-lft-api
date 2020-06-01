@@ -140,8 +140,10 @@ requestsRouter.get('/:project_id', requireAuth, (req, res, next) => {
           return res.status(200).json(requests.map(RequestsService.serializeRequest));
 
         })
+        .catch(next)
 
     })
+    .catch(next)
 
 });
 
