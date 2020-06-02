@@ -22,7 +22,7 @@ usersRouter.post('/', async (req, res, next) => {
           error: `Missing '${field}' in request body`
         });
 
-    // check validity of names rovided
+    // check validity of names provided
     for (const name of ['first_name', 'last_name']) {
       const nameError = UsersService.validateName(req.body[name]);
       if (nameError)
