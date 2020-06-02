@@ -642,7 +642,7 @@ req.user.id: Number
 
 - **Muhiddin Kurbonov** - _Full-Stack_ - [muhiddinsgithub](https://github.com/muhiddinsgithub)
 
-See also the list of [contributors](https://github.com/thinkful-ei24/buvie-server/graphs/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/thinkful-ei-macaw/dev-lft-api/graphs/contributors) who participated in this project.
 
 ## Acknowledgments
 
