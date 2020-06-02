@@ -9,23 +9,21 @@ postsRouter.use(requireAuth);
 postsRouter
   .route('/:project_id')
   .get(async (req, res, next) => {
+    const db = req.app.get('db');
     const { project_id } = req.params;
 
     try {
-      const allPosts = await PostsService.getPostByProjects(
-        req.app.get('db'),
-        project_id
-      );
-
+      const allPosts = await PostsService.getPosts(db, project_id);
       const user_id = req.user.id;
 
       res.status(200).json(allPosts.map(post => PostsService.serializePost(post, user_id)));
-    } catch (e) {
-      next(e);
+    } catch (error) {
+      next(error);
     }
   })
 
   .post(async (req, res, next) => {
+    const db = req.app.get('db');
     const { project_id } = req.params;
     const user_id = req.user.id;
     const { message } = req.body;
@@ -43,20 +41,18 @@ postsRouter
     };
 
     try {
-      const resultingPost = await PostsService.insertNewPost(
-        req.app.get('db'),
-        newPost
-      );
+      const resultingPost = await PostsService.insertItem(db, newPost);
 
       return res.status(201).json(PostsService.serializePost(resultingPost, user_id));
-    } catch (e) {
-      next(e);
+    } catch (error) {
+      next(error);
     }
   });
 
 postsRouter
   .route('/:post_id')
   .patch(async (req, res, next) => {
+    const db = req.app.get('db');
     const { post_id } = req.params;
     const { message } = req.body;
 
@@ -67,17 +63,11 @@ postsRouter
     }
 
     try {
-      const resultingPost = await PostsService.updatePost(
-        req.app.get('db'),
-        post_id,
-        message
-      );
-
-      const user_id = req.user_id;
-
-      return res.status(201).json(PostsService.serializePost(resultingPost, user_id));
-    } catch (e) {
-      next(e);
+      const updatedPost = { message };
+      await PostsService.updateItem(db, post_id, updatedPost);
+      return res.status(204).end();
+    } catch (error) {
+      next(error);
     }
   });
 
