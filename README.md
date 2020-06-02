@@ -65,12 +65,12 @@ To run front-end or back-end tests, simply run `npm test` in the terminal.
 │       └── /:vacancy_id
 ├── /chats
 │   └── GET
+|       └── /
 |       └── /:chat_id
 │   └── POST
 │       └── /
 │   └── PATCH
 │       └── /:chat_id
-│       └── /:post_id
 ├── /posts
 │   └── GET
 |       └── /:project_id
@@ -80,6 +80,7 @@ To run front-end or back-end tests, simply run `npm test` in the terminal.
 │       └── /:post_id
 ├── /notifications
 │   └── GET
+        └── /
 │   └── PATCH
 │       └── /:notification_id
 ```
@@ -370,6 +371,250 @@ user_id: Number;
 
 // res.body
 
+{
+  status: 204;
+}
+```
+
+### GET `/api/vacancies/:project_id`
+
+```js
+// req.params
+{
+  project_id: Number;
+}
+
+// res.body
+
+[
+  {
+    id: Number,
+    project_id: Number,
+    user_id: Number,
+    first_name: String,
+    last_name: String,
+    title: String,
+    description: String,
+    skills: [],
+  },
+];
+```
+
+### POST `/api/vacancies/:project_id`
+
+```js
+// req.body
+{
+  title: String,
+  description: String,
+  skills: []
+}
+//req.params
+{
+  project_id: Number
+}
+
+// res.body
+
+{
+  id: Number,
+  project_id: Number,
+  user_id: Number,
+  title: String,
+  description: String,
+  skills: []
+}
+```
+
+### PATCH `/api/vacancies/:vacancy_id`
+
+```js
+// req.body
+{
+  title: String,
+  description: String,
+  skills: [],
+  user_id: Number
+}
+//req.params
+{
+  vacancy_id: Number
+}
+
+// res.body
+
+{
+  status: 204
+}
+```
+
+### DELETE `/api/vacancies/:vacancy_id`
+
+```js
+//req.params
+{
+  vacancy_id: Number;
+}
+
+// res.body
+{
+  status: 204;
+}
+```
+
+### GET `/api/chats/:chat_id`
+
+```js
+//req.params
+{
+  chat_id: Number;
+}
+// res.body
+{
+  [
+    {
+      id: Number,
+      chat_id: Number,
+      author_id: Number,
+      body: String,
+    }, ...
+  ];
+}
+```
+
+### POST `/api/chats/`
+
+```js
+// req.body
+{
+  recipient_id: Number,
+  project_id: Number,
+  body: String
+}
+// res.body
+
+{
+  id: Number,
+  chat_id: Number,
+  author_id: Number,
+  body: String,
+  date_created: String
+}
+```
+
+### PATCH `/api/chats/:chat_id`
+
+```js
+let { closed } = req.body;
+const { chat_id } = req.params;
+const user_id = req.user.id;
+// req.body
+{
+  closed: Boolean;
+}
+// req.params
+{
+  chat_id: Number;
+}
+// req.user.id
+user_id: Number;
+
+// res.body
+{
+  status: 204;
+}
+```
+
+### GET `/api/posts/:project_id`
+
+```js
+// req.params
+{
+  project_id: Number;
+}
+// res.body
+
+[
+  {
+    id: Number,
+    user_id: Number,
+    message: String,
+    date_created: String,
+    first_name: String,
+    last_name: String
+  }, ...
+]
+```
+
+### POST `/api/posts/:project_id`
+
+```js
+const { project_id } = req.params;
+const user_id = req.user.id;
+const { message } = req.body;
+// req.params
+{
+  project_id: Number;
+}
+// req.user.id
+{
+  user_id: Number;
+}
+// req.body
+{
+  message: String;
+}
+//res.body
+
+{
+  id: Number,
+  user_id: Number,
+  message: String,
+  date_created: String
+}
+```
+
+### PATCH `/api/posts/:post_id`
+
+```js
+// req.params
+{
+  post_id: Number;
+}
+// req.body
+{
+  message: String;
+}
+// res.body
+{
+  id: Number,
+  user_id: Number,
+  message: String,
+  date_created: String
+}
+```
+
+### GET `/api/notifications/`
+
+```js
+req.user.id: Number
+
+// res.body
+[]
+```
+
+### PATCH `/api/notifications/:notification_id`
+
+```js
+// req.body
+{
+  seen: Boolean;
+}
+// req.params
+{
+  notification_id: Number;
+}
+// res.body
 {
   status: 204;
 }
