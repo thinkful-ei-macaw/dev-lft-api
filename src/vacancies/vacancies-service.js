@@ -15,6 +15,7 @@ class VacancyService extends Service {
       v.project_id, 
       u.first_name, 
       u.last_name, 
+      u.username, 
       v.title, 
       v.description, 
       v.skills, 
@@ -36,6 +37,7 @@ class VacancyService extends Service {
       request_status: vacancy.status,
       first_name: vacancy.first_name,
       last_name: vacancy.last_name,
+      username: vacancy.username,
       title: vacancy.title,
       description: xss(vacancy.description),
       skills: vacancy.skills
