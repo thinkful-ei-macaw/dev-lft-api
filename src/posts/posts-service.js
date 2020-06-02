@@ -47,14 +47,15 @@ const PostsService = {
       .returning('*')
       .then(rows => rows[0]);
   },
-  serializePost(post) {
+
+  serializePost(post, user_id) {
     return {
       id: post.id,
-      user_id: post.user_id,
       message: xss(post.message),
       date_created: post.date_created,
       first_name: post.first_name,
-      last_name: post.last_name
+      last_name: post.last_name,
+      canEdit: post.user_id === user_id
     };
   }
 };

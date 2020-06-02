@@ -3,11 +3,11 @@ const PostsService = require('./posts-service');
 const { requireAuth } = require('../middleware/jwt-auth');
 
 const postsRouter = express.Router();
-const bodyParser = express.json();
+postsRouter.use(express.json());
+postsRouter.use(requireAuth);
 
 postsRouter
   .route('/:project_id')
-  .all(requireAuth)
   .get(async (req, res, next) => {
     const { project_id } = req.params;
 
@@ -17,12 +17,15 @@ postsRouter
         project_id
       );
 
-      res.status(200).json(allPosts.map(PostsService.serializePost));
+      const user_id = req.user.id;
+
+      res.status(200).json(allPosts.map(post => PostsService.serializePost(post, user_id)));
     } catch (e) {
       next(e);
     }
   })
-  .post(bodyParser, async (req, res, next) => {
+
+  .post(async (req, res, next) => {
     const { project_id } = req.params;
     const user_id = req.user.id;
     const { message } = req.body;
@@ -45,7 +48,7 @@ postsRouter
         newPost
       );
 
-      return res.status(201).json(PostsService.serializePost(resultingPost));
+      return res.status(201).json(PostsService.serializePost(resultingPost, user_id));
     } catch (e) {
       next(e);
     }
@@ -53,8 +56,7 @@ postsRouter
 
 postsRouter
   .route('/:post_id')
-  .all(requireAuth)
-  .patch(bodyParser, async (req, res, next) => {
+  .patch(async (req, res, next) => {
     const { post_id } = req.params;
     const { message } = req.body;
 
@@ -71,7 +73,9 @@ postsRouter
         message
       );
 
-      return res.status(201).json(PostsService.serializePost(resultingPost));
+      const user_id = req.user_id;
+
+      return res.status(201).json(PostsService.serializePost(resultingPost, user_id));
     } catch (e) {
       next(e);
     }
