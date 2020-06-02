@@ -4,7 +4,9 @@ module.exports = {
   ssl: !!process.env.SSL,
   migrationsDirectory: 'migrations',
   driver: 'pg',
-  connectionString: process.env.DATABASE_URL,
+  connectionString: (process.env.NODE_ENV === 'test') 
+    ? process.env.TEST_DB_URL 
+    : process.env.DB_URL,
   host: process.env.MIGRATION_DB_HOST,
   port: process.env.MIGRATION_DB_PORT,
   database: process.env.MIGRATION_DB_NAME,

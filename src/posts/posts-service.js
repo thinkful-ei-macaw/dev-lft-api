@@ -1,62 +1,28 @@
 const xss = require('xss');
+const Service = require('../base-service');
 
-const PostsService = {
-  getPostByProjects(db, project_id) {
-    return db
-      .raw(
-        `
-      SELECT
-        posts.id,
-        posts.user_id,
-        posts.message,
-        posts.date_created,
-        users.first_name,
-        users.last_name
-      FROM
-        posts
-      JOIN
-        users
-      ON
-        posts.user_id = users.id
-      WHERE
-        posts.project_id = ?
-      `,
-        [project_id]
-      )
-      .then(result => result.rows);
-  },
+class PostsService extends Service {
+  constructor(table_name) {
+    super(table_name);
+  }
 
-  getPostById(db, id) {
-    return db('posts').where({ id }).first();
-  },
+  getPosts(db, project_id) {
+    return super
+      .getItemsWhere(db, { project_id })
+      .join('users', 'users.id', 'posts.user_id')
+      .select('posts.*', 'users.first_name', 'users.last_name');
+  }
 
-  insertNewPost(db, newPost) {
-    return db
-      .insert(newPost)
-      .into('posts')
-      .returning('*')
-      .then(([message]) => message)
-      .then(message => this.getPostById(db, message.id));
-  },
-
-  updatePost(db, id, message) {
-    return db
-      .from('posts')
-      .where({ id })
-      .update({ message })
-      .returning('*')
-      .then(rows => rows[0]);
-  },
-  serializePost(post) {
+  serializePost(post, user_id) {
     return {
       id: post.id,
-      user_id: post.user_id,
       message: xss(post.message),
       date_created: post.date_created,
       first_name: post.first_name,
-      last_name: post.last_name
+      last_name: post.last_name,
+      canEdit: post.user_id === user_id
     };
   }
-};
+}
 
-module.exports = PostsService;
+module.exports = new PostsService('posts');
