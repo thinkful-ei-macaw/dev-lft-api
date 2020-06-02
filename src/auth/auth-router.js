@@ -36,7 +36,7 @@ authRouter.post('/login', async (req, res, next) => {
 
     // send 'em a token
     const sub = username;
-    const payload = { user_id: dbUser.id };
+    const payload = { first_name: dbUser.first_name, last_name: dbUser.last_name };
     return res.status(200).json({
       authToken: AuthService.createJwt(sub, payload)
     });
