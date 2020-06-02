@@ -16,7 +16,9 @@ postsRouter
       const allPosts = await PostsService.getPosts(db, project_id);
       const user_id = req.user.id;
 
-      res.status(200).json(allPosts.map(post => PostsService.serializePost(post, user_id)));
+      res
+        .status(200)
+        .json(allPosts.map(post => PostsService.serializePost(post, user_id)));
     } catch (error) {
       next(error);
     }
@@ -43,32 +45,30 @@ postsRouter
     try {
       const resultingPost = await PostsService.insertItem(db, newPost);
 
-      return res.status(201).json(PostsService.serializePost(resultingPost, user_id));
-    } catch (error) {
-      next(error);
-    }
-  });
-
-postsRouter
-  .route('/:post_id')
-  .patch(async (req, res, next) => {
-    const db = req.app.get('db');
-    const { post_id } = req.params;
-    const { message } = req.body;
-
-    if (!message) {
       return res
-        .status(400)
-        .json({ error: `Missing 'message' in request body` });
-    }
-
-    try {
-      const updatedPost = { message };
-      await PostsService.updateItem(db, post_id, updatedPost);
-      return res.status(204).end();
+        .status(201)
+        .json(PostsService.serializePost(resultingPost, user_id));
     } catch (error) {
       next(error);
     }
   });
+
+postsRouter.route('/:post_id').patch(async (req, res, next) => {
+  const db = req.app.get('db');
+  const { post_id } = req.params;
+  const { message } = req.body;
+
+  if (!message) {
+    return res.status(400).json({ error: `Missing 'message' in request body` });
+  }
+
+  try {
+    const updatedPost = { message };
+    await PostsService.updateItem(db, post_id, updatedPost);
+    return res.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+});
 
 module.exports = postsRouter;

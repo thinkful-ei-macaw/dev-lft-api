@@ -7,7 +7,8 @@ class PostsService extends Service {
   }
 
   getPosts(db, project_id) {
-    return super.getItemsWhere(db, { project_id })
+    return super
+      .getItemsWhere(db, { project_id })
       .join('users', 'users.id', 'posts.user_id')
       .select('posts.*', 'users.first_name', 'users.last_name');
   }
@@ -22,6 +23,6 @@ class PostsService extends Service {
       canEdit: post.user_id === user_id
     };
   }
-};
+}
 
 module.exports = new PostsService('posts');
