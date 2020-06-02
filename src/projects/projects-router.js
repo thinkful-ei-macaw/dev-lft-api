@@ -83,7 +83,9 @@ projectsRouter
           .json({ error: `No projects found for user with id ${user_id}` });
       }
 
-      res.json(allUserProjects.map(ProjectsService.serializeProject));
+      return res
+        .status(200)
+        .json(allUserProjects.map(ProjectsService.serializeProject));
     } catch (e) {
       next(e);
     }
@@ -94,6 +96,8 @@ projectsRouter
   .all(requireAuth)
   .get(async (req, res, next) => {
     const { project_id } = req.params;
+    const user_id = req.user.id;
+
     try {
       const project = await ProjectsService.getProjectById(
         req.app.get('db'),
@@ -105,6 +109,10 @@ projectsRouter
           .status(404)
           .json({ error: `No project found with id ${project_id}` });
       }
+
+      /* Set property on project response that lets client know 
+      if the user is the owner of this project */
+      project.isOwner = user_id === project.creator_id;
 
       res.status(200).json(ProjectsService.serializeProject(project));
     } catch (e) {

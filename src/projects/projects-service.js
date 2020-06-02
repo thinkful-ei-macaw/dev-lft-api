@@ -89,17 +89,20 @@ const ProjectsService = {
     return db('projects').where({ id }).del();
   },
   serializeProject(project) {
-    return {
+    const serialized = {
       id: project.id,
       name: project.name,
-      creator: project.creator_id,
       description: xss(project.description),
       tags: project.tags,
       live_url: project.live_url,
       trello_url: project.trello_url,
       github_url: project.github_url,
-      date_created: project.date_created 
+      date_created: project.date_created
     };
+    if (project.isOwner !== undefined) {
+      serialized.isOwner = project.isOwner;
+    }
+    return serialized;
   }
 };
 
