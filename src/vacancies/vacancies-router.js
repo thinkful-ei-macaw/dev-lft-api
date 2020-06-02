@@ -9,7 +9,12 @@ vacancyRouter.get('/:project_id', requireAuth, async (req, res, next) => {
   try {
     const db = req.app.get('db');
     const { project_id } = req.params;
-    const vacancies = await VacancyService.getVacancies(db, project_id);
+    const user_id = req.user.id;
+    const vacancies = await VacancyService.getVacancies(
+      db,
+      project_id,
+      user_id
+    );
     res.status(200).json(vacancies.map(VacancyService.serializeVacancy));
   } catch (error) {
     next(error);
@@ -73,13 +78,14 @@ vacancyRouter
 
       // delete the request if the user_id is being set to null
       if (user_id === null) {
-
         // find the corresponding request
-        const request = await RequestsService.getItemWhere(db, { vacancy_id, status: 'approved' });
+        const request = await RequestsService.getItemWhere(db, {
+          vacancy_id,
+          status: 'approved'
+        });
 
         // delete it
         await RequestsService.deleteItem(db, request.id);
-
       }
 
       await VacancyService.updateItem(db, vacancy_id, newVacancy);

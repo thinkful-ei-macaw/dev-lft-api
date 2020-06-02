@@ -6,18 +6,34 @@ class VacancyService extends Service {
     super(table_name);
   }
 
-  getVacancies(db, project_id) {
-    return super
-      .getItemsWhere(db, { project_id })
-      .select('vacancies.*', 'users.first_name', 'users.last_name')
-      .leftJoin('users', { 'users.id': 'vacancies.user_id' });
+  getVacancies(db, project_id, user_id) {
+    return db
+      .raw(
+        `
+      SELECT 
+      v.id, 
+      v.project_id, 
+      u.first_name, 
+      u.last_name, 
+      v.title, 
+      v.description, 
+      v.skills, 
+      r.status 
+      FROM vacancies v
+      LEFT JOIN requests r ON r.user_id = ? AND r.vacancy_id = v.id
+      LEFT JOIN users u ON v.user_id = u.id
+      WHERE v.project_id = ?
+      `,
+        [user_id, project_id]
+      )
+      .then(result => result.rows);
   }
 
   serializeVacancy(vacancy) {
     return {
       id: vacancy.id,
       project_id: vacancy.project_id,
-      user_id: vacancy.user_id,
+      request_status: vacancy.status,
       first_name: vacancy.first_name,
       last_name: vacancy.last_name,
       title: vacancy.title,
@@ -25,6 +41,6 @@ class VacancyService extends Service {
       skills: vacancy.skills
     };
   }
-};
+}
 
 module.exports = new VacancyService('vacancies');
