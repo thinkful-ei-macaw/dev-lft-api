@@ -3,26 +3,27 @@ const PostsService = require('./posts-service');
 const { requireAuth } = require('../middleware/jwt-auth');
 
 const postsRouter = express.Router();
-const bodyParser = express.json();
+postsRouter.use(express.json());
+postsRouter.use(requireAuth);
 
 postsRouter
   .route('/:project_id')
-  .all(requireAuth)
   .get(async (req, res, next) => {
+    const db = req.app.get('db');
     const { project_id } = req.params;
 
     try {
-      const allPosts = await PostsService.getPostByProjects(
-        req.app.get('db'),
-        project_id
-      );
+      const allPosts = await PostsService.getPosts(db, project_id);
+      const user_id = req.user.id;
 
-      res.status(200).json(allPosts.map(PostsService.serializePost));
-    } catch (e) {
-      next(e);
+      res.status(200).json(allPosts.map(post => PostsService.serializePost(post, user_id)));
+    } catch (error) {
+      next(error);
     }
   })
-  .post(bodyParser, async (req, res, next) => {
+
+  .post(async (req, res, next) => {
+    const db = req.app.get('db');
     const { project_id } = req.params;
     const user_id = req.user.id;
     const { message } = req.body;
@@ -40,21 +41,18 @@ postsRouter
     };
 
     try {
-      const resultingPost = await PostsService.insertNewPost(
-        req.app.get('db'),
-        newPost
-      );
+      const resultingPost = await PostsService.insertItem(db, newPost);
 
-      return res.status(201).json(PostsService.serializePost(resultingPost));
-    } catch (e) {
-      next(e);
+      return res.status(201).json(PostsService.serializePost(resultingPost, user_id));
+    } catch (error) {
+      next(error);
     }
   });
 
 postsRouter
   .route('/:post_id')
-  .all(requireAuth)
-  .patch(bodyParser, async (req, res, next) => {
+  .patch(async (req, res, next) => {
+    const db = req.app.get('db');
     const { post_id } = req.params;
     const { message } = req.body;
 
@@ -65,15 +63,11 @@ postsRouter
     }
 
     try {
-      const resultingPost = await PostsService.updatePost(
-        req.app.get('db'),
-        post_id,
-        message
-      );
-
-      return res.status(201).json(PostsService.serializePost(resultingPost));
-    } catch (e) {
-      next(e);
+      const updatedPost = { message };
+      await PostsService.updateItem(db, post_id, updatedPost);
+      return res.status(204).end();
+    } catch (error) {
+      next(error);
     }
   });
 
