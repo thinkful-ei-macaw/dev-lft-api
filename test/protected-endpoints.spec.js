@@ -5,16 +5,7 @@ const helpers = require('./test-helpers');
 describe('Protected endpoints', () => {
   let db;
 
-  const {
-    testUsers,
-    testRequests,
-    testProjects,
-    testVacancies,
-    testPosts,
-    testChats,
-    testMessages,
-    testNotifications
-  } = helpers.makeFixtures();
+  const { testUsers } = helpers.makeFixtures();
 
   before('make a knex instance', () => {
     db = knex({
@@ -30,19 +21,7 @@ describe('Protected endpoints', () => {
 
   afterEach('cleanup tables', () => helpers.cleanTables(db));
 
-  beforeEach('insert data', () =>
-    helpers.seedProjectsTables(
-      db,
-      testUsers,
-      testProjects,
-      testVacancies,
-      testRequests,
-      testPosts,
-      testChats,
-      testMessages,
-      testNotifications
-    )
-  );
+  beforeEach('insert data', () => helpers.seedProjectsTables(db, testUsers));
 
   const protectedChats = [
     {
