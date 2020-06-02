@@ -83,21 +83,21 @@ usersRouter.get('/', async (req, res, next) => {
   }
 });
 
-// GET `/users/:user_id` to get a user's info (not the credentials tho)
-usersRouter.get('/:user_id', requireAuth, async (req, res, next) => {
+// GET `/users/:username` to get a user's info (not the credentials tho)
+usersRouter.get('/:username', requireAuth, async (req, res, next) => {
   try {
     const db = req.app.get('db');
-    const { user_id } = req.params;
+    const { username } = req.params;
 
-    // check that an id was provided
-    if (!user_id) {
+    // check that a username was provided
+    if (!username) {
       return res.status(400).json({
-        error: `Missing 'user_id' in request params`
+        error: `Missing 'username' in request params`
       });
     }
 
     // check that the user exists
-    const user = await UsersService.getItemById(db, user_id);
+    const user = await UsersService.getItemWhere(db, { username });
     if (!user)
       return res.status(404).json({
         error: 'User not found'
@@ -111,11 +111,11 @@ usersRouter.get('/:user_id', requireAuth, async (req, res, next) => {
   }
 });
 
-// PATCH `/users/:user_id` to update a user's info in the database
-usersRouter.patch('/:user_id', requireAuth, async (req, res, next) => {
+// PATCH `/users` to update a user's info in the database
+usersRouter.patch('/', requireAuth, async (req, res, next) => {
   try {
     const db = req.app.get('db');
-    const { user_id } = req.params;
+    const user_id = req.user.id;
 
     const {
       first_name,
