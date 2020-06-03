@@ -1,7 +1,7 @@
 const knex = require('knex');
 const app = require('../src/app');
 const jwt = require('jsonwebtoken');
-const { makeUsersArray, seedUsers } = require('./test-helpers');
+const { makeUsersArray, seedUsers, cleanTables } = require('./test-helpers');
 
 describe('Auth Endpoints', function () {
   let db;
@@ -16,13 +16,9 @@ describe('Auth Endpoints', function () {
 
   after('disconnect from db', () => db.destroy());
 
-  before('clean the table', () =>
-    db.raw('TRUNCATE users RESTART IDENTITY CASCADE;')
-  );
+  before('clean the table', () => cleanTables(db));
 
-  afterEach('cleanup', () =>
-    db.raw('TRUNCATE users RESTART IDENTITY CASCADE;')
-  );
+  afterEach('cleanup', () => cleanTables(db));
 
   const users = makeUsersArray();
   const testUser = users[0];
