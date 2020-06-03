@@ -1,19 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-function makeExpectedProject(project) {
-  return {
-    id: project.id,
-    name: project.name,
-    description: project.description,
-    tags: project.tags,
-    live_url: project.live_url,
-    trello_url: project.trello_url,
-    github_url: project.github_url,
-    date_created: project.date_created.toISOString()
-  };
-}
-
 function makeUsersArray() {
   return [
     {
@@ -326,19 +313,18 @@ function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
   return `Bearer ${token}`;
 }
 
-function makeExpectedProjects(user_id, projects) {
+function makeExpectedProjects(projects) {
   return projects.map(project => {
-    if (project.creator_id === user_id) {
-      project.isOwner = true;
-    } else {
-      project.isOwner = false;
-    }
+    // if (project.creator_id === user_id) {
+    //   project.isOwner = true;
+    // } else {
+    //   project.isOwner = false;
+    // }
 
     return {
       id: project.id,
       name: project.name,
       description: project.description,
-      isOwner: project.isOwner,
       tags: project.tags,
       live_url: project.live_url,
       trello_url: project.trello_url,
@@ -349,9 +335,9 @@ function makeExpectedProjects(user_id, projects) {
 }
 
 function makeExpectedUserProjects(user_id, projects) {
-  let userProjects = projects.filter(project => project.creator_id === user_id)
+  let userProjects = projects.filter(project => project.creator_id === user_id);
 
-  userProjects.map(project => {
+  return userProjects.map(project => {
     return {
       id: project.id,
       name: project.name,
@@ -363,7 +349,7 @@ function makeExpectedUserProjects(user_id, projects) {
       github_url: project.github_url,
       date_created: project.date_created
     };
-  })
+  });
 }
 
 function makeExpectedPosts(user, posts, project_id) {
