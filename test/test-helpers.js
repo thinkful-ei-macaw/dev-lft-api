@@ -65,26 +65,23 @@ function makeProjectsArray(users) {
   ];
 }
 
-function makeVacanciesArray(users, projects) {
+function makeVacanciesArray(projects) {
   return [
     {
       id: 1,
       project_id: projects[0].id,
-      user_id: users[0].id,
       title: 'Test vacancy 1',
       description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
     },
     {
       id: 2,
       project_id: projects[1].id,
-      user_id: users[1].id,
       title: 'Test vacancy 2',
       description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
     },
     {
       id: 3,
       project_id: projects[2].id,
-      user_id: users[2].id,
       title: 'Test vacancy 3',
       description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
     }
@@ -336,9 +333,9 @@ function makeExpectedProjects(user_id, projects) {
 }
 
 function makeExpectedUserProjects(user_id, projects) {
-  let userProjects = projects.filter(project => project.creator_id === user_id)
+  let userProjects = projects.filter(project => project.creator_id === user_id);
 
-  userProjects.map(project => {
+  return userProjects.map(project => {
     return {
       id: project.id,
       name: project.name,
@@ -350,7 +347,7 @@ function makeExpectedUserProjects(user_id, projects) {
       github_url: project.github_url,
       date_created: project.date_created
     };
-  })
+  });
 }
 
 function makeExpectedPosts(user, posts, project_id) {
@@ -368,6 +365,31 @@ function makeExpectedPosts(user, posts, project_id) {
   });
 }
 
+
+
+function makeExpectedRequests(users, requests, vacancies, project_id) {
+  let projRequests = requests.filter(
+    request => request.project_id === project_id
+  );
+
+  return projRequests.map(request => {
+    let vacancy = vacancies.find(vacancy => vacancy.id === request.vacancy_id);
+
+    let user = users.find(user => user.id === request.user_id);
+
+    return {
+      id: request.id,
+      vacancy_id: request.vacancy_id,
+      vacancy_title: vacancy.title,
+      user_id: request.user_id,
+      status: request.status,
+      project_id: request.project_id,
+      first_name: user.first_name,
+      last_name: user.last_name
+    };
+  });
+}
+
 module.exports = {
   makeUsersArray,
   makeProjectsArray,
@@ -381,6 +403,7 @@ module.exports = {
   makeExpectedProjects,
   makeExpectedUserProjects,
   makeExpectedPosts,
+  makeExpectedRequests,
 
   makeAuthHeader,
   makeFixtures,
