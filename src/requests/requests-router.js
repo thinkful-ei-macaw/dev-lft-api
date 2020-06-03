@@ -95,6 +95,7 @@ requestsRouter.patch('/:request_id', requireAuth, (req, res, next) => {
             // deny all other requests for the same vacancy
             const deniedRequest = { status: 'denied' };
             RequestsService.updateItemsWhere(db, { vacancy_id }, deniedRequest)
+              .whereNot({ id: request.id })
               .catch(next);
           }
 
