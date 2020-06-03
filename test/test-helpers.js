@@ -379,7 +379,6 @@ function makeExpectedRequests(users, requests, vacancies, project_id) {
 
   return projRequests.map(request => {
     let vacancy = vacancies.find(vacancy => vacancy.id === request.vacancy_id);
-
     let user = users.find(user => user.id === request.user_id);
 
     return {
@@ -407,12 +406,12 @@ function makeExpectedVacancies(
   );
 
   return projVacancies.map(vacancy => {
+    let user = users.filter(user => user.id === vacancy.user_id);
+
     let request = requests.find(
       request =>
         request.vacancy_id === vacancy.id && request.user_id === user_id
     ) || { status: null };
-
-    let user = users.filter(user => user.id === vacancy.user_id);
 
     return {
       id: vacancy.id,
@@ -445,6 +444,48 @@ function makeExpectedNotifications(user_id, notifications) {
   });
 }
 
+//get chat/:chat_id
+function makeExpectedMessages(chat_id, users, messages) {
+  let chatMessages = messages.filter(message => message.chat_id === chat_id);
+
+  return chatMessages.map(message => {
+    let user = users.find(user => user.id === message.author_id);
+    return {
+      id: message.id,
+      body: message.body,
+      chat_id: message.chat_id,
+      author: user.first_name,
+      author_id: message.author_id,
+      date_created: message.date_created
+    };
+  });
+}
+
+function makeExpectedChats(chats, user_id, users, projects, messages) {
+  //user_id for user who is GETting the chats
+  let userChats = chats.filter(
+    chat => chat.author_id === user_id || chat.recipient_id === user_id
+  );
+
+  return userChats.map(chat => {
+    let project = projects.filter(project => project.id === chat.project_id);
+    let message = messages.filter(message => message.chat_id === chat.id);
+    let recipient = users.find(user => user.id === message.recipient_id);
+    return {
+      author_id: chat.author_id,
+      body: message.body,
+      chat_id: chat.id,
+      closed: false,
+      date_created: message.date_created,
+      first_name: recipient.first_name,
+      last_name: recipient.last_name,
+      project_id: chat.project_id,
+      project_name: project.name,
+      recipient_id: chat.recipient_id
+    };
+  });
+}
+
 module.exports = {
   makeUsersArray,
   makeProjectsArray,
@@ -460,6 +501,8 @@ module.exports = {
   makeExpectedVacancies,
   makeExpectedRequests,
   makeExpectedPosts,
+  makeExpectedChats,
+  makeExpectedMessages,
   makeExpectedNotifications,
 
   makeAuthHeader,
