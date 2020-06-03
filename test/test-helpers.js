@@ -43,21 +43,24 @@ function makeProjectsArray(users) {
       name: 'Test Proj 1',
       creator_id: users[0].id,
       description:
-        'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus consequuntur deserunt commodi, nobis qui inventore corrupti iusto aliquid debitis unde non.Adipisci, pariatur.Molestiae, libero esse hic adipisci autem neque ?'
+        'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus consequuntur deserunt commodi, nobis qui inventore corrupti iusto aliquid debitis unde non.Adipisci, pariatur.Molestiae, libero esse hic adipisci autem neque ?',
+      date_created: '2029-01-22T16:28:32.615Z'
     },
     {
       id: 2,
       name: 'Test Proj 2',
       creator_id: users[1].id,
       description:
-        'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus consequuntur deserunt commodi, nobis qui inventore corrupti iusto aliquid debitis unde non.Adipisci, pariatur.Molestiae, libero esse hic adipisci autem neque ?'
+        'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus consequuntur deserunt commodi, nobis qui inventore corrupti iusto aliquid debitis unde non.Adipisci, pariatur.Molestiae, libero esse hic adipisci autem neque ?',
+      date_created: '2029-01-22T16:28:32.615Z'
     },
     {
       id: 3,
       name: 'Test Proj 3',
       creator_id: users[2].id,
       description:
-        'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus consequuntur deserunt commodi, nobis qui inventore corrupti iusto aliquid debitis unde non.Adipisci, pariatur.Molestiae, libero esse hic adipisci autem neque ?'
+        'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus consequuntur deserunt commodi, nobis qui inventore corrupti iusto aliquid debitis unde non.Adipisci, pariatur.Molestiae, libero esse hic adipisci autem neque ?',
+      date_created: '2029-01-22T16:28:32.615Z'
     }
   ];
 }
@@ -117,19 +120,22 @@ function makePostsArray(users, projects) {
       id: 1,
       project_id: projects[0].id,
       user_id: users[0].id,
-      message: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
+      message: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.',
+      date_created: '2029-01-22T16:28:32.615Z'
     },
     {
       id: 2,
       project_id: projects[1].id,
       user_id: users[1].id,
-      message: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
+      message: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.',
+      date_created: '2029-01-22T16:28:32.615Z'
     },
     {
       id: 3,
       project_id: projects[2].id,
       user_id: users[2].id,
-      message: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
+      message: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.',
+      date_created: '2029-01-22T16:28:32.615Z'
     }
   ];
 }
@@ -218,10 +224,11 @@ function seedUsers(db, users) {
   return db
     .into('users')
     .insert(usersHashedPw)
-    .then(() =>
+    .returning('*')
+    .then(() => {
       //update autoseqencer
-      db.raw(`SELECT setval('users_id_seq', ?)`, [users[users.length - 1].id])
-    );
+      db.raw(`SELECT setval('users_id_seq', ?)`, [users[users.length - 1].id]);
+    });
 }
 
 function seedProjectsTables(
@@ -292,11 +299,73 @@ function makeFixtures() {
 }
 
 function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
-  const token = jwt.sign({ user_id: user.id }, secret, {
-    subject: user.username,
-    algorithm: 'HS256'
-  });
+  const token = jwt.sign(
+    {
+      first_name: user.first_name,
+      last_name: user.last_name
+    },
+    secret,
+    {
+      subject: user.username,
+      algorithm: 'HS256'
+    }
+  );
   return `Bearer ${token}`;
+}
+
+function makeExpectedProjects(user_id, projects) {
+  return projects.map(project => {
+    if (project.creator_id === user_id) {
+      project.isOwner = true;
+    } else {
+      project.isOwner = false;
+    }
+
+    return {
+      id: project.id,
+      name: project.name,
+      description: project.description,
+      isOwner: project.isOwner,
+      tags: project.tags,
+      live_url: project.live_url,
+      trello_url: project.trello_url,
+      github_url: project.github_url,
+      date_created: project.date_created
+    };
+  });
+}
+
+function makeExpectedUserProjects(user_id, projects) {
+  let userProjects = projects.filter(project => project.creator_id === user_id)
+
+  userProjects.map(project => {
+    return {
+      id: project.id,
+      name: project.name,
+      description: project.description,
+      isOwner: true,
+      tags: project.tags,
+      live_url: project.live_url,
+      trello_url: project.trello_url,
+      github_url: project.github_url,
+      date_created: project.date_created
+    };
+  })
+}
+
+function makeExpectedPosts(user, posts, project_id) {
+  let projPosts = posts.filter(post => post.project_id === project_id);
+
+  return projPosts.map(post => {
+    return {
+      id: post.id,
+      message: post.message,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      canEdit: post.user_id === user.id,
+      date_created: post.date_created
+    };
+  });
 }
 
 module.exports = {
@@ -309,8 +378,13 @@ module.exports = {
   makeMessagesArray,
   makeNotificationsArray,
 
+  makeExpectedProjects,
+  makeExpectedUserProjects,
+  makeExpectedPosts,
+
   makeAuthHeader,
   makeFixtures,
   seedProjectsTables,
+  seedUsers,
   cleanTables
 };
