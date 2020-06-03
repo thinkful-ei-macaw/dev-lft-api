@@ -70,22 +70,22 @@ function makeVacanciesArray(users, projects) {
     {
       id: 1,
       project_id: projects[0].id,
-      user_id: users[0].id,
       title: 'Test vacancy 1',
+      user_id: null,
       description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
     },
     {
       id: 2,
       project_id: projects[1].id,
-      user_id: users[1].id,
       title: 'Test vacancy 2',
+      user_id: null,
       description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
     },
     {
       id: 3,
       project_id: projects[2].id,
-      user_id: users[2].id,
       title: 'Test vacancy 3',
+      user_id: users[2].id,
       description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
     }
   ];
@@ -192,25 +192,29 @@ function makeNotificationsArray(users, projects) {
       id: 1,
       recipient_id: users[0].id,
       project_id: projects[0].id,
-      type: 'join'
+      type: 'join',
+      date_created: '2029-01-22T16:28:32.615Z'
     },
     {
       id: 2,
       recipient_id: users[1].id,
       project_id: projects[1].id,
-      type: 'leave'
+      type: 'leave',
+      date_created: '2029-01-22T16:28:32.615Z'
     },
     {
       id: 3,
       recipient_id: users[2].id,
       project_id: projects[2].id,
-      type: 'post'
+      type: 'post',
+      date_created: '2029-01-22T16:28:32.615Z'
     },
     {
       id: 4,
       recipient_id: users[0].id,
       project_id: projects[2].id,
-      type: 'chat'
+      type: 'chat',
+      date_created: '2029-01-22T16:28:32.615Z'
     }
   ];
 }
@@ -367,6 +371,120 @@ function makeExpectedPosts(user, posts, project_id) {
   });
 }
 
+function makeExpectedRequests(users, requests, vacancies, project_id) {
+  let projRequests = requests.filter(
+    request => request.project_id === project_id
+  );
+
+  return projRequests.map(request => {
+    let vacancy = vacancies.find(vacancy => vacancy.id === request.vacancy_id);
+    let user = users.find(user => user.id === request.user_id);
+
+    return {
+      id: request.id,
+      vacancy_id: request.vacancy_id,
+      vacancy_title: vacancy.title,
+      user_id: request.user_id,
+      status: request.status,
+      project_id: request.project_id,
+      first_name: user.first_name,
+      last_name: user.last_name
+    };
+  });
+}
+
+function makeExpectedVacancies(
+  users,
+  user_id,
+  vacancies,
+  requests,
+  project_id
+) {
+  let projVacancies = vacancies.filter(
+    vacancy => vacancy.project_id === project_id
+  );
+
+  return projVacancies.map(vacancy => {
+    let user = users.filter(user => user.id === vacancy.user_id);
+
+    let request = requests.find(
+      request =>
+        request.vacancy_id === vacancy.id && request.user_id === user_id
+    ) || { status: null };
+
+    return {
+      id: vacancy.id,
+      project_id: vacancy.project_id,
+      request_status: request.status,
+      first_name: user ? user.first_name : null,
+      last_name: user ? user.last_name : null,
+      username: user ? user.username : null,
+      title: vacancy.title,
+      description: vacancy.description,
+      skills: vacancy.skills
+    };
+  });
+}
+
+function makeExpectedNotifications(user_id, notifications) {
+  let userNotifications = notifications.filter(
+    item => item.recipient_id === user_id
+  );
+
+  return userNotifications.map(notification => {
+    return {
+      id: notification.id,
+      recipient_id: notification.recipient_id,
+      project_id: notification.project_id,
+      type: notification.type,
+      seen: false,
+      date_created: '2029-01-22T16:28:32.615Z'
+    };
+  });
+}
+
+//get chat/:chat_id
+function makeExpectedMessages(chat_id, users, messages) {
+  let chatMessages = messages.filter(message => message.chat_id === chat_id);
+
+  return chatMessages.map(message => {
+    let user = users.find(user => user.id === message.author_id);
+    return {
+      id: message.id,
+      body: message.body,
+      chat_id: message.chat_id,
+      author: user.first_name,
+      author_id: message.author_id,
+      date_created: message.date_created
+    };
+  });
+}
+
+function makeExpectedChats(chats, user_id, users, projects, messages) {
+  //user_id for user who is GETting the chats
+  let userChats = chats.filter(
+    chat => chat.author_id === user_id || chat.recipient_id === user_id
+  );
+
+  return userChats.map(chat => {
+    let project = projects.filter(project => project.id === chat.project_id);
+    let message = messages.filter(message => message.chat_id === chat.id);
+    let recipient = users.find(user => user.id === message.recipient_id);
+    return {
+      author_id: chat.author_id,
+      body: message.body,
+      chat_id: chat.id,
+      closed: false,
+      date_created: message.date_created,
+      first_name: recipient.first_name,
+      last_name: recipient.last_name,
+      project_id: chat.project_id,
+      project_name: project.name,
+      recipient_id: chat.recipient_id
+    };
+  });
+}
+
 module.exports = {
   makeUsersArray,
   makeProjectsArray,
@@ -379,7 +497,12 @@ module.exports = {
 
   makeExpectedProjects,
   makeExpectedUserProjects,
+  makeExpectedVacancies,
+  makeExpectedRequests,
   makeExpectedPosts,
+  makeExpectedChats,
+  makeExpectedMessages,
+  makeExpectedNotifications,
 
   makeAuthHeader,
   makeFixtures,
