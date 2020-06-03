@@ -120,6 +120,11 @@ describe('Protected endpoints', () => {
       name: 'PATCH /api/users',
       path: '/api/users',
       method: supertest(app).patch
+    },
+    {
+      name: 'GET /api/users/profile',
+      path: '/api/users',
+      method: supertest(app).get
     }
   ];
 
