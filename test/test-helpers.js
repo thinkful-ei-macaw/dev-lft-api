@@ -1,6 +1,19 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+function makeExpectedProject(project) {
+  return {
+    id: project.id,
+    name: project.name,
+    description: project.description,
+    tags: project.tags,
+    live_url: project.live_url,
+    trello_url: project.trello_url,
+    github_url: project.github_url,
+    date_created: project.date_created.toISOString()
+  };
+}
+
 function makeUsersArray() {
   return [
     {
