@@ -365,8 +365,6 @@ function makeExpectedPosts(user, posts, project_id) {
   });
 }
 
-
-
 function makeExpectedRequests(users, requests, vacancies, project_id) {
   let projRequests = requests.filter(
     request => request.project_id === project_id
@@ -390,6 +388,28 @@ function makeExpectedRequests(users, requests, vacancies, project_id) {
   });
 }
 
+function makeExpectedVacancies(vacancies, requests, project_id) {
+  let projVacancies = vacancies.filter(
+    vacancy => vacancy.project_id === project_id
+  );
+
+  return projVacancies.map(vacancy => {
+    let request = requests.find(request => request.vacancy_id === vacancy.id)
+
+    return {
+      id: vacancy.id,
+      project_id: vacancy.project_id,
+      request_status: request.status,
+      first_name: null,
+      last_name: null,
+      username: null,
+      title: vacancy.title,
+      description: vacancy.description,
+      skills: vacancy.skills
+    };
+  });
+}
+
 module.exports = {
   makeUsersArray,
   makeProjectsArray,
@@ -404,6 +424,7 @@ module.exports = {
   makeExpectedUserProjects,
   makeExpectedPosts,
   makeExpectedRequests,
+  makeExpectedVacancies,
 
   makeAuthHeader,
   makeFixtures,
