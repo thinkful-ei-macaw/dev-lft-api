@@ -62,7 +62,6 @@ usersRouter.post('/', async (req, res, next) => {
     return res.status(201).json({
       authToken: AuthService.createJwt(sub, payload)
     });
-
   } catch (error) {
     next(error);
   }
@@ -80,7 +79,22 @@ usersRouter.get('/', async (req, res, next) => {
     return res.status(200).json({
       count: users.length
     });
+  } catch (error) {
+    next(error);
+  }
+});
 
+usersRouter.get('/profile', requireAuth, async (req, res, next) => {
+  try {
+    const db = req.app.get('db');
+    const user_id = req.user.id;
+    const userProfile = await UsersService.getItemWhere(db, { id: user_id });
+
+    if (!userProfile) {
+      return res.status(404).json({ error: `Could not find user profile.` });
+    }
+
+    return res.status(200).json(UsersService.serializeUser(userProfile));
   } catch (error) {
     next(error);
   }
@@ -108,7 +122,6 @@ usersRouter.get('/:username', requireAuth, async (req, res, next) => {
 
     // send 'em the user otherwise
     return res.status(200).json(UsersService.serializeUser(user));
-
   } catch (error) {
     next(error);
   }
@@ -151,9 +164,8 @@ usersRouter.patch('/', requireAuth, async (req, res, next) => {
       });
 
     // update the user
-    await UsersService.updateItem(db, user_id, updatedUser)
+    await UsersService.updateItem(db, user_id, updatedUser);
     return res.status(204).end();
-
   } catch (error) {
     next(error);
   }
