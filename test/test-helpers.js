@@ -192,25 +192,29 @@ function makeNotificationsArray(users, projects) {
       id: 1,
       recipient_id: users[0].id,
       project_id: projects[0].id,
-      type: 'join'
+      type: 'join',
+      date_created: '2029-01-22T16:28:32.615Z'
     },
     {
       id: 2,
       recipient_id: users[1].id,
       project_id: projects[1].id,
-      type: 'leave'
+      type: 'leave',
+      date_created: '2029-01-22T16:28:32.615Z'
     },
     {
       id: 3,
       recipient_id: users[2].id,
       project_id: projects[2].id,
-      type: 'post'
+      type: 'post',
+      date_created: '2029-01-22T16:28:32.615Z'
     },
     {
       id: 4,
       recipient_id: users[0].id,
       project_id: projects[2].id,
-      type: 'chat'
+      type: 'chat',
+      date_created: '2029-01-22T16:28:32.615Z'
     }
   ];
 }
@@ -391,15 +395,24 @@ function makeExpectedRequests(users, requests, vacancies, project_id) {
   });
 }
 
-function makeExpectedVacancies(users, user_id, vacancies, requests, project_id) {
+function makeExpectedVacancies(
+  users,
+  user_id,
+  vacancies,
+  requests,
+  project_id
+) {
   let projVacancies = vacancies.filter(
     vacancy => vacancy.project_id === project_id
   );
 
   return projVacancies.map(vacancy => {
-    let request = requests.find(request => request.vacancy_id === vacancy.id && request.user_id === user_id) || {status: null}
-  
-    let user = users.filter(user => user.id === vacancy.user_id)
+    let request = requests.find(
+      request =>
+        request.vacancy_id === vacancy.id && request.user_id === user_id
+    ) || { status: null };
+
+    let user = users.filter(user => user.id === vacancy.user_id);
 
     return {
       id: vacancy.id,
@@ -411,6 +424,23 @@ function makeExpectedVacancies(users, user_id, vacancies, requests, project_id) 
       title: vacancy.title,
       description: vacancy.description,
       skills: vacancy.skills
+    };
+  });
+}
+
+function makeExpectedNotifications(user_id, notifications) {
+  let userNotifications = notifications.filter(
+    item => item.recipient_id === user_id
+  );
+
+  return userNotifications.map(notification => {
+    return {
+      id: notification.id,
+      recipient_id: notification.recipient_id,
+      project_id: notification.project_id,
+      type: notification.type,
+      seen: false,
+      date_created: '2029-01-22T16:28:32.615Z'
     };
   });
 }
@@ -427,9 +457,10 @@ module.exports = {
 
   makeExpectedProjects,
   makeExpectedUserProjects,
-  makeExpectedPosts,
-  makeExpectedRequests,
   makeExpectedVacancies,
+  makeExpectedRequests,
+  makeExpectedPosts,
+  makeExpectedNotifications,
 
   makeAuthHeader,
   makeFixtures,
