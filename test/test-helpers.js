@@ -65,24 +65,27 @@ function makeProjectsArray(users) {
   ];
 }
 
-function makeVacanciesArray(projects) {
+function makeVacanciesArray(users, projects) {
   return [
     {
       id: 1,
       project_id: projects[0].id,
       title: 'Test vacancy 1',
+      user_id: null,
       description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
     },
     {
       id: 2,
       project_id: projects[1].id,
       title: 'Test vacancy 2',
+      user_id: null,
       description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
     },
     {
       id: 3,
       project_id: projects[2].id,
       title: 'Test vacancy 3',
+      user_id: users[2].id,
       description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
     }
   ];
@@ -388,21 +391,23 @@ function makeExpectedRequests(users, requests, vacancies, project_id) {
   });
 }
 
-function makeExpectedVacancies(vacancies, requests, project_id) {
+function makeExpectedVacancies(users, user_id, vacancies, requests, project_id) {
   let projVacancies = vacancies.filter(
     vacancy => vacancy.project_id === project_id
   );
 
   return projVacancies.map(vacancy => {
-    let request = requests.find(request => request.vacancy_id === vacancy.id)
+    let request = requests.find(request => request.vacancy_id === vacancy.id && request.user_id === user_id) || {status: null}
+  
+    let user = users.filter(user => user.id === vacancy.user_id)
 
     return {
       id: vacancy.id,
       project_id: vacancy.project_id,
       request_status: request.status,
-      first_name: null,
-      last_name: null,
-      username: null,
+      first_name: user ? user.first_name : null,
+      last_name: user ? user.last_name : null,
+      username: user ? user.username : null,
       title: vacancy.title,
       description: vacancy.description,
       skills: vacancy.skills
