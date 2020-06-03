@@ -23,7 +23,7 @@ describe('Auth Endpoints', function () {
   const users = makeUsersArray();
   const testUser = users[0];
 
-  describe.only('POST /api/auth/login', () => {
+  describe('POST /api/auth/login', () => {
     this.beforeEach('insert users', () => {
       return seedUsers(db, users);
     });
