@@ -58,8 +58,62 @@ describe.only('Vacancies Endpoints', () => {
       );
 
       return supertest(app)
-      .get(`/api/vacancies/${testProject.id}`)
+        .get(`/api/vacancies/${testProject.id}`)
+        .set('Authorization', helpers.makeAuthHeader(testUser))
+        .expect(200, expectedVacancies);
+    });
+  });
+
+  describe('POST /api/vacancies/:project_id', () => {
+    beforeEach('insert data', () => {
+      return helpers.seedProjectsTables(
+        db,
+        testUsers,
+        testProjects,
+        testVacancies,
+        testRequests,
+        testPosts,
+        testChats,
+        testMessages,
+        testNotifications
+      );
+    });
+
+    it('creates a vacancy, responding with 201 and the vacancy', () => {
+      const testProject = testProjects[0];
+      const testUser = testUsers[0];
+      const newVacancy = { 
+        user_id: testUser.id,
+        title: 'test new vacancy',
+        description: 'test new desc',
+        skills: [],
+      }
+
+      return supertest(app)
+      .post(`/api/vacancies/${testProject.id}`)
       .set('Authorization', helpers.makeAuthHeader(testUser))
-      .expect(200, expectedVacancies);    });
+      .send(newVacancy)
+      .expect(201)
+      .expect(res => {
+        expect(res.body).to.have.property('id');
+        expect(res.body.title).to.eql(newVacancy.title)
+        expect(res.body.description).to.eql(newVacancy.description)
+        expect(res.body.skills).to.eql(newVacancy.skills)
+        expect(res.body.project_id).to.eql(testProject.id)
+      })
+      .expect(res => {
+        db  
+          .from('vacancies')
+          .select('*')
+          .where({ id: res.body.id })
+          .first()
+          .then(row => {
+            expect(row.title).to.eql(newVacancy.title);
+            expect(row.project_id).to.eql(testProject.id);
+            expect(row.description).to.eql(newVacancy.description);
+            expect(row.skills).to.eql(newVacancy.skills);
+          })
+      })
+    })
   });
 });
