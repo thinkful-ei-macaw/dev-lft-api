@@ -94,14 +94,12 @@ const ProjectsService = {
       name: project.name,
       description: xss(project.description),
       tags: project.tags,
+      userRole: project.userRole,
       live_url: project.live_url,
       trello_url: project.trello_url,
       github_url: project.github_url,
       date_created: project.date_created
     };
-    if (project.isOwner !== undefined) {
-      serialized.isOwner = project.isOwner;
-    }
     return serialized;
   }
 };
