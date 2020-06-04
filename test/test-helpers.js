@@ -364,10 +364,10 @@ function makeExpectedPosts(user, posts, project_id) {
     return {
       id: post.id,
       message: post.message,
+      date_created: post.date_created,
       first_name: user.first_name,
       last_name: user.last_name,
-      canEdit: post.user_id === user.id,
-      date_created: post.date_created
+      canEdit: post.user_id === user.id
     };
   });
 }
