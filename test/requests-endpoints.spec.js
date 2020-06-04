@@ -5,21 +5,19 @@ const helpers = require('./test-helpers');
 describe.only('Requests endpoints', () => {
   let db;
 
-  function seedBeforeEach() {
-    beforeEach('insert data', () => {
-      return helpers.seedProjectsTables(
-        db,
-        testUsers,
-        testProjects,
-        testVacancies,
-        testRequests,
-        testPosts,
-        testChats,
-        testMessages,
-        testNotifications
-      );
-    });
-  }
+  beforeEach('insert data', () => {
+    return helpers.seedProjectsTables(
+      db,
+      testUsers,
+      testProjects,
+      testVacancies,
+      testRequests,
+      testPosts,
+      testChats,
+      testMessages,
+      testNotifications
+    );
+  });
 
   let {
     testUsers,
@@ -47,7 +45,6 @@ describe.only('Requests endpoints', () => {
   afterEach('cleanup', () => helpers.cleanTables(db));
 
   describe('GET /api/requests/:project_id', () => {
-    seedBeforeEach();
     it('responds with 200 and the requests', () => {
       const testVacancy = testVacancies[0];
       const testProject = testProjects[0];
@@ -80,8 +77,6 @@ describe.only('Requests endpoints', () => {
   });
 
   describe('POST /api/requests/vacancy_id', () => {
-    seedBeforeEach();
-
     it('creates a request, responding with 201 and the request', () => {
       let testUser = testUsers[3];
       let testVacancy = testVacancies[0];
@@ -107,6 +102,77 @@ describe.only('Requests endpoints', () => {
         .set('Authorization', helpers.makeAuthHeader(testUser))
         .expect(400, {
           error: `Request for same vacancy by this user already exists`
+        });
+    });
+  });
+
+  describe('PATCH /api/requests/:request_id', () => {
+    it('responds with 204 and updates the request', () => {
+      const testUser = testUsers[0];
+      const testVacancy = testVacancies[0];
+
+      const updatedRequest = {
+        status: 'approved'
+      };
+
+      let testRequest = helpers.makeExpectedRequests(
+        testUsers,
+        testRequests,
+        testVacancies,
+        testVacancy.id
+      );
+
+      return supertest(app)
+        .patch(`/api/requests/${testRequest[0].id}`)
+        .set('Authorization', helpers.makeAuthHeader(testUser))
+        .send(updatedRequest)
+        .expect(204);
+    });
+
+    it('responds with 400 and error message if status is missing', () => {
+      const testUser = testUsers[0];
+      const testVacancy = testVacancies[0];
+      const updatedRequest = {};
+
+      return supertest(app)
+        .patch(`/api/requests/${testVacancy.id}`)
+        .set('Authorization', helpers.makeAuthHeader(testUser))
+        .send(updatedRequest)
+        .expect(400, {
+          error: 'Request body must contain status'
+        });
+    });
+
+    it('responds with 400 and error message if status is invalid', () => {
+      const testUser = testUsers[0];
+      const testVacancy = testVacancies[0];
+      const updatedRequest = {
+        status: 'invalid'
+      };
+
+      return supertest(app)
+        .patch(`/api/requests/${testVacancy.id}`)
+        .set('Authorization', helpers.makeAuthHeader(testUser))
+        .send(updatedRequest)
+        .expect(400, {
+          error: `Status must be either 'approved' or 'denied'`
+        });
+    });
+
+    it('responds with 404 and error message if id is invalid', () => {
+      const testUser = testUsers[0];
+
+      const updatedRequest = {
+        status: 'approved'
+      };
+      const idToUpdate = 234;
+
+      return supertest(app)
+        .patch(`/api/requests/${idToUpdate}`)
+        .set('Authorization', helpers.makeAuthHeader(testUser))
+        .send(updatedRequest)
+        .expect(404, {
+          error: 'Request not found'
         });
     });
   });
