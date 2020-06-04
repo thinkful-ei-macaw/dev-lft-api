@@ -79,6 +79,35 @@ describe.only('Requests endpoints', () => {
     });
   });
 
+  describe('POST /api/requests/vacancy_id', () => {
+    seedBeforeEach();
 
-  
+    it('creates a request, responding with 201 and the request', () => {
+      let testUser = testUsers[3];
+      let testVacancy = testVacancies[0];
+
+      return supertest(app)
+        .post(`/api/requests/${testVacancy.id}`)
+        .set('Authorization', helpers.makeAuthHeader(testUser))
+        .expect(201)
+        .expect(res => {
+          expect(res.body).to.have.property('id');
+          expect(res.body.vacancy_id).to.eql(testVacancy.id);
+          expect(res.body.user_id).to.eql(testUser.id);
+          expect(res.body.status).to.eql('pending');
+        });
+    });
+
+    it('reponds with 400 and error message if request already exists', () => {
+      const testUser = testUsers[1];
+      const testVacancy = testVacancies[1];
+
+      return supertest(app)
+        .post(`/api/requests/${testVacancy.id}`)
+        .set('Authorization', helpers.makeAuthHeader(testUser))
+        .expect(400, {
+          error: `Request for same vacancy by this user already exists`
+        });
+    });
+  });
 });
