@@ -4,6 +4,21 @@ const helpers = require('./test-helpers');
 
 describe('Posts Endpoints', () => {
   let db;
+  function seedBeforeEach() {
+    beforeEach('insert data', () => {
+      return helpers.seedProjectsTables(
+        db,
+        testUsers,
+        testProjects,
+        testVacancies,
+        testRequests,
+        testPosts,
+        testChats,
+        testMessages,
+        testNotifications
+      );
+    });
+  }
 
   let {
     testUsers,
@@ -31,19 +46,7 @@ describe('Posts Endpoints', () => {
   afterEach('cleanup', () => helpers.cleanTables(db));
 
   describe('GET /api/posts/:project_id', () => {
-    beforeEach('insert data', () => {
-      return helpers.seedProjectsTables(
-        db,
-        testUsers,
-        testProjects,
-        testVacancies,
-        testRequests,
-        testPosts,
-        testChats,
-        testMessages,
-        testNotifications
-      );
-    });
+    seedBeforeEach();
 
     it('responds with 200 and the posts', () => {
       const testProject = testProjects[0];
@@ -61,19 +64,7 @@ describe('Posts Endpoints', () => {
   });
 
   describe(`POST /api/posts/:project_id`, () => {
-    beforeEach('insert data', () => {
-      return helpers.seedProjectsTables(
-        db,
-        testUsers,
-        testProjects,
-        testVacancies,
-        testRequests,
-        testPosts,
-        testChats,
-        testMessages,
-        testNotifications
-      );
-    });
+    seedBeforeEach();
 
     it('creates a post, responding with 201 and the post', () => {
       const testProject = testProjects[0];
@@ -125,19 +116,7 @@ describe('Posts Endpoints', () => {
   });
 
   describe('PATCH /api/posts/:post_id', () => {
-    beforeEach('insert data', () => {
-      return helpers.seedProjectsTables(
-        db,
-        testUsers,
-        testProjects,
-        testVacancies,
-        testRequests,
-        testPosts,
-        testChats,
-        testMessages,
-        testNotifications
-      );
-    });
+    seedBeforeEach();
 
     it('responds with 204 and updates the post', () => {
       const testUser = testUsers[0];

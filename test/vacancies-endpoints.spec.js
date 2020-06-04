@@ -2,7 +2,7 @@ const knex = require('knex');
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
-describe.only('Vacancies Endpoints', () => {
+describe('Vacancies Endpoints', () => {
   let db;
 
   let {
@@ -137,21 +137,12 @@ describe.only('Vacancies Endpoints', () => {
 
     it('responds with 204 and updates the vacancy', () => {
       const testUser = testUsers[2];
-      const testProject = testProjects[0];
       const idToUpdate = testVacancies[0].id;
       const updatedVacancy = {
         title: 'updated title',
         description: 'updated description',
         user_id: testUser.id
       };
-
-      let testVacancy = helpers.makeExpectedVacancies(
-        testUsers,
-        testUser.id,
-        testVacancies,
-        testRequests,
-        testProject.id
-      );
 
       return supertest(app)
         .patch(`/api/vacancies/${idToUpdate}`)
@@ -195,13 +186,37 @@ describe.only('Vacancies Endpoints', () => {
   });
 
   describe('DELETE /api/vacancies/vacancy_id', () => {
-    seedBeforeEach()
+    seedBeforeEach();
 
     it('responds with 204 and deletes the vacancy', () => {
       const idToDelete = testVacancies[0].id;
+      const testUser = testUsers[0];
+      const testProject = testProjects[0];
+      const expectedVacancies = testVacancies.filter(
+        vacancy => vacancy.id !== idToDelete && vacancy.project_id === testProject.id
+      );
+      return supertest(app)
+        .delete(`/api/vacancies/${idToDelete}`)
+        .set('Authorization', helpers.makeAuthHeader(testUser))
+        .expect(204)
+        .then(res =>
+          supertest(app)
+            .get(`/api/vacancies/${testProject.id}`)
+            .set('Authorization', helpers.makeAuthHeader(testUser))
+            .expect(expectedVacancies)
+        );
+    });
 
-      
+    it('responds with 404 and an error message if the id is invalid', () => {
+      const idToDelete = 1344
+      const testUser = testUsers[0];
+
+      return supertest(app)
+        .delete(`/api/vacancies/${idToDelete}`)
+        .set('Authorization', helpers.makeAuthHeader(testUser))
+        .expect(404, {
+          error: 'Vacancy does not exist'
+        });
     })
-  })
-  
+  });
 });
