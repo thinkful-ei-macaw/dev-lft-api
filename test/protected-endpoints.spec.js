@@ -123,7 +123,7 @@ describe('Protected endpoints', () => {
     },
     {
       name: 'GET /api/users/profile',
-      path: '/api/users',
+      path: '/api/users/profile',
       method: supertest(app).get
     }
   ];

@@ -1,5 +1,6 @@
 const express = require('express');
 const ProjectsService = require('./projects-service');
+const VacanciesService = require('../vacancies/vacancies-service');
 const { requireAuth } = require('../middleware/jwt-auth');
 
 const projectsRouter = express.Router();
@@ -112,7 +113,18 @@ projectsRouter
 
       /* Set property on project response that lets client know 
       if the user is the owner of this project */
-      project.isOwner = user_id === project.creator_id;
+      const vacancy = await VacanciesService.findFilledVacancy(
+        req.app.get('db'),
+        project_id,
+        user_id
+      );
+      if (user_id === project.creator_id) {
+        project.userRole = 'owner';
+      } else if (vacancy.length) {
+        project.userRole = 'member';
+      } else {
+        project.userRole = 'user';
+      }
 
       res.status(200).json(ProjectsService.serializeProject(project));
     } catch (e) {

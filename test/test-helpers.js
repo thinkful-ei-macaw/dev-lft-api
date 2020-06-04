@@ -169,19 +169,22 @@ function makeMessagesArray(users, chats) {
       id: 1,
       chat_id: chats[0].id,
       author_id: users[0].id,
-      body: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
+      body: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.',
+      date_created: '2029-01-22T16:28:32.615Z'
     },
     {
       id: 2,
       chat_id: chats[1].id,
       author_id: users[1].id,
-      body: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
+      body: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.',
+      date_created: '2029-01-22T16:28:32.615Z'
     },
     {
       id: 3,
       chat_id: chats[2].id,
       author_id: users[2].id,
-      body: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
+      body: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.',
+      date_created: '2029-01-22T16:28:32.615Z'
     }
   ];
 }
@@ -442,7 +445,7 @@ function makeExpectedNotifications(user_id, notifications) {
 }
 
 //get chat/:chat_id
-function makeExpectedMessages(chat_id, users, messages) {
+function makeExpectedMessages(chat_id, user_id, users, messages) {
   let chatMessages = messages.filter(message => message.chat_id === chat_id);
 
   return chatMessages.map(message => {
@@ -450,7 +453,7 @@ function makeExpectedMessages(chat_id, users, messages) {
     return {
       id: message.id,
       body: message.body,
-      chat_id: message.chat_id,
+      isAuthor: messages.author_id !== user_id,
       author: user.first_name,
       author_id: message.author_id,
       date_created: message.date_created
@@ -465,9 +468,9 @@ function makeExpectedChats(chats, user_id, users, projects, messages) {
   );
 
   return userChats.map(chat => {
-    let project = projects.filter(project => project.id === chat.project_id);
-    let message = messages.filter(message => message.chat_id === chat.id);
-    let recipient = users.find(user => user.id === message.recipient_id);
+    let project = projects.find(project => project.id === chat.project_id);
+    let message = messages.find(message => message.chat_id === chat.id);
+    let recipient = users.find(user => user.id === chat.recipient_id);
     return {
       author_id: chat.author_id,
       body: message.body,
