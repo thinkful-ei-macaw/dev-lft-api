@@ -32,7 +32,7 @@ describe.only('Projects Endpoints', function () {
 
   // GET /api/projects endpoint test
 
-  describe.only(`GET /api/projects`, () => {
+  describe(`GET /api/projects`, () => {
     context(`Given no projects`, () => {
       it(`responds with 200 and an empty list`, () => {
         return supertest(app).get('/api/projects').expect(200, []);
@@ -54,16 +54,11 @@ describe.only('Projects Endpoints', function () {
         )
       );
 
-      it('responds with 200 and all of the projects', () => {
-        const testUser = testUsers[0];
-        const user_id = testUser.id;
-        const expectedProjects = helpers.makeExpectedProjects(
-          user_id,
-          testProjects
-        );
+      it.only('responds with 200 and all of the projects', () => {
+        const expectedProjects = helpers.makeExpectedProjects(testProjects);
         return supertest(app)
           .get('/api/projects')
-          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .set('Authorization', helpers.makeAuthHeader(testUsers[2]))
           .expect(200, expectedProjects);
       });
     });
@@ -114,6 +109,7 @@ describe.only('Projects Endpoints', function () {
         const project_id = 12345;
         return supertest(app)
           .get(`/api/projects/${project_id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUsers[2]))
           .expect(404, { error: `Project doesn't exist` });
       });
     });
@@ -138,6 +134,7 @@ describe.only('Projects Endpoints', function () {
         const expectedProjects = helpers.makeExpectedProjects(testProjects);
         return supertest(app)
           .get(`/api/projects/${project_id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUsers[2]))
           .expect(200, expectedProjects[0]);
       });
     });
@@ -165,6 +162,7 @@ describe.only('Projects Endpoints', function () {
         const testProject = testProjects[0];
         return supertest(app)
           .post('/api/projects')
+          .set('Authorization', helpers.makeAuthHeader(testUsers[2]))
           .send(testProject)
           .expect(201)
           .expect(res => {
@@ -238,6 +236,7 @@ describe.only('Projects Endpoints', function () {
         const project_id = 12345;
         return supertest(app)
           .get(`/api/projects/${project_id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUsers[2]))
           .expect(404, { error: `Project doesn't exist` });
       });
     });
@@ -264,6 +263,7 @@ describe.only('Projects Endpoints', function () {
         );
         return supertest(app)
           .delete(`/projects/${idToRemove}`)
+          .set('Authorization', helpers.makeAuthHeader(testUsers[2]))
           .expect(204)
           .then(res =>
             supertest(app).get(`/projects`).expect(expectedProjects)
