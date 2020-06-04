@@ -378,11 +378,10 @@ function makeExpectedPosts(user, posts, project_id) {
   });
 }
 
-function makeExpectedRequests(users, requests, vacancies, project_id) {
+function makeExpectedRequests(users, requests, vacancies, vacancy_id) {
   let projRequests = requests.filter(
-    request => request.project_id === project_id
+    request => request.vacancy_id === vacancy_id
   );
-
   return projRequests.map(request => {
     let vacancy = vacancies.find(vacancy => vacancy.id === request.vacancy_id);
     let user = users.find(user => user.id === request.user_id);
@@ -393,7 +392,7 @@ function makeExpectedRequests(users, requests, vacancies, project_id) {
       vacancy_title: vacancy.title,
       user_id: request.user_id,
       status: request.status,
-      project_id: request.project_id,
+      project_id: vacancy.project_id,
       first_name: user.first_name,
       last_name: user.last_name
     };
