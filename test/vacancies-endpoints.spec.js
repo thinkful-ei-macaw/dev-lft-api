@@ -16,21 +16,19 @@ describe('Vacancies Endpoints', () => {
     testNotifications
   } = helpers.makeFixtures();
 
-  function seedBeforeEach() {
-    beforeEach('insert data', () => {
-      return helpers.seedProjectsTables(
-        db,
-        testUsers,
-        testProjects,
-        testVacancies,
-        testRequests,
-        testPosts,
-        testChats,
-        testMessages,
-        testNotifications
-      );
-    });
-  }
+  beforeEach('insert data', () => {
+    return helpers.seedProjectsTables(
+      db,
+      testUsers,
+      testProjects,
+      testVacancies,
+      testRequests,
+      testPosts,
+      testChats,
+      testMessages,
+      testNotifications
+    );
+  });
 
   before('make knex instance', () => {
     db = knex({
@@ -47,8 +45,6 @@ describe('Vacancies Endpoints', () => {
   afterEach('cleanup', () => helpers.cleanTables(db));
 
   describe('GET /api/vacancies/:project_id', () => {
-    seedBeforeEach();
-
     it('responds with 200 and the vacancies', () => {
       const testProject = testProjects[0];
       const testUser = testUsers[0];
@@ -69,8 +65,6 @@ describe('Vacancies Endpoints', () => {
   });
 
   describe('POST /api/vacancies/:project_id', () => {
-    seedBeforeEach();
-
     it('creates a vacancy, responding with 201 and the vacancy', () => {
       const testProject = testProjects[0];
       const testUser = testUsers[0];
@@ -132,8 +126,6 @@ describe('Vacancies Endpoints', () => {
     });
   });
   describe('PATCH /api/vacancies/:vacancy_id', () => {
-    seedBeforeEach();
-
     it('responds with 204 and updates the vacancy', () => {
       const testUser = testUsers[2];
       const idToUpdate = testVacancies[0].id;
@@ -185,14 +177,13 @@ describe('Vacancies Endpoints', () => {
   });
 
   describe('DELETE /api/vacancies/vacancy_id', () => {
-    seedBeforeEach();
-
     it('responds with 204 and deletes the vacancy', () => {
       const idToDelete = testVacancies[0].id;
       const testUser = testUsers[0];
       const testProject = testProjects[0];
       const expectedVacancies = testVacancies.filter(
-        vacancy => vacancy.id !== idToDelete && vacancy.project_id === testProject.id
+        vacancy =>
+          vacancy.id !== idToDelete && vacancy.project_id === testProject.id
       );
       return supertest(app)
         .delete(`/api/vacancies/${idToDelete}`)
@@ -207,7 +198,7 @@ describe('Vacancies Endpoints', () => {
     });
 
     it('responds with 404 and an error message if the id is invalid', () => {
-      const idToDelete = 1344
+      const idToDelete = 1344;
       const testUser = testUsers[0];
 
       return supertest(app)
@@ -216,6 +207,6 @@ describe('Vacancies Endpoints', () => {
         .expect(404, {
           error: 'Vacancy does not exist'
         });
-    })
+    });
   });
 });
