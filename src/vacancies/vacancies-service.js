@@ -30,6 +30,21 @@ class VacancyService extends Service {
       .then(result => result.rows);
   }
 
+  // Helps us find out if a user is part of the project
+  findFilledVacancy(db, project_id, user_id) {
+    return db
+      .raw(
+        `
+      SELECT * FROM vacancies v
+      WHERE project_id = ?
+      AND user_id = ?
+      LIMIT 1
+    `,
+        [project_id, user_id]
+      )
+      .then(result => result.rows);
+  }
+
   serializeVacancy(vacancy) {
     return {
       id: vacancy.id,
