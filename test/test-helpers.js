@@ -317,22 +317,23 @@ function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
   return `Bearer ${token}`;
 }
 
-function makeExpectedProjects(projects) {
+function makeExpectedProjects(user_id, projects) {
   return projects.map(project => {
-    // if (project.creator_id === user_id) {
-    //   project.isOwner = true;
-    // } else {
-    //   project.isOwner = false;
-    // }
+    if (project.creator_id === user_id) {
+      project.isOwner = true;
+    } else {
+      project.isOwner = false;
+    }
 
     return {
       id: project.id,
       name: project.name,
       description: project.description,
-      tags: project.tags,
-      live_url: project.live_url,
-      trello_url: project.trello_url,
-      github_url: project.github_url,
+      isOwner: project.isOwner,
+      tags: project.tags || null,
+      live_url: project.live_url || null,
+      trello_url: project.trello_url || null,
+      github_url: project.github_url || null,
       date_created: project.date_created
     };
   });

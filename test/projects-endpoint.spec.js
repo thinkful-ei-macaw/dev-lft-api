@@ -2,7 +2,7 @@ const knex = require('knex');
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
-describe('Projects Endpoints', function () {
+describe.only('Projects Endpoints', function () {
   let db;
 
   const {
@@ -32,7 +32,7 @@ describe('Projects Endpoints', function () {
 
   // GET /api/projects endpoint test
 
-  describe(`GET /api/projects`, () => {
+  describe.only(`GET /api/projects`, () => {
     context(`Given no projects`, () => {
       it(`responds with 200 and an empty list`, () => {
         return supertest(app).get('/api/projects').expect(200, []);
@@ -55,9 +55,15 @@ describe('Projects Endpoints', function () {
       );
 
       it('responds with 200 and all of the projects', () => {
-        const expectedProjects = helpers.makeExpectedProjects(testProjects);
+        const testUser = testUsers[0];
+        const user_id = testUser.id;
+        const expectedProjects = helpers.makeExpectedProjects(
+          user_id,
+          testProjects
+        );
         return supertest(app)
           .get('/api/projects')
+          .set('Authorization', helpers.makeAuthHeader(testUser))
           .expect(200, expectedProjects);
       });
     });
@@ -94,6 +100,7 @@ describe('Projects Endpoints', function () {
         );
         return supertest(app)
           .get('/api/projects/user')
+          .set('Authorization', helpers.makeAuthHeader(testUsers[2]))
           .expect(200, expectedUserProjects);
       });
     });
@@ -101,7 +108,7 @@ describe('Projects Endpoints', function () {
 
   // api/projects/:project_id endpoint test
 
-  describe.only(`GET /api/projects/project_id`, () => {
+  describe(`GET /api/projects/project_id`, () => {
     context(`Given no projects`, () => {
       it(`responds with 404`, () => {
         const project_id = 12345;
@@ -157,7 +164,7 @@ describe('Projects Endpoints', function () {
       it('creates a project, responding with 201 and the new project', () => {
         const testProject = testProjects[0];
         return supertest(app)
-          .get('/api/projects')
+          .post('/api/projects')
           .send(testProject)
           .expect(201)
           .expect(res => {
@@ -201,13 +208,7 @@ describe('Projects Endpoints', function () {
 
   // PATCH api/projects/:project_id endpoint test
 
-  describe(`GET /api/projects`, () => {
-    context(`Given no projects`, () => {
-      it(`responds with 200 and an empty list`, () => {
-        return supertest(app).get('/api/projects').expect(200, []);
-      });
-    });
-
+  describe(`PATCH /api/projects/:project_id`, () => {
     context('Given there are projects in the database', () => {
       beforeEach('insert projects', () =>
         helpers.seedProjectsTables(
@@ -223,21 +224,21 @@ describe('Projects Endpoints', function () {
         )
       );
 
-      it('responds with 200 and all of the projects', () => {
-        const expectedProjects = helpers.makeExpectedProjects(testProjects);
-        return supertest(app)
-          .get('/api/projects')
-          .expect(200, expectedProjects);
+      it('responds with 204', () => {
+        // no idea yet
       });
     });
   });
 
   // DELETE api/projects/:project_id endpoint test
 
-  describe(`GET /api/projects`, () => {
+  describe(`DELETE /api/projects/:project_id`, () => {
     context(`Given no projects`, () => {
-      it(`responds with 200 and an empty list`, () => {
-        return supertest(app).get('/api/projects').expect(200, []);
+      it(`responds with 404`, () => {
+        const project_id = 12345;
+        return supertest(app)
+          .get(`/api/projects/${project_id}`)
+          .expect(404, { error: `Project doesn't exist` });
       });
     });
 
@@ -256,11 +257,17 @@ describe('Projects Endpoints', function () {
         )
       );
 
-      it('responds with 200 and all of the projects', () => {
-        const expectedProjects = helpers.makeExpectedProjects(testProjects);
+      it('responds with 204 and removes the article', () => {
+        const idToRemove = 2;
+        const expectedProjects = testProjects.filter(
+          project => project.id !== idToRemove
+        );
         return supertest(app)
-          .get('/api/projects')
-          .expect(200, expectedProjects);
+          .delete(`/projects/${idToRemove}`)
+          .expect(204)
+          .then(res =>
+            supertest(app).get(`/projects`).expect(expectedProjects)
+          );
       });
     });
   });
