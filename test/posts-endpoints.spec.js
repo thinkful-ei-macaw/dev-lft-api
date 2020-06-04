@@ -142,7 +142,7 @@ describe('Posts Endpoints', () => {
         .set('Authorization', helpers.makeAuthHeader(testUser))
         .send(updatedPost)
         .expect(204)
-        .then(res =>
+        .then(() =>
           supertest(app)
             .get(`/api/posts/${idToUpdate}`)
             .set('Authorization', helpers.makeAuthHeader(testUser))

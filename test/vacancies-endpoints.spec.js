@@ -131,7 +131,6 @@ describe('Vacancies Endpoints', () => {
       });
     });
   });
-
   describe('PATCH /api/vacancies/:vacancy_id', () => {
     seedBeforeEach();
 
@@ -199,7 +198,7 @@ describe('Vacancies Endpoints', () => {
         .delete(`/api/vacancies/${idToDelete}`)
         .set('Authorization', helpers.makeAuthHeader(testUser))
         .expect(204)
-        .then(res =>
+        .then(() =>
           supertest(app)
             .get(`/api/vacancies/${testProject.id}`)
             .set('Authorization', helpers.makeAuthHeader(testUser))
