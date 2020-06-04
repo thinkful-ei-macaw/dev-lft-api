@@ -48,25 +48,6 @@ describe('Auth Endpoints', function () {
       });
     });
 
-    it(`responds 400 'invalid username or password' when bad username`, () => {
-      const userInvalidUser = { username: 'user-not', password: 'existy' };
-      return supertest(app)
-        .post('/api/auth/login')
-        .send(userInvalidUser)
-        .expect(400, { error: `Incorrect username or password` });
-    });
-
-    it(`responds 400 'invalid username or password' when bad password`, () => {
-      const userInvalidPass = {
-        username: testUser.username,
-        password: 'incorrect'
-      };
-      return supertest(app)
-        .post('/api/auth/login')
-        .send(userInvalidPass)
-        .expect(400, { error: `Incorrect username or password` });
-    });
-
     it(`responds 200 and JWT auth token using secret when valid credentials`, () => {
       const userValidCreds = {
         username: users[0].username,
