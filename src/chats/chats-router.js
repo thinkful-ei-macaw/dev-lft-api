@@ -13,11 +13,15 @@ chatsRouter
     const author_id = req.user.id;
     const { recipient_id, project_id, body } = req.body;
 
-    for (const value of [recipient_id, project_id, body]) {
+    for (const [key, value] of Object.entries({
+      recipient_id,
+      project_id,
+      body
+    })) {
       if (!value) {
         return res
           .status(400)
-          .json({ error: `Missing ${value} in request body` });
+          .json({ error: `Missing ${key} in request body` });
       }
     }
 
