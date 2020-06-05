@@ -350,8 +350,7 @@ function makeMaliciousProject(user) {
     id: 555,
     name: 'Malicious name <script>alert("xss");</script>',
     creator_id: user.id,
-    description:
-      'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus consequuntur deserunt commodi, nobis qui inventore corrupti iusto aliquid debitis unde non.Adipisci, pariatur.Molestiae, libero esse hic adipisci autem neque ?',
+    description: `Bad image <img src="https://url.to.file.which/does-not.exist" onerror="alert(document.cookie);">. But not <strong>all</strong> bad.`,
     date_created: new Date()
   };
 }
