@@ -145,7 +145,7 @@ describe.only('Projects Endpoints', function () {
           testVacancies
         );
         const expectedProject = projects[0];
-        expectedProject.isOwner = false;
+        expectedProject.userRole = 'user';
 
         return supertest(app)
           .get(`/api/projects/${project_id}`)
@@ -215,7 +215,7 @@ describe.only('Projects Endpoints', function () {
 
   // PATCH api/projects/:project_id endpoint test
 
-  describe.only(`PATCH /api/projects/:project_id`, () => {
+  describe(`PATCH /api/projects/:project_id`, () => {
     context('Given there are projects in the database', () => {
       beforeEach('insert projects', () =>
         helpers.seedProjectsTables(
@@ -232,7 +232,7 @@ describe.only('Projects Endpoints', function () {
       );
 
       it('responds with 204 and updates the project', () => {
-        const testUser = testUsers[2];
+        const testUser = testUsers[0];
         const idToUpdate = testProjects[0].id;
         const updatedProject = {
           name: 'test update project name',
@@ -245,6 +245,7 @@ describe.only('Projects Endpoints', function () {
         const expectedProject = testProject;
         expectedProject.name = updatedProject.name;
         expectedProject.description = updatedProject.description;
+        expectedProject.userRole = 'owner';
 
         return supertest(app)
           .patch(`/api/projects/${idToUpdate}`)
@@ -263,13 +264,13 @@ describe.only('Projects Endpoints', function () {
   // DELETE api/projects/:project_id endpoint test
 
   describe(`DELETE /api/projects/:project_id`, () => {
-    beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
     context(`Given no projects`, () => {
+      beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
       it(`responds with 404`, () => {
         const project_id = 12345;
         return supertest(app)
           .get(`/api/projects/${project_id}`)
-          .set('Authorization', helpers.makeAuthHeader(testUsers[2]))
+          .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
           .expect(404, { error: `No project found with id ${project_id}` });
       });
     });
@@ -289,16 +290,17 @@ describe.only('Projects Endpoints', function () {
       );
 
       it('responds with 204 and removes the project', () => {
-        const idToRemove = 2;
-        const expectedProjects = testProjects.filter(
-          project => project.id !== idToRemove
-        );
+        const idToRemove = 1;
+        const expectedProjects = helpers
+          .makeExpectedProjects(testProjects, testVacancies)
+          .filter(project => project.id !== idToRemove);
+
         return supertest(app)
-          .delete(`api/projects/${idToRemove}`)
-          .set('Authorization', helpers.makeAuthHeader(testUsers[2]))
+          .delete(`/api/projects/${idToRemove}`)
+          .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
           .expect(204)
-          .then(res => {
-            return supertest(app).get(`api/projects`).expect(expectedProjects);
+          .then(() => {
+            return supertest(app).get(`/api/projects`).expect(expectedProjects);
           });
       });
     });
