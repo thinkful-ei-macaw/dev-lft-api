@@ -40,6 +40,10 @@ usersRouter.post('/', async (req, res, next) => {
         error: 'Username already exists'
       });
 
+    // check sername validity
+    const usernameError = UsersService.validateUsername(username);
+    if (usernameError) return res.status(400).json({ error: usernameError });
+
     // hash the password
     const hashedPassword = await UsersService.hashPassword(password);
     const newUser = {
