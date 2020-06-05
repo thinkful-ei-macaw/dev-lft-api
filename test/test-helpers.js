@@ -345,6 +345,16 @@ function makeExpectedProjects(user_id, projects) {
   });
 }
 
+function makeMaliciousProject(user) {
+  const maliciousProject = {
+    id: 555,
+    name: 'Malicious name <script>alert("xss");</script>',
+    creator_id: user.id,
+    description:
+      'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus consequuntur deserunt commodi, nobis qui inventore corrupti iusto aliquid debitis unde non.Adipisci, pariatur.Molestiae, libero esse hic adipisci autem neque ?',
+    date_created: new Date()
+  };
+}
 function makeExpectedUserProjects(user_id, projects) {
   let userProjects = projects.filter(project => project.creator_id === user_id);
 
@@ -421,7 +431,7 @@ function makeExpectedVacancies(
       id: vacancy.id,
       project_id: vacancy.project_id,
       request_status: request.status,
-      first_name: (user.id ? user.first_name : null),
+      first_name: user.id ? user.first_name : null,
       last_name: user.id ? user.last_name : null,
       username: user.id ? user.username : null,
       title: vacancy.title,
