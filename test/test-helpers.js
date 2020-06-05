@@ -237,7 +237,9 @@ function seedUsers(db, users) {
     .returning('*')
     .then(() => {
       //update autoseqencer
-      db.raw(`SELECT setval('users_id_seq', ?)`, [users[users.length - 1].id]);
+      return db.raw(`SELECT setval('users_id_seq', ?)`, [
+        users[users.length - 1].id
+      ]);
     });
 }
 
@@ -323,23 +325,21 @@ function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
   return `Bearer ${token}`;
 }
 
-function makeExpectedProjects(user_id, projects) {
-  return projects.map(project => {
-    if (project.creator_id === user_id) {
-      project.isOwner = true;
-    } else {
-      project.isOwner = false;
-    }
-
+function makeExpectedProjects(projects, vacancies) {
+  let filteredProjects = projects.filter(project => {
+    return vacancies.find(
+      vacancy => vacancy.project_id === project.id && vacancy.user_id == null
+    );
+  });
+  return filteredProjects.map(project => {
     return {
       id: project.id,
       name: project.name,
       description: project.description,
-      isOwner: project.isOwner,
-      tags: project.tags,
-      live_url: project.live_url,
-      trello_url: project.trello_url,
-      github_url: project.github_url,
+      tags: null,
+      live_url: null,
+      trello_url: null,
+      github_url: null,
       date_created: project.date_created
     };
   });
@@ -353,11 +353,10 @@ function makeExpectedUserProjects(user_id, projects) {
       id: project.id,
       name: project.name,
       description: project.description,
-      isOwner: true,
-      tags: project.tags,
-      live_url: project.live_url,
-      trello_url: project.trello_url,
-      github_url: project.github_url,
+      tags: null,
+      live_url: null,
+      trello_url: null,
+      github_url: null,
       date_created: project.date_created
     };
   });
