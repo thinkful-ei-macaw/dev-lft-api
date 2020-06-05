@@ -281,9 +281,10 @@ describe('User Endpoints', function () {
     });
 
     describe(`Given a valid user`, () => {
-      it(`responds 201 with Auth Token`, () => {
+      it(`responds 201 with Auth Token`, function () {
+        this.retries(3);
         const newUser = {
-          username: 'test username',
+          username: 'test_username',
           password: '11AAaa@bc',
           first_name: 'firstname',
           last_name: 'lastname'
@@ -305,7 +306,7 @@ describe('User Endpoints', function () {
       it(`stores the new user in db with bcryped password`, () => {
         const newUser = {
           id: 5,
-          username: 'test username',
+          username: 'test_username',
           password: '11AAaa@bc',
           first_name: 'firstname',
           last_name: 'lastname'

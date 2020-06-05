@@ -4,6 +4,7 @@ const xss = require('xss');
 
 const REGEX_ALPHA_NO_SPACES_OR_NUMBERS = /^[A-Za-z'-]+$/;
 const REGEX_UPPER_LOWER_NUMBER = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])+/;
+const REGEX_APLHA_NUMBERS_HYPHENS_UNDERSCORES_NO_SPACES = /^[A-Za-z0-9_/-]+$/;
 
 class UsersService extends Service {
   constructor(table_name) {
@@ -22,6 +23,30 @@ class UsersService extends Service {
 
     if (!REGEX_ALPHA_NO_SPACES_OR_NUMBERS.test(name)) {
       return 'must contain only alphabetic characters and no spaces';
+    }
+  }
+
+  validateUsername(username) {
+    username = username.toString();
+
+    if (username.length < 2) {
+      return 'must be 2 or more characters';
+    }
+
+    if (username.length > 30) {
+      return 'must be less than 30 characters';
+    }
+
+    if (username.startsWith('_') || username.endsWith('_')) {
+      return 'must not start or end with an underscore';
+    }
+
+    if (username.startsWith('-') || username.endsWith('-')) {
+      return 'must not start or end with a dash';
+    }
+
+    if (!REGEX_APLHA_NUMBERS_HYPHENS_UNDERSCORES_NO_SPACES.test(username)) {
+      return 'must contain only letters, numbers, hyphens, and underscores with no spaces';
     }
   }
 
