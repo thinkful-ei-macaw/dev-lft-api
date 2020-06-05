@@ -345,15 +345,76 @@ function makeExpectedProjects(projects, vacancies) {
   });
 }
 
-function makeMaliciousProject(user) {
+function makeMaliciousData(user, project, chat) {
   const maliciousProject = {
-    id: 555,
-    name: 'Malicious name <script>alert("xss");</script>',
+    id: 111,
+    name: 'Malicious data <script>alert("xss");</script>',
     creator_id: user.id,
     description: `Bad image <img src="https://url.to.file.which/does-not.exist" onerror="alert(document.cookie);">. But not <strong>all</strong> bad.`,
     date_created: new Date()
   };
+  const expectedProject = {
+    ...maliciousProject,
+    name: `Malicious data &lt;script&gt;alert("xss");&lt;/script&gt;`,
+    description: `Bad image <img src="https://url.to.file.which/does-not.exist">. But not <strong>all</strong> bad.`
+  };
+  const maliciousVacancy = {
+    id: 666,
+    project_id: project.id,
+    title: 'Malicious data <script>alert("xss");</script>',
+    user_id: null,
+    description: `Bad image <img src="https://url.to.file.which/does-not.exist" onerror="alert(document.cookie);">. But not <strong>all</strong> bad.`,
+    skills: ['<div>skills <script>alert("xss");</script></div>']
+  };
+  const expectedVacancy = {
+    ...maliciousVacancy,
+    title: `Malicious data &lt;script&gt;alert("xss");&lt;/script&gt;`,
+    description: `Bad image <img src="https://url.to.file.which/does-not.exist">. But not <strong>all</strong> bad.`,
+    skills: [`<div>skills &lt;script&gt;alert("xss");&lt;/script&gt;</div>`]
+  };
+  const maliciousPost = {
+    id: 222,
+    project_id: project.id,
+    user_id: user.id,
+    message: 'Malicious data <script>alert("xss");</script>',
+    date_created: new Date()
+  };
+  const expectedPost = {
+    ...maliciousPost,
+    message: `Malicious data &lt;script&gt;alert("xss");&lt;/script&gt;`
+  };
+  const maliciousMessage = {
+    id: 1,
+    chat_id: chat.id,
+    author_id: user.id,
+    body: 'Malicious data <script>alert("xss");</script>',
+    date_created: new Date()
+  };
+  const expectedMessage = {
+    maliciousMessage,
+    body: `Malicious data &lt;script&gt;alert("xss");&lt;/script&gt;`
+  };
+  return {
+    maliciousProject,
+    expectedProject,
+    maliciousVacancy,
+    expectedVacancy,
+    maliciousPost,
+    expectedPost,
+    maliciousMessage,
+    expectedMessage
+  };
 }
+
+function seedMaliciousProject(db, user, project) {
+  return db
+    .into('users')
+    .insert(user)
+    .then(() => {
+      return db.into('projects').insert(project);
+    });
+}
+
 function makeExpectedUserProjects(user_id, projects) {
   let userProjects = projects.filter(project => project.creator_id === user_id);
 
@@ -521,5 +582,8 @@ module.exports = {
   makeFixtures,
   seedProjectsTables,
   seedUsers,
-  cleanTables
+  cleanTables,
+
+  makeMaliciousData,
+  seedMaliciousProject
 };

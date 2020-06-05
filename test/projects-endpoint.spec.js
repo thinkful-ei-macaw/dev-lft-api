@@ -65,6 +65,31 @@ describe('Projects Endpoints', function () {
           .expect(200, expectedProjects);
       });
     });
+
+    // XSS test - malicious project
+    context(`Given an XSS attack project`, () => {
+      const testUser = testUsers[0];
+      const { maliciousProject, expectedProject } = helpers.makeMaliciousData(
+        testUser,
+        testProjects[0],
+        testChats[0]
+      );
+      console.log(maliciousProject);
+      beforeEach('insert malicious project', () => {
+        return helpers.seedMaliciousProject(db, testUser, maliciousProject);
+      });
+
+      it.only('removes XSS attack content', () => {
+        return supertest(app)
+          .get(`/api/projects`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(200)
+          .expect(res => {
+            expect(res.body.name).to.eql(expectedProject.name);
+            expect(res.body.description).to.eql(expectedProject.description);
+          });
+      });
+    });
   });
 
   // GET /api/projects/user endpoint test
