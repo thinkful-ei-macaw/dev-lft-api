@@ -4,6 +4,19 @@ const helpers = require('./test-helpers');
 
 describe('Posts Endpoints', () => {
   let db;
+    beforeEach('insert data', () => {
+      return helpers.seedProjectsTables(
+        db,
+        testUsers,
+        testProjects,
+        testVacancies,
+        testRequests,
+        testPosts,
+        testChats,
+        testMessages,
+        testNotifications
+      );
+    });
 
   let {
     testUsers,
@@ -31,19 +44,6 @@ describe('Posts Endpoints', () => {
   afterEach('cleanup', () => helpers.cleanTables(db));
 
   describe('GET /api/posts/:project_id', () => {
-    beforeEach('insert data', () => {
-      return helpers.seedProjectsTables(
-        db,
-        testUsers,
-        testProjects,
-        testVacancies,
-        testRequests,
-        testPosts,
-        testChats,
-        testMessages,
-        testNotifications
-      );
-    });
 
     it('responds with 200 and the posts', () => {
       const testProject = testProjects[0];
@@ -61,19 +61,6 @@ describe('Posts Endpoints', () => {
   });
 
   describe(`POST /api/posts/:project_id`, () => {
-    beforeEach('insert data', () => {
-      return helpers.seedProjectsTables(
-        db,
-        testUsers,
-        testProjects,
-        testVacancies,
-        testRequests,
-        testPosts,
-        testChats,
-        testMessages,
-        testNotifications
-      );
-    });
 
     it('creates a post, responding with 201 and the post', () => {
       const testProject = testProjects[0];
@@ -125,19 +112,6 @@ describe('Posts Endpoints', () => {
   });
 
   describe('PATCH /api/posts/:post_id', () => {
-    beforeEach('insert data', () => {
-      return helpers.seedProjectsTables(
-        db,
-        testUsers,
-        testProjects,
-        testVacancies,
-        testRequests,
-        testPosts,
-        testChats,
-        testMessages,
-        testNotifications
-      );
-    });
 
     it('responds with 204 and updates the post', () => {
       const testUser = testUsers[0];
@@ -163,7 +137,7 @@ describe('Posts Endpoints', () => {
         .set('Authorization', helpers.makeAuthHeader(testUser))
         .send(updatedPost)
         .expect(204)
-        .then(res =>
+        .then(() =>
           supertest(app)
             .get(`/api/posts/${idToUpdate}`)
             .set('Authorization', helpers.makeAuthHeader(testUser))

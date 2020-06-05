@@ -72,21 +72,24 @@ function makeVacanciesArray(users, projects) {
       project_id: projects[0].id,
       title: 'Test vacancy 1',
       user_id: null,
-      description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
+      description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.',
+      skills: []
     },
     {
       id: 2,
       project_id: projects[1].id,
       title: 'Test vacancy 2',
       user_id: null,
-      description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
+      description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.',
+      skills: []
     },
     {
       id: 3,
       project_id: projects[2].id,
       title: 'Test vacancy 3',
       user_id: users[2].id,
-      description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.'
+      description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.',
+      skills: []
     }
   ];
 }
@@ -374,11 +377,10 @@ function makeExpectedPosts(user, posts, project_id) {
   });
 }
 
-function makeExpectedRequests(users, requests, vacancies, project_id) {
+function makeExpectedRequests(users, requests, vacancies, vacancy_id) {
   let projRequests = requests.filter(
-    request => request.project_id === project_id
+    request => request.vacancy_id === vacancy_id
   );
-
   return projRequests.map(request => {
     let vacancy = vacancies.find(vacancy => vacancy.id === request.vacancy_id);
     let user = users.find(user => user.id === request.user_id);
@@ -389,7 +391,7 @@ function makeExpectedRequests(users, requests, vacancies, project_id) {
       vacancy_title: vacancy.title,
       user_id: request.user_id,
       status: request.status,
-      project_id: request.project_id,
+      project_id: vacancy.project_id,
       first_name: user.first_name,
       last_name: user.last_name
     };
@@ -414,14 +416,13 @@ function makeExpectedVacancies(
       request =>
         request.vacancy_id === vacancy.id && request.user_id === user_id
     ) || { status: null };
-
     return {
       id: vacancy.id,
       project_id: vacancy.project_id,
       request_status: request.status,
-      first_name: user ? user.first_name : null,
-      last_name: user ? user.last_name : null,
-      username: user ? user.username : null,
+      first_name: (user.id ? user.first_name : null),
+      last_name: user.id ? user.last_name : null,
+      username: user.id ? user.username : null,
       title: vacancy.title,
       description: vacancy.description,
       skills: vacancy.skills
