@@ -231,7 +231,9 @@ function seedUsers(db, users) {
     .returning('*')
     .then(() => {
       //update autoseqencer
-      db.raw(`SELECT setval('users_id_seq', ?)`, [users[users.length - 1].id]);
+      return db.raw(`SELECT setval('users_id_seq', ?)`, [
+        users[users.length - 1].id
+      ]);
     });
 }
 
