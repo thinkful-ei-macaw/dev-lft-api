@@ -4,19 +4,6 @@ const helpers = require('./test-helpers');
 
 describe('Posts Endpoints', () => {
   let db;
-    beforeEach('insert data', () => {
-      return helpers.seedProjectsTables(
-        db,
-        testUsers,
-        testProjects,
-        testVacancies,
-        testRequests,
-        testPosts,
-        testChats,
-        testMessages,
-        testNotifications
-      );
-    });
 
   let {
     testUsers,
@@ -28,6 +15,20 @@ describe('Posts Endpoints', () => {
     testMessages,
     testNotifications
   } = helpers.makeFixtures();
+
+  beforeEach('insert data', () => {
+    return helpers.seedProjectsTables(
+      db,
+      testUsers,
+      testProjects,
+      testVacancies,
+      testRequests,
+      testPosts,
+      testChats,
+      testMessages,
+      testNotifications
+    );
+  });
 
   before('make knex instance', () => {
     db = knex({
