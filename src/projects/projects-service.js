@@ -85,11 +85,23 @@ const ProjectsService = {
       .update(updatedProject)
       .then(rowsAffected => rowsAffected[0]);
   },
+  getOpenCount(db, project_id) {
+    return db
+      .raw(
+        `
+      SELECT count(*) FROM vacancies WHERE project_id = ? AND user_id IS NULL;
+      `,
+        [project_id]
+      )
+      .then(result => result.rows);
+  },
+
   deleteProject(db, id) {
     return db('projects').where({ id }).del();
   },
   serializeProject(project) {
     const serialized = {
+      vacancies: project.vacancies,
       id: project.id,
       name: project.name,
       description: xss(project.description),
@@ -98,7 +110,8 @@ const ProjectsService = {
       live_url: project.live_url,
       trello_url: project.trello_url,
       github_url: project.github_url,
-      date_created: project.date_created
+      date_created: project.date_created,
+      openVacancies: project.openVacancies
     };
     return serialized;
   }
