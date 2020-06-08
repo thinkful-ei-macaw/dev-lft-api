@@ -73,7 +73,7 @@ projectsRouter
         return handle;
       }
 
-      if (doesHandleExist) {
+      else {
         handle = handle + Math.floor(Math.random() * 100);
         return checkHandle(handle);
       }
@@ -140,29 +140,29 @@ projectsRouter
   });
 
 projectsRouter
-  .route('/:project_id')
+  .route('/:project_handle')
   .all(requireAuth)
   .get(async (req, res, next) => {
-    const { project_id } = req.params;
+    const { project_handle } = req.params;
     const user_id = req.user.id;
 
     try {
-      const project = await ProjectsService.getProjectById(
+      const project = await ProjectsService.getProjectByHandle(
         req.app.get('db'),
-        project_id
+        project_handle
       );
 
       if (!project) {
         return res
           .status(404)
-          .json({ error: `No project found with id ${project_id}` });
+          .json({ error: `No project found with id ${project_handle}` });
       }
 
       /* Set property on project response that lets client know 
       if the user is the owner of this project */
       const vacancy = await VacanciesService.findFilledVacancy(
         req.app.get('db'),
-        project_id,
+        project.id,
         user_id
       );
       if (user_id === project.creator_id) {

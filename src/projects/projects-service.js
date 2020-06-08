@@ -75,6 +75,9 @@ const ProjectsService = {
   getProjectById(db, id) {
     return db('projects').where({ id }).first();
   },
+  getProjectByHandle(db, handle) {
+    return db('projects').where({ handle }).first();
+  },
   doesHandleExist(db, handle) {
     return db('projects').where({ handle }).first();
   },
