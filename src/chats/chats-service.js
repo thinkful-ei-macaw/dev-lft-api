@@ -76,7 +76,8 @@ const ChatsService = {
       SELECT
       m.body, 
       m.date_created, 
-      u.first_name as author
+      u.first_name as author,
+      u.username as author_username 
       FROM messages m INNER JOIN users u
       ON m.author_id = u.id
       WHERE m.chat_id = ?
