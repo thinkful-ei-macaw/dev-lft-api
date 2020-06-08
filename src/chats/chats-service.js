@@ -97,7 +97,7 @@ const ChatsService = {
   },
   serializeChat(chat) {
     return {
-      chat_id: chat.id,
+      chat_id: chat.chat_id,
       body: xss(chat.body),
       request_id: chat.request_id,
       request_status: chat.request_status,

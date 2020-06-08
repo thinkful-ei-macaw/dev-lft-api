@@ -15,13 +15,14 @@ const ProjectsService = {
         p.live_url,
         p.trello_url,
         p.github_url,
-        p.date_created 
-     FROM
+        p.date_created,
+        p.handle 
+      FROM
         projects p 
         INNER JOIN
-           vacancies v 
-           ON v.project_id = p.id 
-     WHERE
+          vacancies v 
+          ON v.project_id = p.id 
+      WHERE
         v.user_id IS NULL
         ) t ORDER BY date_created DESC;
       `
@@ -41,7 +42,8 @@ const ProjectsService = {
         p.live_url,
         p.trello_url,
         p.github_url,
-        p.date_created 
+        p.date_created,
+        p.handle 
       FROM
         projects p 
       WHERE
@@ -56,7 +58,8 @@ const ProjectsService = {
         p.live_url,
         p.trello_url,
         p.github_url,
-        p.date_created 
+        p.date_created,
+        p.handle 
       FROM
         projects p 
         INNER JOIN
@@ -71,6 +74,12 @@ const ProjectsService = {
   },
   getProjectById(db, id) {
     return db('projects').where({ id }).first();
+  },
+  getProjectByHandle(db, handle) {
+    return db('projects').where({ handle }).first();
+  },
+  doesHandleExist(db, handle) {
+    return db('projects').where({ handle }).first();
   },
   insertNewProject(db, newProject) {
     return db('projects')
@@ -106,11 +115,12 @@ const ProjectsService = {
       name: xss(project.name),
       description: xss(project.description),
       tags: project.tags,
-      userRole: project.userRole,
       live_url: project.live_url,
       trello_url: project.trello_url,
       github_url: project.github_url,
       date_created: project.date_created,
+      userRole: project.userRole,
+      handle: project.handle,
       openVacancies: project.openVacancies
     };
     return serialized;
