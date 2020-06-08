@@ -184,6 +184,10 @@ projectsRouter
       next(e);
     }
   })
+
+projectsRouter
+  .route('/:project_id')
+  .all(requireAuth)
   .patch(bodyParser, async (req, res, next) => {
     const {
       name,
