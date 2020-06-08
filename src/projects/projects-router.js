@@ -13,9 +13,21 @@ projectsRouter
       const allWithVacancies = await ProjectsService.getAllWithVacancies(
         req.app.get('db')
       );
+
+      let vacancies = allWithVacancies.map(async project => {
+        let openCount = await ProjectsService.getOpenCount(
+          req.app.get('db'),
+          project.id
+        );
+        let openVacancies = openCount[0].count;
+        return { ...project, openVacancies };
+      });
+
+      const allWithVacanciesWithCount = await Promise.all(vacancies);
+
       res
         .status(200)
-        .json(allWithVacancies.map(ProjectsService.serializeProject));
+        .json(allWithVacanciesWithCount.map(ProjectsService.serializeProject));
     } catch (e) {
       next(e);
     }
@@ -73,7 +85,7 @@ projectsRouter
     const user_id = req.user.id;
 
     try {
-      const allUserProjects = await ProjectsService.getAllUserProjects(
+      let allUserProjects = await ProjectsService.getAllUserProjects(
         req.app.get('db'),
         user_id
       );
@@ -84,9 +96,20 @@ projectsRouter
           .json({ error: `No projects found for user with id ${user_id}` });
       }
 
+      let vacancies = allUserProjects.map(async project => {
+        let openCount = await ProjectsService.getOpenCount(
+          req.app.get('db'),
+          project.id
+        );
+        let openVacancies = openCount[0].count;
+        return { ...project, openVacancies };
+      });
+
+      const allUserProjectsWithCount = await Promise.all(vacancies);
+
       return res
         .status(200)
-        .json(allUserProjects.map(ProjectsService.serializeProject));
+        .json(allUserProjectsWithCount.map(ProjectsService.serializeProject));
     } catch (e) {
       next(e);
     }

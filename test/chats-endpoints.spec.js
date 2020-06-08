@@ -46,8 +46,8 @@ describe.only('/api/chats endpoints', () => {
     it(`POST /api/chats responds 201 and the resulting message`, () => {
       const newMessage = {
         body: 'test body',
-        project_id: testProjects[0].id,
-        recipient_id: testUsers[1].id
+        request_id: testProjects[0].id,
+        recipient_username: testUsers[1].username
       };
 
       return supertest(app)
@@ -64,14 +64,14 @@ describe.only('/api/chats endpoints', () => {
         });
     });
 
-    const requiredFields = ['recipient_id', 'project_id', 'body'];
+    const requiredFields = ['body', 'request_id', 'recipient_username'];
 
     requiredFields.forEach(field => {
       it(`POST /api/chats responds 400 missing ${field} in request body when missing`, () => {
         const badRequest = {
           body: 'test body',
-          project_id: testProjects[0].id,
-          recipient_id: testUsers[1].id
+          request_id: testProjects[0].id,
+          recipient_username: testUsers[1].username
         };
 
         delete badRequest[field];
@@ -93,7 +93,9 @@ describe.only('/api/chats endpoints', () => {
         testUser.id,
         testUsers,
         testProjects,
-        testMessages
+        testMessages,
+        testRequests,
+        testVacancies
       );
 
       return supertest(app)
