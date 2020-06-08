@@ -389,7 +389,7 @@ function makeExpectedRequests(users, requests, vacancies, vacancy_id) {
       id: request.id,
       vacancy_id: request.vacancy_id,
       vacancy_title: vacancy.title,
-      user_id: request.user_id,
+      username: user.username,
       status: request.status,
       project_id: vacancy.project_id,
       first_name: user.first_name,
