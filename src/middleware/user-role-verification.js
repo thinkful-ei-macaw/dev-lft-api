@@ -1,7 +1,3 @@
-const express = require('express');
-const ProjectsRouter = require('../projects/projects-router');
-const ProjectsService = require('../projects/projects-service');
-
 async function requireOwner(req, res, next) {
   const is_creator = await isProjectCreator(req);
   if (!is_creator) {
