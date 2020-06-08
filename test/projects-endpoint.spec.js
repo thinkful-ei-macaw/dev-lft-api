@@ -99,7 +99,8 @@ describe('Projects Endpoints', function () {
       it('responds with 200 and all of the user projects', () => {
         const expectedUserProjects = helpers.makeExpectedUserProjects(
           testUsers[2].id,
-          testProjects
+          testProjects,
+          testVacancies
         );
         return supertest(app)
           .get('/api/projects/user')
@@ -157,7 +158,7 @@ describe('Projects Endpoints', function () {
 
   // POST api/projects/ endpoint test
 
-  describe(`GET /api/projects`, () => {
+describe(`POST /api/projects`, () => {
     context('Given there are projects in the database', () => {
       beforeEach('insert projects', () =>
         helpers.seedProjectsTables(
@@ -177,8 +178,9 @@ describe('Projects Endpoints', function () {
         const testProject = testProjects[0];
         const newProject = {
           id: testProject.id,
-          name: testProject.name,
+          name: 'new name',
           creator_id: testProject.creator_id,
+          handle: 'new-name',
           description: testProject.description,
           date_created: testProject.date_created
         };
@@ -191,6 +193,7 @@ describe('Projects Endpoints', function () {
             expect(res.body).to.have.property('id');
             expect(res.body.name).to.eql(newProject.name);
             expect(res.body.description).to.eql(newProject.description);
+            expect(res.body.handle).to.eql(newProject.handle);
             const expectedDate = new Date().toLocaleString();
             const actualDate = new Date(res.body.date_created).toLocaleString();
             expect(actualDate).to.eql(expectedDate);
@@ -204,6 +207,7 @@ describe('Projects Endpoints', function () {
               .then(row => {
                 expect(row.name).to.eql(newProject.name);
                 expect(row.description).to.eql(newProject.description);
+                expect(row.handle).to.eql(newProject.handle);
                 const expectedDate = new Date().toLocaleString();
                 const actualDate = new Date(row.date_created).toLocaleString();
                 expect(actualDate).to.eql(expectedDate);
@@ -252,7 +256,7 @@ describe('Projects Endpoints', function () {
           .set('Authorization', helpers.makeAuthHeader(testUser))
           .send(updatedProject)
           .expect(204)
-          .then(res =>
+          .then(() =>
             supertest(app)
               .get(`/api/projects/${idToUpdate}`)
               .set('Authorization', helpers.makeAuthHeader(testUser))

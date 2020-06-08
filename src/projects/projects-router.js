@@ -58,12 +58,36 @@ projectsRouter
       }
     }
 
+    let handle = name
+      .replace(/\s+/g, '-')
+      .replace(/[^A-Za-z0-9-]/g, '')
+      .toLowerCase();
+
+    async function checkHandle(handle) {
+      const doesHandleExist = await ProjectsService.doesHandleExist(
+        req.app.get('db'),
+        handle
+      );
+
+      if (!doesHandleExist) {
+        return handle;
+      }
+
+      if (doesHandleExist) {
+        handle = handle + Math.floor(Math.random() * 100);
+        return checkHandle(handle);
+      }
+    }
+
+    const handleOK = await checkHandle(handle);
+
     const newProject = {
       ...requiredFields,
       tags,
       live_url,
       trello_url,
-      github_url
+      github_url,
+      handle: handleOK
     };
 
     try {
@@ -148,6 +172,12 @@ projectsRouter
       } else {
         project.userRole = 'user';
       }
+      let openCount = await ProjectsService.getOpenCount(
+        req.app.get('db'),
+        project.id
+      );
+
+      project.openVacancies = await openCount[0].count;
 
       res.status(200).json(ProjectsService.serializeProject(project));
     } catch (e) {
