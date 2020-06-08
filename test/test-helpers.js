@@ -143,23 +143,23 @@ function makePostsArray(users, projects) {
   ];
 }
 
-function makeChatsArray(users, projects) {
+function makeChatsArray(users, requests) {
   return [
     {
       id: 1,
-      project_id: projects[0].id,
+      request_id: requests[0].id,
       author_id: users[0].id,
       recipient_id: users[1].id
     },
     {
       id: 2,
-      project_id: projects[1].id,
+      request_id: requests[1].id,
       author_id: users[1].id,
       recipient_id: users[2].id
     },
     {
       id: 3,
-      project_id: projects[2].id,
+      request_id: requests[2].id,
       author_id: users[2].id,
       recipient_id: users[3].id
     }
@@ -294,7 +294,7 @@ function makeFixtures() {
   const testVacancies = makeVacanciesArray(testUsers, testProjects);
   const testRequests = makeRequestsArray(testUsers, testVacancies);
   const testPosts = makePostsArray(testUsers, testProjects);
-  const testChats = makeChatsArray(testUsers, testProjects);
+  const testChats = makeChatsArray(testUsers, testRequests);
   const testMessages = makeMessagesArray(testUsers, testChats);
   const testNotifications = makeNotificationsArray(testUsers, testProjects);
 
@@ -389,7 +389,7 @@ function makeExpectedRequests(users, requests, vacancies, vacancy_id) {
       id: request.id,
       vacancy_id: request.vacancy_id,
       vacancy_title: vacancy.title,
-      user_id: request.user_id,
+      username: user.username,
       status: request.status,
       project_id: vacancy.project_id,
       first_name: user.first_name,
@@ -420,7 +420,7 @@ function makeExpectedVacancies(
       id: vacancy.id,
       project_id: vacancy.project_id,
       request_status: request.status,
-      first_name: (user.id ? user.first_name : null),
+      first_name: user.id ? user.first_name : null,
       last_name: user.id ? user.last_name : null,
       username: user.id ? user.username : null,
       title: vacancy.title,
@@ -454,37 +454,48 @@ function makeExpectedMessages(chat_id, user_id, users, messages) {
   return chatMessages.map(message => {
     let user = users.find(user => user.id === message.author_id);
     return {
-      id: message.id,
       body: message.body,
-      isAuthor: messages.author_id !== user_id,
+      isAuthor: messages.author_username !== user.username,
       author: user.first_name,
-      author_id: message.author_id,
+      author_username: user.username,
       date_created: message.date_created
     };
   });
 }
 
-function makeExpectedChats(chats, user_id, users, projects, messages) {
+function makeExpectedChats(
+  chats,
+  user_id,
+  users,
+  projects,
+  messages,
+  requests,
+  vacancies
+) {
   //user_id for user who is GETting the chats
   let userChats = chats.filter(
     chat => chat.author_id === user_id || chat.recipient_id === user_id
   );
 
   return userChats.map(chat => {
-    let project = projects.find(project => project.id === chat.project_id);
+    let request = requests.find(request => request.id === chat.request_id);
+    let vacancy = vacancies.find(vacancy => vacancy.id === request.vacancy_id);
+    let project = projects.find(project => project.id === vacancy.project_id);
     let message = messages.find(message => message.chat_id === chat.id);
     let recipient = users.find(user => user.id === chat.recipient_id);
+
     return {
-      author_id: chat.author_id,
       body: message.body,
       chat_id: chat.id,
       closed: false,
       date_created: message.date_created,
       first_name: recipient.first_name,
       last_name: recipient.last_name,
-      project_id: chat.project_id,
       project_name: project.name,
-      recipient_id: chat.recipient_id
+      recipient_username: recipient.username,
+      request_id: request.id,
+      request_status: request.status,
+      vacancy_name: vacancy.title
     };
   });
 }
