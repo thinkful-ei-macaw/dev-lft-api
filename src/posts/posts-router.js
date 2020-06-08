@@ -1,6 +1,7 @@
 const express = require('express');
 const PostsService = require('./posts-service');
 const { requireAuth } = require('../middleware/jwt-auth');
+const { requireMember } = require('../middleware/user-role-verification');
 
 const postsRouter = express.Router();
 postsRouter.use(express.json());
@@ -24,7 +25,7 @@ postsRouter
     }
   })
 
-  .post(async (req, res, next) => {
+  .post(requireAuth, requireMember, async (req, res, next) => {
     const db = req.app.get('db');
     const { project_id } = req.params;
     const user_id = req.user.id;
@@ -53,22 +54,26 @@ postsRouter
     }
   });
 
-postsRouter.route('/:post_id').patch(async (req, res, next) => {
-  const db = req.app.get('db');
-  const { post_id } = req.params;
-  const { message } = req.body;
+postsRouter
+  .route('/:id')
+  .patch(requireAuth, requireMember, async (req, res, next) => {
+    const db = req.app.get('db');
+    const post_id = req.params.id;
+    const { message } = req.body;
 
-  if (!message) {
-    return res.status(400).json({ error: `Missing 'message' in request body` });
-  }
+    if (!message) {
+      return res
+        .status(400)
+        .json({ error: `Missing 'message' in request body` });
+    }
 
-  try {
-    const updatedPost = { message };
-    await PostsService.updateItem(db, post_id, updatedPost);
-    return res.status(204).end();
-  } catch (error) {
-    next(error);
-  }
-});
+    try {
+      const updatedPost = { message };
+      await PostsService.updateItem(db, post_id, updatedPost);
+      return res.status(204).end();
+    } catch (error) {
+      next(error);
+    }
+  });
 
 module.exports = postsRouter;
