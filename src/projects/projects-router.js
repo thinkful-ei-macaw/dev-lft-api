@@ -58,12 +58,36 @@ projectsRouter
       }
     }
 
+    let handle = name
+      .replace(/\s+/g, '-')
+      .replace(/[^A-Za-z0-9-]/g, '')
+      .toLowerCase();
+
+    async function checkHandle(handle) {
+      const doesHandleExist = await ProjectsService.doesHandleExist(
+        req.app.get('db'),
+        handle
+      );
+
+      if (!doesHandleExist) {
+        return handle;
+      }
+
+      else {
+        handle = handle + Math.floor(Math.random() * 100);
+        return checkHandle(handle);
+      }
+    }
+
+    const handleOK = await checkHandle(handle);
+
     const newProject = {
       ...requiredFields,
       tags,
       live_url,
       trello_url,
-      github_url
+      github_url,
+      handle: handleOK
     };
 
     try {
@@ -116,29 +140,29 @@ projectsRouter
   });
 
 projectsRouter
-  .route('/:project_id')
+  .route('/:project_handle')
   .all(requireAuth)
   .get(async (req, res, next) => {
-    const { project_id } = req.params;
+    const { project_handle } = req.params;
     const user_id = req.user.id;
 
     try {
-      const project = await ProjectsService.getProjectById(
+      const project = await ProjectsService.getProjectByHandle(
         req.app.get('db'),
-        project_id
+        project_handle
       );
 
       if (!project) {
         return res
           .status(404)
-          .json({ error: `No project found with id ${project_id}` });
+          .json({ error: `No project found with handle ${project_handle}` });
       }
 
       /* Set property on project response that lets client know 
       if the user is the owner of this project */
       const vacancy = await VacanciesService.findFilledVacancy(
         req.app.get('db'),
-        project_id,
+        project.id,
         user_id
       );
       if (user_id === project.creator_id) {
@@ -148,12 +172,22 @@ projectsRouter
       } else {
         project.userRole = 'user';
       }
+      let openCount = await ProjectsService.getOpenCount(
+        req.app.get('db'),
+        project.id
+      );
+
+      project.openVacancies = await openCount[0].count;
 
       res.status(200).json(ProjectsService.serializeProject(project));
     } catch (e) {
       next(e);
     }
   })
+
+projectsRouter
+  .route('/:project_id')
+  .all(requireAuth)
   .patch(bodyParser, async (req, res, next) => {
     const {
       name,
