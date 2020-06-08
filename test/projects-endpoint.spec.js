@@ -2,7 +2,7 @@ const knex = require('knex');
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
-describe.only('Projects Endpoints', function () {
+describe('Projects Endpoints', function () {
   let db;
 
   const {
@@ -32,9 +32,9 @@ describe.only('Projects Endpoints', function () {
 
   // GET /api/projects endpoint test
 
-  describe.only(`GET /api/projects`, () => {
+  describe(`GET /api/projects`, () => {
     context(`Given no projects`, () => {
-      it.only(`responds with 200 and an empty list`, () => {
+      it(`responds with 200 and an empty list`, () => {
         return supertest(app).get('/api/projects').expect(200, []);
       });
     });
@@ -70,11 +70,12 @@ describe.only('Projects Endpoints', function () {
     // XSS test - malicious project
     context(`Given an XSS attack project`, () => {
       const testUser = testUsers[0];
+      const testChat = testChats[0];
       const {
         maliciousProject,
         expectedProject,
         maliciousVacancy
-      } = helpers.makeMaliciousData(testUser, testChats[0]);
+      } = helpers.makeMaliciousData(testUser, testChat);
       beforeEach('insert malicious project', () => {
         return helpers.seedMaliciousProject(
           db,
@@ -131,7 +132,8 @@ describe.only('Projects Endpoints', function () {
       it('responds with 200 and all of the user projects', () => {
         const expectedUserProjects = helpers.makeExpectedUserProjects(
           testUser.id,
-          testProjects
+          testProjects,
+          testVacancies
         );
         return supertest(app)
           .get('/api/projects/user')
@@ -170,7 +172,7 @@ describe.only('Projects Endpoints', function () {
     });
   });
 
-  // api/projects/:project_id endpoint test
+  // api/projects/:project_handle endpoint test
 
   describe(`GET /api/projects/project_handle`, () => {
     context(`Given no projects`, () => {
@@ -204,7 +206,6 @@ describe.only('Projects Endpoints', function () {
 
       it('responds with 200 and the specified project', () => {
         const testUser = testUsers[0];
-        const project_id = 1;
         const projects = helpers.makeExpectedProjects(
           testProjects,
           testVacancies
@@ -239,7 +240,7 @@ describe.only('Projects Endpoints', function () {
 
       it('removes XSS attack content', () => {
         return supertest(app)
-          .get(`/api/projects/${maliciousProject.id}`)
+          .get(`/api/projects/${maliciousProject.handle}`)
           .set('Authorization', helpers.makeAuthHeader(testUser))
           .expect(200)
           .expect(res => {

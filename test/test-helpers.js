@@ -44,7 +44,8 @@ function makeProjectsArray(users) {
       creator_id: users[0].id,
       description:
         'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus consequuntur deserunt commodi, nobis qui inventore corrupti iusto aliquid debitis unde non.Adipisci, pariatur.Molestiae, libero esse hic adipisci autem neque ?',
-      date_created: '2029-01-22T16:28:32.615Z'
+      date_created: '2029-01-22T16:28:32.615Z',
+      handle: 'test-proj-1'
     },
     {
       id: 2,
@@ -52,7 +53,8 @@ function makeProjectsArray(users) {
       creator_id: users[1].id,
       description:
         'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus consequuntur deserunt commodi, nobis qui inventore corrupti iusto aliquid debitis unde non.Adipisci, pariatur.Molestiae, libero esse hic adipisci autem neque ?',
-      date_created: '2029-01-22T16:28:32.615Z'
+      date_created: '2029-01-22T16:28:32.615Z',
+      handle: 'test-proj-2'
     },
     {
       id: 3,
@@ -60,7 +62,8 @@ function makeProjectsArray(users) {
       creator_id: users[2].id,
       description:
         'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus consequuntur deserunt commodi, nobis qui inventore corrupti iusto aliquid debitis unde non.Adipisci, pariatur.Molestiae, libero esse hic adipisci autem neque ?',
-      date_created: '2029-01-22T16:28:32.615Z'
+      date_created: '2029-01-22T16:28:32.615Z',
+      handle: 'test-proj-3'
     }
   ];
 }
@@ -332,6 +335,9 @@ function makeExpectedProjects(projects, vacancies) {
     );
   });
   return filteredProjects.map(project => {
+    let openVacancies = vacancies.filter(vacancy => {
+      return vacancy.project_id === project.id && vacancy.user_id == null;
+    });
     return {
       id: project.id,
       name: project.name,
@@ -340,7 +346,9 @@ function makeExpectedProjects(projects, vacancies) {
       live_url: null,
       trello_url: null,
       github_url: null,
-      date_created: project.date_created
+      date_created: project.date_created,
+      handle: project.handle,
+      openVacancies: openVacancies.length.toString()
     };
   });
 }
@@ -351,7 +359,8 @@ function makeMaliciousData(user, chat) {
     name: 'Malicious data <script>alert("xss");</script>',
     creator_id: user.id,
     description: `Bad image <img src="https://url.to.file.which/does-not.exist" onerror="alert(document.cookie);">. But not <strong>all</strong> bad.`,
-    date_created: new Date()
+    date_created: new Date(),
+    handle: 'bad-handle'
   };
   const expectedProject = {
     ...maliciousProject,
@@ -426,10 +435,13 @@ async function seedMaliciousMessage(db, message) {
   await db.into('messages').insert(message);
 }
 
-function makeExpectedUserProjects(user_id, projects) {
+function makeExpectedUserProjects(user_id, projects, vacancies) {
   let userProjects = projects.filter(project => project.creator_id === user_id);
 
   return userProjects.map(project => {
+    let openVacancies = vacancies.filter(vacancy => {
+      return vacancy.project_id === project.id && vacancy.user_id == null;
+    });
     return {
       id: project.id,
       name: project.name,
@@ -438,7 +450,9 @@ function makeExpectedUserProjects(user_id, projects) {
       live_url: null,
       trello_url: null,
       github_url: null,
-      date_created: project.date_created
+      date_created: project.date_created,
+      handle: project.handle,
+      openVacancies: openVacancies.length.toString()
     };
   });
 }
