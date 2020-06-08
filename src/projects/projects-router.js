@@ -155,7 +155,7 @@ projectsRouter
       if (!project) {
         return res
           .status(404)
-          .json({ error: `No project found with id ${project_handle}` });
+          .json({ error: `No project found with handle ${project_handle}` });
       }
 
       /* Set property on project response that lets client know 

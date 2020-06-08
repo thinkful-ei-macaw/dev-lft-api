@@ -2,7 +2,7 @@ const knex = require('knex');
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
-describe('Projects Endpoints', function () {
+describe.only('Projects Endpoints', function () {
   let db;
 
   const {
@@ -112,15 +112,15 @@ describe('Projects Endpoints', function () {
 
   // api/projects/:project_id endpoint test
 
-  describe(`GET /api/projects/project_id`, () => {
+  describe(`GET /api/projects/project_handle`, () => {
     context(`Given no projects`, () => {
       beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
       it(`responds with 404`, () => {
-        const project_id = 12345;
+        const project_handle = 'bad-handle';
         return supertest(app)
-          .get(`/api/projects/${project_id}`)
+          .get(`/api/projects/${project_handle}`)
           .set('Authorization', helpers.makeAuthHeader(testUsers[2]))
-          .expect(404, { error: `No project found with id ${project_id}` });
+          .expect(404, { error: `No project found with handle ${project_handle}` });
       });
     });
 
@@ -140,16 +140,17 @@ describe('Projects Endpoints', function () {
       );
 
       it('responds with 200 and the specified project', () => {
-        const project_id = 1;
         const projects = helpers.makeExpectedProjects(
           testProjects,
           testVacancies
         );
+
+        const project_handle = projects[0].handle
         const expectedProject = projects[0];
         expectedProject.userRole = 'user';
 
         return supertest(app)
-          .get(`/api/projects/${project_id}`)
+          .get(`/api/projects/${project_handle}`)
           .set('Authorization', helpers.makeAuthHeader(testUsers[2]))
           .expect(200, expectedProject);
       });
@@ -258,7 +259,7 @@ describe(`POST /api/projects`, () => {
           .expect(204)
           .then(() =>
             supertest(app)
-              .get(`/api/projects/${idToUpdate}`)
+              .get(`/api/projects/${expectedProject.handle}`)
               .set('Authorization', helpers.makeAuthHeader(testUser))
               .expect(expectedProject)
           );
@@ -271,11 +272,11 @@ describe(`POST /api/projects`, () => {
     context(`Given no projects`, () => {
       beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
       it(`responds with 404`, () => {
-        const project_id = 12345;
+        const project_handle = 'bad-handle';
         return supertest(app)
-          .get(`/api/projects/${project_id}`)
+          .get(`/api/projects/${project_handle}`)
           .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
-          .expect(404, { error: `No project found with id ${project_id}` });
+          .expect(404, { error: `No project found with handle ${project_handle}` });
       });
     });
     context('Given there are projects in the database', () => {
