@@ -420,7 +420,7 @@ function makeExpectedVacancies(
       id: vacancy.id,
       project_id: vacancy.project_id,
       request_status: request.status,
-      first_name: (user.id ? user.first_name : null),
+      first_name: user.id ? user.first_name : null,
       last_name: user.id ? user.last_name : null,
       username: user.id ? user.username : null,
       title: vacancy.title,
