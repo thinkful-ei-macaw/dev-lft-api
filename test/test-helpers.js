@@ -388,7 +388,7 @@ function makeMaliciousData(user, chat) {
     chat_id: chat.id,
     author_id: user.id,
     body: 'Malicious data <script>alert("xss");</script>',
-    date_created: new Date()
+    date_created: '2029-02-22T16:28:32.615Z'
   };
   const expectedMessage = {
     ...maliciousMessage,

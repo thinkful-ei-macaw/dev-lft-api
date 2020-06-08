@@ -1,3 +1,5 @@
+const xss = require('xss');
+
 const ChatsService = {
   getChatByRequest(db, request_id, author_id, recipient_id) {
     return db
@@ -92,6 +94,30 @@ const ChatsService = {
       .where({ id })
       .update({ closed })
       .then(rowsAffected => rowsAffected[0]);
+  },
+  serializeChat(chat) {
+    return {
+      chat_id: chat.id,
+      body: xss(chat.body),
+      request_id: chat.request_id,
+      request_status: chat.request_status,
+      date_created: chat.date_created,
+      project_name: chat.project_name,
+      vacancy_name: chat.vacancy_name,
+      first_name: chat.first_name,
+      last_name: chat.last_name,
+      recipient_username: chat.recipient_username,
+      closed: chat.closed
+    };
+  },
+  serializeMessage(message) {
+    return {
+      body: xss(message.body),
+      date_created: message.date_created,
+      author: message.author,
+      author_username: message.author_username,
+      isAuthor: message.isAuthor
+    };
   }
 };
 
