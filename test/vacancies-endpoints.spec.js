@@ -62,6 +62,34 @@ describe('Vacancies Endpoints', () => {
         .set('Authorization', helpers.makeAuthHeader(testUser))
         .expect(200, expectedVacancies);
     });
+
+    // XSS test
+    context(`Given an XSS attack vacancy`, () => {
+      const testUser = testUsers[0];
+      const {
+        maliciousVacancy,
+        expectedVacancy,
+        maliciousProject
+      } = helpers.makeMaliciousData(testUser, testChats[0]);
+      beforeEach('insert malicious vacancy', () => {
+        return helpers.seedMaliciousVacancy(
+          db,
+          maliciousProject,
+          maliciousVacancy
+        );
+      });
+
+      it('removes XSS attack content', () => {
+        return supertest(app)
+          .get(`/api/vacancies/${maliciousProject.id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(200)
+          .expect(res => {
+            expect(res.body[0].title).to.eql(expectedVacancy.title);
+            expect(res.body[0].description).to.eql(expectedVacancy.description);
+          });
+      });
+    });
   });
 
   describe('POST /api/vacancies/:project_id', () => {

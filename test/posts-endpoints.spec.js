@@ -45,24 +45,46 @@ describe('Posts Endpoints', () => {
   afterEach('cleanup', () => helpers.cleanTables(db));
 
   describe('GET /api/posts/:project_id', () => {
-
-    it('responds with 200 and the posts', () => {
-      const testProject = testProjects[0];
+    context(`Given posts in the database`, () => {
+      it('responds with 200 and the posts', () => {
+        const testProject = testProjects[0];
+        const testUser = testUsers[0];
+        const expectedPosts = helpers.makeExpectedPosts(
+          testUser,
+          testPosts,
+          testProject.id
+        );
+        return supertest(app)
+          .get(`/api/posts/${testProject.id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(200, expectedPosts);
+      });
+    });
+    // XSS test - malicious post
+    context(`Given an XSS attack post`, () => {
       const testUser = testUsers[0];
-      const expectedPosts = helpers.makeExpectedPosts(
-        testUser,
-        testPosts,
-        testProject.id
-      );
-      return supertest(app)
-        .get(`/api/posts/${testProject.id}`)
-        .set('Authorization', helpers.makeAuthHeader(testUser))
-        .expect(200, expectedPosts);
+      const {
+        maliciousPost,
+        expectedPost,
+        maliciousProject
+      } = helpers.makeMaliciousData(testUser, testChats[0]);
+      beforeEach('insert malicious post', () => {
+        return helpers.seedMaliciousPost(db, maliciousProject, maliciousPost);
+      });
+
+      it('removes XSS attack content', () => {
+        return supertest(app)
+          .get(`/api/posts/${maliciousProject.id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(200)
+          .expect(res => {
+            expect(res.body[0].message).to.eql(expectedPost.message);
+          });
+      });
     });
   });
 
   describe(`POST /api/posts/:project_id`, () => {
-
     it('creates a post, responding with 201 and the post', () => {
       const testProject = testProjects[0];
       const testUser = testUsers[0];
@@ -113,7 +135,6 @@ describe('Posts Endpoints', () => {
   });
 
   describe('PATCH /api/posts/:post_id', () => {
-
     it('responds with 204 and updates the post', () => {
       const testUser = testUsers[0];
       const testProject = testProjects[0];

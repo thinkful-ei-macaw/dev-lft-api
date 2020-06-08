@@ -2,7 +2,7 @@ const knex = require('knex');
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
-describe('/api/chats endpoints', () => {
+describe.only('/api/chats endpoints', () => {
   let db;
 
   const {
@@ -105,6 +105,30 @@ describe('/api/chats endpoints', () => {
           expect(res.body.chats).to.be.an('array');
           expect(res.body.chats).to.eql(expectedMessages);
         });
+    });
+
+    // XSS test
+    context(`Given an XSS attack message`, () => {
+      const testUser = testUsers[0];
+      const testChat = testChats[0];
+      const { maliciousMessage, expectedMessage } = helpers.makeMaliciousData(
+        testUser,
+        testChat
+      );
+      beforeEach('insert malicious message', () => {
+        return helpers.seedMaliciousMessage(db, maliciousMessage);
+      });
+
+      it.only('removes XSS attack content', () => {
+        return supertest(app)
+          .get(`/api/chats`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(200)
+          .expect(res => {
+            console.log(res.body);
+            expect(res.body.chats[0].body).to.eql(expectedMessage.body);
+          });
+      });
     });
   });
 

@@ -40,6 +40,7 @@ describe('Projects Endpoints', function () {
     });
 
     context('Given there are projects in the database', () => {
+      const testUser = testUsers[0];
       beforeEach('insert projects', () =>
         helpers.seedProjectsTables(
           db,
@@ -61,7 +62,7 @@ describe('Projects Endpoints', function () {
         );
         return supertest(app)
           .get('/api/projects')
-          .set('Authorization', helpers.makeAuthHeader(testUsers[2]))
+          .set('Authorization', helpers.makeAuthHeader(testUser))
           .expect(200, expectedProjects);
       });
     });
@@ -69,24 +70,28 @@ describe('Projects Endpoints', function () {
     // XSS test - malicious project
     context(`Given an XSS attack project`, () => {
       const testUser = testUsers[0];
-      const { maliciousProject, expectedProject } = helpers.makeMaliciousData(
-        testUser,
-        testProjects[0],
-        testChats[0]
-      );
-      console.log(maliciousProject);
+      const {
+        maliciousProject,
+        expectedProject,
+        maliciousVacancy
+      } = helpers.makeMaliciousData(testUser, testChats[0]);
       beforeEach('insert malicious project', () => {
-        return helpers.seedMaliciousProject(db, testUser, maliciousProject);
+        return helpers.seedMaliciousProject(
+          db,
+          testUser,
+          maliciousProject,
+          maliciousVacancy
+        );
       });
 
-      it.only('removes XSS attack content', () => {
+      it('removes XSS attack content', () => {
         return supertest(app)
           .get(`/api/projects`)
           .set('Authorization', helpers.makeAuthHeader(testUser))
           .expect(200)
           .expect(res => {
-            expect(res.body.name).to.eql(expectedProject.name);
-            expect(res.body.description).to.eql(expectedProject.description);
+            expect(res.body[0].name).to.eql(expectedProject.name);
+            expect(res.body[0].description).to.eql(expectedProject.description);
           });
       });
     });
@@ -96,17 +101,19 @@ describe('Projects Endpoints', function () {
 
   describe(`GET /api/projects/user`, () => {
     context(`Given no user projects`, () => {
+      const testUser = testUsers[0];
       beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
 
       it(`responds with 200 and an empty list`, () => {
         return supertest(app)
           .get('/api/projects/user')
-          .set('Authorization', helpers.makeAuthHeader(testUsers[2]))
+          .set('Authorization', helpers.makeAuthHeader(testUser))
           .expect(200, []);
       });
     });
 
     context('Given there are user projects in the database', () => {
+      const testUser = testUsers[0];
       beforeEach('insert projects', () =>
         helpers.seedProjectsTables(
           db,
@@ -123,13 +130,42 @@ describe('Projects Endpoints', function () {
 
       it('responds with 200 and all of the user projects', () => {
         const expectedUserProjects = helpers.makeExpectedUserProjects(
-          testUsers[2].id,
+          testUser.id,
           testProjects
         );
         return supertest(app)
           .get('/api/projects/user')
-          .set('Authorization', helpers.makeAuthHeader(testUsers[2]))
+          .set('Authorization', helpers.makeAuthHeader(testUser))
           .expect(200, expectedUserProjects);
+      });
+    });
+
+    // XSS test - malicious project
+    context(`Given an XSS attack project`, () => {
+      const testUser = testUsers[0];
+      const {
+        maliciousProject,
+        expectedProject,
+        maliciousVacancy
+      } = helpers.makeMaliciousData(testUser, testChats[0]);
+      beforeEach('insert malicious project', () => {
+        return helpers.seedMaliciousProject(
+          db,
+          testUser,
+          maliciousProject,
+          maliciousVacancy
+        );
+      });
+
+      it('removes XSS attack content', () => {
+        return supertest(app)
+          .get(`/api/projects/user`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(200)
+          .expect(res => {
+            expect(res.body[0].name).to.eql(expectedProject.name);
+            expect(res.body[0].description).to.eql(expectedProject.description);
+          });
       });
     });
   });
@@ -140,10 +176,11 @@ describe('Projects Endpoints', function () {
     context(`Given no projects`, () => {
       beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
       it(`responds with 404`, () => {
+        const testUser = testUsers[0];
         const project_id = 12345;
         return supertest(app)
           .get(`/api/projects/${project_id}`)
-          .set('Authorization', helpers.makeAuthHeader(testUsers[2]))
+          .set('Authorization', helpers.makeAuthHeader(testUser))
           .expect(404, { error: `No project found with id ${project_id}` });
       });
     });
@@ -164,18 +201,47 @@ describe('Projects Endpoints', function () {
       );
 
       it('responds with 200 and the specified project', () => {
+        const testUser = testUsers[0];
         const project_id = 1;
         const projects = helpers.makeExpectedProjects(
           testProjects,
           testVacancies
         );
         const expectedProject = projects[0];
-        expectedProject.userRole = 'user';
+        expectedProject.userRole = 'owner';
 
         return supertest(app)
           .get(`/api/projects/${project_id}`)
-          .set('Authorization', helpers.makeAuthHeader(testUsers[2]))
+          .set('Authorization', helpers.makeAuthHeader(testUser))
           .expect(200, expectedProject);
+      });
+    });
+    // XSS test - malicious project
+    context(`Given an XSS attack project`, () => {
+      const testUser = testUsers[0];
+      const {
+        maliciousProject,
+        expectedProject,
+        maliciousVacancy
+      } = helpers.makeMaliciousData(testUser, testChats[0]);
+      beforeEach('insert malicious project', () => {
+        return helpers.seedMaliciousProject(
+          db,
+          testUser,
+          maliciousProject,
+          maliciousVacancy
+        );
+      });
+
+      it('removes XSS attack content', () => {
+        return supertest(app)
+          .get(`/api/projects/${maliciousProject.id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(200)
+          .expect(res => {
+            expect(res.body.name).to.eql(expectedProject.name);
+            expect(res.body.description).to.eql(expectedProject.description);
+          });
       });
     });
   });
@@ -199,6 +265,7 @@ describe('Projects Endpoints', function () {
       );
 
       it('creates a project, responding with 201 and the new project', () => {
+        const testUser = testUsers[0];
         const testProject = testProjects[0];
         const newProject = {
           id: testProject.id,
@@ -209,7 +276,7 @@ describe('Projects Endpoints', function () {
         };
         return supertest(app)
           .post('/api/projects')
-          .set('Authorization', helpers.makeAuthHeader(testUsers[2]))
+          .set('Authorization', helpers.makeAuthHeader(testUser))
           .send(newProject)
           .expect(201)
           .expect(res => {
@@ -292,10 +359,11 @@ describe('Projects Endpoints', function () {
     context(`Given no projects`, () => {
       beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
       it(`responds with 404`, () => {
+        const testUser = testUsers[0];
         const project_id = 12345;
         return supertest(app)
           .get(`/api/projects/${project_id}`)
-          .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
+          .set('Authorization', helpers.makeAuthHeader(testUser))
           .expect(404, { error: `No project found with id ${project_id}` });
       });
     });
@@ -315,6 +383,7 @@ describe('Projects Endpoints', function () {
       );
 
       it('responds with 204 and removes the project', () => {
+        const testUser = testUsers[0];
         const idToRemove = 1;
         const expectedProjects = helpers
           .makeExpectedProjects(testProjects, testVacancies)
@@ -322,7 +391,7 @@ describe('Projects Endpoints', function () {
 
         return supertest(app)
           .delete(`/api/projects/${idToRemove}`)
-          .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
+          .set('Authorization', helpers.makeAuthHeader(testUser))
           .expect(204)
           .then(() => {
             return supertest(app).get(`/api/projects`).expect(expectedProjects);

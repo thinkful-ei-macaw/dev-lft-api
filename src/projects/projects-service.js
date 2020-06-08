@@ -91,7 +91,7 @@ const ProjectsService = {
   serializeProject(project) {
     const serialized = {
       id: project.id,
-      name: project.name,
+      name: xss(project.name),
       description: xss(project.description),
       tags: project.tags,
       userRole: project.userRole,

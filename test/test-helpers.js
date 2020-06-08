@@ -345,7 +345,7 @@ function makeExpectedProjects(projects, vacancies) {
   });
 }
 
-function makeMaliciousData(user, project, chat) {
+function makeMaliciousData(user, chat) {
   const maliciousProject = {
     id: 111,
     name: 'Malicious data <script>alert("xss");</script>',
@@ -360,7 +360,7 @@ function makeMaliciousData(user, project, chat) {
   };
   const maliciousVacancy = {
     id: 666,
-    project_id: project.id,
+    project_id: maliciousProject.id,
     title: 'Malicious data <script>alert("xss");</script>',
     user_id: null,
     description: `Bad image <img src="https://url.to.file.which/does-not.exist" onerror="alert(document.cookie);">. But not <strong>all</strong> bad.`,
@@ -374,7 +374,7 @@ function makeMaliciousData(user, project, chat) {
   };
   const maliciousPost = {
     id: 222,
-    project_id: project.id,
+    project_id: maliciousProject.id,
     user_id: user.id,
     message: 'Malicious data <script>alert("xss");</script>',
     date_created: new Date()
@@ -384,14 +384,14 @@ function makeMaliciousData(user, project, chat) {
     message: `Malicious data &lt;script&gt;alert("xss");&lt;/script&gt;`
   };
   const maliciousMessage = {
-    id: 1,
+    id: 999,
     chat_id: chat.id,
     author_id: user.id,
     body: 'Malicious data <script>alert("xss");</script>',
     date_created: new Date()
   };
   const expectedMessage = {
-    maliciousMessage,
+    ...maliciousMessage,
     body: `Malicious data &lt;script&gt;alert("xss");&lt;/script&gt;`
   };
   return {
@@ -406,13 +406,24 @@ function makeMaliciousData(user, project, chat) {
   };
 }
 
-function seedMaliciousProject(db, user, project) {
-  return db
-    .into('users')
-    .insert(user)
-    .then(() => {
-      return db.into('projects').insert(project);
-    });
+async function seedMaliciousProject(db, user, project, vacancy) {
+  await db.into('users').insert(user);
+  await db.into('projects').insert(project);
+  await db.into('vacancies').insert(vacancy);
+}
+
+async function seedMaliciousPost(db, project, post) {
+  await db.into('projects').insert(project);
+  await db.into('posts').insert(post);
+}
+
+async function seedMaliciousVacancy(db, project, vacancy) {
+  await db.into('projects').insert(project);
+  await db.into('vacancies').insert(vacancy);
+}
+
+async function seedMaliciousMessage(db, message) {
+  await db.into('messages').insert(message);
 }
 
 function makeExpectedUserProjects(user_id, projects) {
@@ -585,5 +596,8 @@ module.exports = {
   cleanTables,
 
   makeMaliciousData,
-  seedMaliciousProject
+  seedMaliciousProject,
+  seedMaliciousPost,
+  seedMaliciousVacancy,
+  seedMaliciousMessage
 };
