@@ -1,5 +1,6 @@
 const express = require('express');
 const ChatsService = require('./chats-service');
+const UsersService = require('../users/users-service');
 const { requireAuth } = require('../middleware/jwt-auth');
 
 const chatsRouter = express.Router();
@@ -11,11 +12,11 @@ chatsRouter
   .post(bodyParser, async (req, res, next) => {
     const db = req.app.get('db');
     const author_id = req.user.id;
-    const { recipient_id, project_id, body } = req.body;
+    const { recipient_username, request_id, body } = req.body;
 
     for (const [key, value] of Object.entries({
-      recipient_id,
-      project_id,
+      recipient_username,
+      request_id,
       body
     })) {
       if (!value) {
@@ -26,22 +27,32 @@ chatsRouter
     }
 
     try {
-      /* First check to see if chat exists between users
+      // First, retrieve info for user we want to chat with
+      const recipient = await UsersService.getItemWhere(db, {
+        username: recipient_username
+      });
+
+      if (!recipient)
+        return res.status(404).json({
+          error: 'User not found'
+        });
+
+      /* Then, check to see if chat exists between users
       / for this project */
-      const chat = await ChatsService.getChatByProject(
+      const chat = await ChatsService.getChatByRequest(
         db,
-        project_id,
+        request_id,
         author_id,
-        recipient_id
+        recipient.id
       );
 
       // If there is no pre-existing chat
       if (!chat) {
         // insert new chat AND message
         const newChat = {
-          project_id,
+          request_id,
           author_id,
-          recipient_id
+          recipient_id: recipient.id
         };
 
         const resultingChat = await ChatsService.insertNewChat(db, newChat);
