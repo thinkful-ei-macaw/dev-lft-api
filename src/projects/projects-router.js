@@ -57,19 +57,27 @@ projectsRouter
           .json({ error: `Missing '${key}' in request body` });
       }
     }
+
     // validate project name
     const nameError = ProjectsService.validateName(name);
     if (nameError)
-      return res.status(400).json({ error: `${name} ${nameError}` });
+      return res
+        .status(400)
+        .json({ error: `Project name ${name} ${nameError}` });
     // validate description
     const descError = ProjectsService.validateProjectDescription(description);
     if (descError)
-      return res.status(400).json({ error: `${description} ${descError}` });
+      return res
+        .status(400)
+        .json({ error: `Description "${description}" ${descError}` });
     // validate tags
+    if (tags.length > 10) {
+      return res.status(400).json({ error: `You must enter up to 10 tags!` });
+    }
     for (let i = 0; i < tags.length; i++) {
       const tagError = ProjectsService.validateName(tags[i]);
       if (tagError)
-        return res.status(400).json({ error: `${tags[i]} ${tagError}` });
+        return res.status(400).json({ error: `Tag "${tags[i]}" ${tagError}` });
     }
 
     let handle = name
