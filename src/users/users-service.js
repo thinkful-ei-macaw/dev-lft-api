@@ -4,11 +4,19 @@ const xss = require('xss');
 
 const REGEX_ALPHA_NO_SPACES_OR_NUMBERS = /^[A-Za-z'-]+$/;
 const REGEX_UPPER_LOWER_NUMBER = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])+/;
-const REGEX_APLHA_NUMBERS_HYPHENS_UNDERSCORES_NO_SPACES = /^[A-Za-z0-9_/-]+$/;
+const REGEX_ALPHA_NUMBERS_HYPHENS_UNDERSCORES_NO_SPACES = /^[A-Za-z0-9_/-]+$/;
 
 class UsersService extends Service {
   constructor(table_name) {
     super(table_name);
+  }
+
+  validateURL(url) {
+    url = url.toString()
+
+    if (url.length > 255) {
+      return 'must be fewer than 255 characters'
+    }
   }
 
   validateName(name) {
@@ -45,7 +53,7 @@ class UsersService extends Service {
       return 'must not start or end with a dash';
     }
 
-    if (!REGEX_APLHA_NUMBERS_HYPHENS_UNDERSCORES_NO_SPACES.test(username)) {
+    if (!REGEX_ALPHA_NUMBERS_HYPHENS_UNDERSCORES_NO_SPACES.test(username)) {
       return 'must contain only letters, numbers, hyphens, and underscores with no spaces';
     }
   }
@@ -53,19 +61,19 @@ class UsersService extends Service {
   validatePassword(password) {
     password = password.toString();
     if (password.length < 8) {
-      return 'Password must be 8 or more characters';
+      return 'password must be 8 or more characters';
     }
 
     if (password.length > 72) {
-      return 'Password must be less than 72 characters';
+      return 'password must be less than 72 characters';
     }
 
     if (password.startsWith(' ') || password.endsWith(' ')) {
-      return 'Password must not start or end with empty spaces';
+      return 'password must not start or end with empty spaces';
     }
 
     if (!REGEX_UPPER_LOWER_NUMBER.test(password)) {
-      return 'Password must contain at least 1 uppercase, lowercase and number characters';
+      return 'password must contain at least 1 uppercase, lowercase and number characters';
     }
   }
 

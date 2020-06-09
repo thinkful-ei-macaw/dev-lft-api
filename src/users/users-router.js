@@ -126,7 +126,9 @@ usersRouter.patch('/', requireAuth, async (req, res, next) => {
       last_name,
       github_url,
       linkedin_url,
-      twitter_url
+      twitter_url,
+      bio,
+      skills
     } = req.body;
 
     const updatedUser = {
@@ -134,7 +136,8 @@ usersRouter.patch('/', requireAuth, async (req, res, next) => {
       last_name,
       github_url,
       linkedin_url,
-      twitter_url
+      twitter_url,
+      bio
     };
 
     // check that they gave any values to update
@@ -150,6 +153,42 @@ usersRouter.patch('/', requireAuth, async (req, res, next) => {
       return res.status(404).json({
         error: 'User not found'
       });
+
+    // validation that name has no special characters and is proper length
+    let names = ['first_name', 'last_name'];
+
+    names.forEach(name => {
+      if (name) {
+        const nameError = UsersService.validateName(req.body[name]);
+
+        if (nameError)
+          return res.status(400).json({ error: `${name} ${nameError}` });
+      }
+    });
+
+    //validation that url is no longer than 255 chars
+    let urls = ['github_url', 'linkedin_url', 'twitter_url'];
+
+    urls.forEach(url => {
+      if (url) {
+        const urlError = UsersService.validateURL(req.body[url]);
+        if (urlError) {
+          return res.status(400).json({ error: `${url} ${urlError}` });
+        }
+      }
+    });
+
+    if(bio && bio.length > 500) {
+      return res.status(400).json({ error: `bio must be fewer than 500 characters` })
+    } 
+
+    if(skills) {
+      let validSkills = skills.filter(item => {
+        item.length > 1
+      })
+      updatedUser.skills = validSkills
+    }
+
 
     // update the user
     await UsersService.updateItem(db, user_id, updatedUser);
