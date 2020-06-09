@@ -1,6 +1,35 @@
 const xss = require('xss');
 
+const REGEX_ALPHA_NUMBERS_AND_HYPHENS_UNDERSCORE_SPACE = /^[\w]+([-_\s]{1}[a-z0-9]+)*$/i;
+
 const ProjectsService = {
+  validateName(name) {
+    name = name.toString();
+    if (name.length < 2) {
+      return 'must be 3 or more characters';
+    }
+
+    if (name.length > 30) {
+      return 'must be less than 30 characters';
+    }
+
+    if (!REGEX_ALPHA_NUMBERS_AND_HYPHENS_UNDERSCORE_SPACE.test(name)) {
+      return 'must contain only alphabetic characters or numbers and only 1 hyphen, underscore or space between them';
+    }
+  },
+  validateProjectDescription(desc) {
+    desc = desc.toString();
+    if (desc.length < 10) {
+      return 'must be 10 or more characters';
+    }
+
+    if (desc.length > 255) {
+      return 'must be less than 255 characters';
+    }
+    if (!REGEX_ALPHA_NUMBERS_AND_HYPHENS_UNDERSCORE_SPACE.test(desc)) {
+      return 'must contain only alphabetic characters or numbers and only 1 hyphen, underscore or space between them';
+    }
+  },
   getAllWithVacancies(db) {
     return db
       .raw(

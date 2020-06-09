@@ -57,6 +57,20 @@ projectsRouter
           .json({ error: `Missing '${key}' in request body` });
       }
     }
+    // validate project name
+    const nameError = ProjectsService.validateName(name);
+    if (nameError)
+      return res.status(400).json({ error: `${name} ${nameError}` });
+    // validate description
+    const descError = ProjectsService.validateProjectDescription(description);
+    if (descError)
+      return res.status(400).json({ error: `${description} ${descError}` });
+    // validate tags
+    for (let i = 0; i < tags.length; i++) {
+      const tagError = ProjectsService.validateName(tags[i]);
+      if (tagError)
+        return res.status(400).json({ error: `${tags[i]} ${tagError}` });
+    }
 
     let handle = name
       .replace(/\s+/g, '-')
@@ -71,9 +85,7 @@ projectsRouter
 
       if (!doesHandleExist) {
         return handle;
-      }
-
-      else {
+      } else {
         handle = handle + Math.floor(Math.random() * 100);
         return checkHandle(handle);
       }
@@ -183,7 +195,7 @@ projectsRouter
     } catch (e) {
       next(e);
     }
-  })
+  });
 
 projectsRouter
   .route('/:project_id')
