@@ -5,6 +5,7 @@ const xss = require('xss');
 const REGEX_ALPHA_NO_SPACES_OR_NUMBERS = /^[A-Za-z'-]+$/;
 const REGEX_UPPER_LOWER_NUMBER = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])+/;
 const REGEX_APLHA_NUMBERS_HYPHENS_UNDERSCORES_NO_SPACES = /^[A-Za-z0-9_/-]+$/;
+const REGEX_URL_SIMPLE = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'*+,;=.]+$/;
 
 class UsersService extends Service {
   constructor(table_name) {
@@ -66,6 +67,12 @@ class UsersService extends Service {
 
     if (!REGEX_UPPER_LOWER_NUMBER.test(password)) {
       return 'Password must contain at least 1 uppercase, lowercase and number characters';
+    }
+  }
+
+  validateURL(url) {
+    if (!REGEX_URL_SIMPLE.test(url)) {
+      return 'is an invalid URL';
     }
   }
 
