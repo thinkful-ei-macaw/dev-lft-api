@@ -78,6 +78,7 @@ projectsRouter
       const tagError = ProjectsService.validateName(tags[i]);
       if (tagError)
         return res.status(400).json({ error: `Tag "${tags[i]}" ${tagError}` });
+    }
     // Validate project URLs if they are provided.
     for (const url of ['live_url', 'trello_url', 'github_url']) {
       if (req.body[url]) {
