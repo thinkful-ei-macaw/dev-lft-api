@@ -1,6 +1,6 @@
 const xss = require('xss');
 const Service = require('../base-service');
-const REGEX_APLHA_NUMBERS_HYPHENS_UNDERSCORES_NO_SPACES = /^[A-Za-z0-9_/-]+$/;
+const REGEX_APLHA_NUMBERS_HYPHENS_UNDERSCORES_AND_SPACES = /^[A-Za-z0-9_/-\s]+$/;
 
 class VacancyService extends Service {
   constructor(table_name) {
@@ -70,8 +70,8 @@ class VacancyService extends Service {
       return 'must be less than 30 characters';
     }
 
-    if (!REGEX_APLHA_NUMBERS_HYPHENS_UNDERSCORES_NO_SPACES.test(title)) {
-      return 'must contain only letters, numbers, hyphens, and underscores with no spaces';
+    if (!REGEX_APLHA_NUMBERS_HYPHENS_UNDERSCORES_AND_SPACES.test(title)) {
+      return 'must contain only letters, numbers, hyphens, and underscores or spaces';
     }
   }
 
