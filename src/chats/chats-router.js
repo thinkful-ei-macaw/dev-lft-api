@@ -1,5 +1,6 @@
 const express = require('express');
 const ChatsService = require('./chats-service');
+const UsersService = require('../users/users-service');
 const { requireAuth } = require('../middleware/jwt-auth');
 
 const chatsRouter = express.Router();
@@ -11,11 +12,11 @@ chatsRouter
   .post(bodyParser, async (req, res, next) => {
     const db = req.app.get('db');
     const author_id = req.user.id;
-    const { recipient_id, project_id, body } = req.body;
+    const { recipient_username, request_id, body } = req.body;
 
     for (const [key, value] of Object.entries({
-      recipient_id,
-      project_id,
+      recipient_username,
+      request_id,
       body
     })) {
       if (!value) {
@@ -26,22 +27,32 @@ chatsRouter
     }
 
     try {
-      /* First check to see if chat exists between users
+      // First, retrieve info for user we want to chat with
+      const recipient = await UsersService.getItemWhere(db, {
+        username: recipient_username
+      });
+
+      if (!recipient)
+        return res.status(404).json({
+          error: 'User not found'
+        });
+
+      /* Then, check to see if chat exists between users
       / for this project */
-      const chat = await ChatsService.getChatByProject(
+      const chat = await ChatsService.getChatByRequest(
         db,
-        project_id,
+        request_id,
         author_id,
-        recipient_id
+        recipient.id
       );
 
       // If there is no pre-existing chat
       if (!chat) {
         // insert new chat AND message
         const newChat = {
-          project_id,
+          request_id,
           author_id,
-          recipient_id
+          recipient_id: recipient.id
         };
 
         const resultingChat = await ChatsService.insertNewChat(db, newChat);
@@ -81,10 +92,11 @@ chatsRouter
     and another person */
     const user_id = req.user.id;
     try {
-      const chats = await ChatsService.getLatestChatMessages(
+      let chats = await ChatsService.getLatestChatMessages(
         req.app.get('db'),
         user_id
       );
+      chats = chats.map(ChatsService.serializeChat);
       return res.status(200).json({ chats });
     } catch (e) {
       next(e);
@@ -97,20 +109,20 @@ chatsRouter
   .get(async (req, res, next) => {
     // Get all the messages from a specific chat
     const { chat_id } = req.params;
-    const user_id = req.user.id;
+    const username = req.user.username;
     try {
       const allMessagesNoAuthorStatus = await ChatsService.getAllChatMessages(
         req.app.get('db'),
         chat_id
       );
 
-      const allMessages = allMessagesNoAuthorStatus.map(msg => {
+      let allMessages = allMessagesNoAuthorStatus.map(msg => {
         return {
           ...msg,
-          isAuthor: msg.author_id === user_id
+          isAuthor: msg.author_username === username
         };
       });
-
+      allMessages = allMessages.map(ChatsService.serializeMessage);
       return res.status(200).json({ allMessages });
     } catch (e) {
       next(e);

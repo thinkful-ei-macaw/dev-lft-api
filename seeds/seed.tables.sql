@@ -60,13 +60,14 @@ VALUES
     'https://www.linkedin.com/in/jtknox'
   );
 
-INSERT INTO "projects" ("id", "name", "description", "creator_id", "tags", "github_url")
+INSERT INTO "projects" ("id", "name", "description", "creator_id", "handle", "tags", "github_url")
 VALUES 
   (
     1,
     'CSS Legends',
     'A game to build your knowledge of CSS, and conquer the world... kinda.',
     1,
+    'css-legends',
     ARRAY [ 'React', 'JavaScript', 'CSS', 'Game Development' ],
     'https://github.com/malcolmkiano/css-legends'
   ),
@@ -75,6 +76,7 @@ VALUES
     'Dev LFT Mobile App',
     'Build the perfect team to conquer your side projects with DevLFT!',
     3,
+    'dev-lft-mobile-app',
     ARRAY [ 'React Native', 'Android', 'iOS' ],
     'https://github.com/thinkful-ei-macaw/dev-lft'
   );
