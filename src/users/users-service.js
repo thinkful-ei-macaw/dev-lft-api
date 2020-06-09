@@ -4,19 +4,31 @@ const xss = require('xss');
 
 const REGEX_ALPHA_NO_SPACES_OR_NUMBERS = /^[A-Za-z'-]+$/;
 const REGEX_UPPER_LOWER_NUMBER = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])+/;
-const REGEX_APLHA_NUMBERS_HYPHENS_UNDERSCORES_NO_SPACES = /^[A-Za-z0-9_/-]+$/;
+const REGEX_ALPHA_NUMBERS_HYPHENS_UNDERSCORES_NO_SPACES = /^[A-Za-z0-9_/-]+$/;
 const REGEX_URL_SIMPLE = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'*+,;=.]+$/;
+const REGEX_ALPHA_NUMBERS_PERIOD_SPACE_HYPHEN =  /^[A-Za-z0-9_,./-\s]+$/;
 
 class UsersService extends Service {
   constructor(table_name) {
     super(table_name);
   }
 
-  validateURL(url) {
-    url = url.toString()
+  validateSkills(skills) {
+    let allSkills = skills.join(',')
 
+    if (!REGEX_ALPHA_NUMBERS_PERIOD_SPACE_HYPHEN.test(allSkills)) {
+      return 'skills can only contain letters, numbers, periods, and hyphens';
+    }
+  }
+
+  validateURL(url) {
+    url = url.toString();
+
+    if (!REGEX_URL_SIMPLE.test(url)) {
+      return 'is an invalid URL';
+    }
     if (url.length > 255) {
-      return 'must be fewer than 255 characters'
+      return 'must be fewer than 255 characters';
     }
   }
 
@@ -78,17 +90,14 @@ class UsersService extends Service {
     }
   }
 
-  validateURL(url) {
-    if (!REGEX_URL_SIMPLE.test(url)) {
-      return 'is an invalid URL';
-    }
-  }
-
   hashPassword(password) {
     return bcrypt.hash(password, 10);
   }
 
   serializeUser(user) {
+    let skills = user.skills.map(skill => {
+      return xss(skill);
+    });
     return {
       username: user.username,
       first_name: user.first_name,
@@ -96,6 +105,8 @@ class UsersService extends Service {
       github_url: xss(user.github_url),
       linkedin_url: xss(user.linkedin_url),
       twitter_url: xss(user.twitter_url),
+      bio: xss(user.bio),
+      skills: skills,
       date_created: new Date(user.date_created).toISOString()
     };
   }
