@@ -96,6 +96,23 @@ class VacancyService extends Service {
       return 'must be less than 30 characters';
     }
   }
+
+  validateTags(tags) {
+    if (tags.length > 10) {
+      return 'must be no more than 10 skills';
+    }
+  }
+
+  validateTagLength(tag) {
+    tag = tag.toString();
+    if (tag.length < 3) {
+      return 'must be at least 3 characters';
+    }
+
+    if (tag.length > 30) {
+      return 'must be no more than 30 characters';
+    }
+  }
 }
 
 module.exports = new VacancyService('vacancies');
