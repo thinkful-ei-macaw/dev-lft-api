@@ -1,11 +1,6 @@
 async function requireOwner(req, res, next) {
-<<<<<<< HEAD
-  const is_creator = await isProjectCreator(req);
-  if (!is_creator) {
-=======
   const is_creator = await isProjectCreator(req, res);
   if (!is_creator && !res.headersSent) {
->>>>>>> 6d4c0184e5c95161891708212c4acbb796ef1fd6
     return res.status(401).json({ error: 'Unauthorized request' });
   }
   req.user.role = 'owner';
@@ -13,13 +8,8 @@ async function requireOwner(req, res, next) {
 }
 
 async function requireMember(req, res, next) {
-<<<<<<< HEAD
-  const is_creator = await isProjectCreator(req);
-  const is_member = await isProjectMember(req);
-=======
   const is_creator = await isProjectCreator(req, res);
   const is_member = await isProjectMember(req, res);
->>>>>>> 6d4c0184e5c95161891708212c4acbb796ef1fd6
   if (!is_creator && !is_member) {
     return res.status(401).json({ error: 'Unauthorized request' });
   }
@@ -27,21 +17,6 @@ async function requireMember(req, res, next) {
   next();
 }
 
-<<<<<<< HEAD
-async function isProjectCreator(req) {
-  const project_id = await findProjectId(req);
-  const db = req.app.get('db');
-  const project = await db
-    .from('projects')
-    .select('*')
-    .where({ id: project_id })
-    .first();
-  return project.creator_id === req.user.id;
-}
-
-async function isProjectMember(req) {
-  const project_id = await findProjectId(req);
-=======
 async function isProjectCreator(req, res) {
   const { project_id, creator_id } = await findProjectId(req, res);
   return creator_id === req.user.id;
@@ -49,7 +24,6 @@ async function isProjectCreator(req, res) {
 
 async function isProjectMember(req, res) {
   const { project_id } = await findProjectId(req, res);
->>>>>>> 6d4c0184e5c95161891708212c4acbb796ef1fd6
   const db = req.app.get('db');
   const positions = await db
     .from('vacancies')
