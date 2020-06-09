@@ -58,6 +58,7 @@ projectsRouter
       }
     }
 
+    // Validate project URLs if they are provided.
     for (const url of ['live_url', 'trello_url', 'github_url']) {
       if (req.body[url]) {
         const urlError = ProjectsService.validateURL(req.body[url]);
