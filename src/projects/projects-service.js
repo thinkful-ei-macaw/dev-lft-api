@@ -78,7 +78,16 @@ const ProjectsService = {
     return db('projects').where({ id }).first();
   },
   getProjectByHandle(db, handle) {
-    return db('projects').where({ handle }).first();
+    return db('projects')
+      .where({ handle })
+      .join('users', 'users.id', 'projects.creator_id')
+      .select(
+        'projects.*',
+        'users.first_name',
+        'users.last_name',
+        'users.username'
+      )
+      .first();
   },
   doesHandleExist(db, handle) {
     return db('projects').where({ handle }).first();
@@ -132,6 +141,15 @@ const ProjectsService = {
       handle: project.handle,
       openVacancies: project.openVacancies
     };
+
+    if (project.username) {
+      serialized['project_creator'] = {
+        fist_name: project.first_name,
+        last_name: project.last_name,
+        username: project.username
+      };
+    }
+
     return serialized;
   }
 };
