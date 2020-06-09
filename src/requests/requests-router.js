@@ -68,37 +68,26 @@ requestsRouter.patch('/:id', requireAuth, requireOwner, (req, res, next) => {
     });
   }
 
-  RequestsService.getItemById(db, request_id)
+  // update the request
+  RequestsService.updateItem(db, request_id, updatedRequest)
     .then(request => {
-      // 404 if request doesn't exist
-      if (!request)
-        return res.status(404).json({
-          error: 'Request not found'
-        });
+      if (!request) return;
+      // if the status was approved
+      if (status === 'approved') {
+        // put the user into the vacancy
+        const { user_id, vacancy_id } = request;
+        const updatedVacancy = { user_id };
+        VacanciesService.updateItem(db, vacancy_id, updatedVacancy).catch(next);
 
-      // update the request
-      RequestsService.updateItem(db, request_id, updatedRequest)
-        .then(request => {
-          // if the status was approved
-          if (status === 'approved') {
-            // put the user into the vacancy
-            const { user_id, vacancy_id } = request;
-            const updatedVacancy = { user_id };
-            VacanciesService.updateItem(db, vacancy_id, updatedVacancy).catch(
-              next
-            );
+        // deny all other requests for the same vacancy
+        const deniedRequest = { status: 'denied' };
+        RequestsService.updateItemsWhere(db, { vacancy_id }, deniedRequest)
+          .whereNot({ id: request.id })
+          .catch(next);
+      }
 
-            // deny all other requests for the same vacancy
-            const deniedRequest = { status: 'denied' };
-            RequestsService.updateItemsWhere(db, { vacancy_id }, deniedRequest)
-              .whereNot({ id: request.id })
-              .catch(next);
-          }
-
-          // send 'em back a thing
-          return res.status(204).end();
-        })
-        .catch(next);
+      // send 'em back a thing
+      return res.status(204).end();
     })
     .catch(next);
 });
@@ -112,23 +101,13 @@ requestsRouter.get(
     const db = req.app.get('db');
     const { project_id } = req.params;
 
-    // check if project exists
-    ProjectsService.getProjectById(db, project_id)
-      .then(project => {
-        // 404 if no project
-        if (!project)
-          return res.status(404).json({
-            error: 'Project not found'
-          });
-
-        // send 'em a list
-        RequestsService.getRequests(db, project_id)
-          .then(requests => {
-            return res
-              .status(200)
-              .json(requests.map(RequestsService.serializeRequest));
-          })
-          .catch(next);
+    // send 'em a list
+    RequestsService.getRequests(db, project_id)
+      .then(requests => {
+        if (res.headersSent) return;
+        return res
+          .status(200)
+          .json(requests.map(RequestsService.serializeRequest));
       })
       .catch(next);
   }
