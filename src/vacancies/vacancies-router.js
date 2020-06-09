@@ -36,6 +36,23 @@ vacancyRouter
         project_id
       };
 
+      const wrongTitle = VacancyService.validateTitle(title);
+      if (wrongTitle) {
+        return res.status(400).json({ error: `${title} ${wrongTitle}` });
+      }
+
+      const wrongDescription = VacancyService.validateDescription(description);
+      if (wrongDescription) {
+        return res
+          .status(400)
+          .json({ error: `${description} ${wrongDescription}` });
+      }
+
+      const wrongSkills = VacancyService.validateSkills(skills);
+      if (wrongSkills) {
+        return res.status(400).json({ error: `${skills} ${wrongSkills}` });
+      }
+
       const requiredFields = ['title', 'description'];
 
       for (const field of requiredFields)
