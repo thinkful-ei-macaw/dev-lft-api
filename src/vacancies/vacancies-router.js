@@ -4,6 +4,7 @@ const VacancyService = require('./vacancies-service');
 const vacancyRouter = express.Router();
 const jsonParser = express.json();
 const { requireAuth } = require('../middleware/jwt-auth');
+const { requireOwner } = require('../middleware/user-role-verification');
 
 vacancyRouter.get('/:project_id', requireAuth, async (req, res, next) => {
   try {
@@ -23,7 +24,7 @@ vacancyRouter.get('/:project_id', requireAuth, async (req, res, next) => {
 
 vacancyRouter
   .route('/:project_id')
-  .post(requireAuth, jsonParser, async (req, res, next) => {
+  .post(requireAuth, requireOwner, jsonParser, async (req, res, next) => {
     try {
       const db = req.app.get('db');
       const { title, description, skills } = req.body;
@@ -51,12 +52,12 @@ vacancyRouter
   });
 
 vacancyRouter
-  .route('/:vacancy_id')
-  .patch(requireAuth, jsonParser, async (req, res, next) => {
+  .route('/:id')
+  .patch(requireAuth, requireOwner, jsonParser, async (req, res, next) => {
     try {
       const db = req.app.get('db');
       const { title, description, skills, user_id } = req.body;
-      const { vacancy_id } = req.params;
+      const vacancy_id = req.params.id;
       const newVacancy = {
         title,
         description,
@@ -72,9 +73,7 @@ vacancyRouter
         });
 
       const vacancy = await VacancyService.getItemById(db, vacancy_id);
-      if (!vacancy) {
-        return res.status(404).json({ error: 'Vacancy does not exist' });
-      }
+      if (!vacancy) return;
 
       // delete the request if the user_id is being set to null
       if (user_id === null) {
@@ -97,16 +96,14 @@ vacancyRouter
   });
 
 vacancyRouter
-  .route('/:vacancy_id')
-  .delete(requireAuth, async (req, res, next) => {
+  .route('/:id')
+  .delete(requireAuth, requireOwner, async (req, res, next) => {
     try {
       const db = req.app.get('db');
-      const { vacancy_id } = req.params;
+      const vacancy_id = req.params.id;
       const vacancy = await VacancyService.getItemById(db, vacancy_id);
 
-      if (!vacancy) {
-        return res.status(404).json({ error: 'Vacancy does not exist' });
-      }
+      if (!vacancy) return;
 
       await VacancyService.deleteItem(db, vacancy_id);
       res.status(204).end();
