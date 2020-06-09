@@ -1,6 +1,7 @@
 const xss = require('xss');
 
 const REGEX_ALPHA_NUMBERS_AND_HYPHENS_UNDERSCORE_SPACE = /^[\w]+([-_\s]{1}[a-z0-9]+)*$/i;
+const REGEX_URL_SIMPLE = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'*+,;=.]+$/;
 
 const ProjectsService = {
   validateName(name) {
@@ -134,6 +135,13 @@ const ProjectsService = {
   deleteProject(db, id) {
     return db('projects').where({ id }).del();
   },
+
+  validateURL(url) {
+    if (!REGEX_URL_SIMPLE.test(url)) {
+      return 'is an invalid URL';
+    }
+  },
+
   serializeProject(project) {
     const serialized = {
       vacancies: project.vacancies,
