@@ -27,7 +27,7 @@ vacancyRouter
   .post(requireAuth, requireOwner, jsonParser, async (req, res, next) => {
     try {
       const db = req.app.get('db');
-      const { title, description, skills } = req.body;
+      const { title, description, skills = [] } = req.body;
       const { project_id } = req.params;
       const newVacancy = {
         title,
@@ -43,6 +43,25 @@ vacancyRouter
           return res.status(400).json({
             error: `Missing '${field}' in request body`
           });
+
+      const wrongTitle = VacancyService.validateTitle(title);
+      if (wrongTitle) {
+        return res.status(400).json({ error: `${title} ${wrongTitle}` });
+      }
+
+      const wrongDescription = VacancyService.validateDescription(description);
+      if (wrongDescription) {
+        return res
+          .status(400)
+          .json({ error: `${description} ${wrongDescription}` });
+      }
+
+      const wrongSkills = skills.length
+        ? VacancyService.validateSkills(skills)
+        : false;
+      if (wrongSkills) {
+        return res.status(400).json({ error: `${skills} ${wrongSkills}` });
+      }
 
       const vacancy = await VacancyService.insertItem(db, newVacancy);
       res.status(201).json(VacancyService.serializeVacancy(vacancy));
