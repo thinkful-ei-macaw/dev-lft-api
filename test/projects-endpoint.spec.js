@@ -2,7 +2,7 @@ const knex = require('knex');
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
-describe('Projects Endpoints', function () {
+describe.only('Projects Endpoints', function () {
   let db;
 
   const {
@@ -205,14 +205,16 @@ describe('Projects Endpoints', function () {
       );
 
       it('responds with 200 and the specified project', () => {
+        this.retries(3);
         const testUser = testUsers[0];
-        const projects = helpers.makeExpectedProjects(
-          testProjects,
-          testVacancies
+        const testProject = testProjects[0];
+        const expectedProject = helpers.makeExpectedProjectByHandle(
+          testProject,
+          testVacancies,
+          testUser
         );
 
-        const project_handle = projects[0].handle;
-        const expectedProject = projects[0];
+        const project_handle = testProject.handle;
         expectedProject.userRole = 'owner';
 
         return supertest(app)
@@ -333,16 +335,19 @@ describe('Projects Endpoints', function () {
 
       it('responds with 204 and updates the project', () => {
         const testUser = testUsers[0];
+        const testProject = testProjects[0];
         const idToUpdate = testProjects[0].id;
         const updatedProject = {
           name: 'test update project name',
           description: 'test update project description'
         };
-        const testProject = helpers.makeExpectedProjects(
-          testProjects,
-          testVacancies
-        )[0];
-        const expectedProject = testProject;
+
+        const expectedProject = helpers.makeExpectedProjectByHandle(
+          testProject,
+          testVacancies,
+          testUser
+        );
+
         expectedProject.name = updatedProject.name;
         expectedProject.description = updatedProject.description;
         expectedProject.userRole = 'owner';

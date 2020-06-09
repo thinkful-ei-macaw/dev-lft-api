@@ -353,6 +353,30 @@ function makeExpectedProjects(projects, vacancies) {
   });
 }
 
+function makeExpectedProjectByHandle(project, vacancies, user) {
+  let numVacancies = vacancies.filter(v => v.project_id === project.id).length;
+  const expectedProject = {
+    id: project.id,
+    name: project.name,
+    description: project.description,
+    tags: null,
+    live_url: null,
+    trello_url: null,
+    github_url: null,
+    date_created: project.date_created,
+    userRole: null,
+    handle: project.handle,
+    openVacancies: numVacancies.toString(),
+    project_creator: {
+      first_name: user.first_name,
+      last_name: user.last_name,
+      username: user.username
+    }
+  };
+
+  return expectedProject;
+}
+
 function makeMaliciousData(user, chat) {
   const maliciousProject = {
     id: 111,
@@ -607,6 +631,7 @@ module.exports = {
 
   makeExpectedProjects,
   makeExpectedUserProjects,
+  makeExpectedProjectByHandle,
   makeExpectedVacancies,
   makeExpectedRequests,
   makeExpectedPosts,

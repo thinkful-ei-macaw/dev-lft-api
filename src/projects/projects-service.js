@@ -144,7 +144,7 @@ const ProjectsService = {
 
     if (project.username) {
       serialized['project_creator'] = {
-        fist_name: project.first_name,
+        first_name: project.first_name,
         last_name: project.last_name,
         username: project.username
       };
