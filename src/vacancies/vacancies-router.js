@@ -68,14 +68,14 @@ vacancyRouter
         return res.status(400).json({ error: `${skills} ${tagsLimit}` });
       }
 
-      for (var i = 0; i < skills.length; i++) {
-        const tagsLimitLength = VacancyService.validateTagLength(skills[i]);
-        if (tagsLimitLength) {
+      skills.forEach(skill => {
+        const tagsLengthError = VacancyService.validateTagLength(skill);
+        if (tagsLengthError) {
           return res
             .status(400)
-            .json({ error: `${skills[i]} ${tagsLimitLength}` });
+            .json({ error: `${skills} ${tagsLengthError}` });
         }
-      }
+      });
 
       const vacancy = await VacancyService.insertItem(db, newVacancy);
       res.status(201).json(VacancyService.serializeVacancy(vacancy));
