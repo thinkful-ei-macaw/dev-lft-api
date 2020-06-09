@@ -6,7 +6,7 @@ const ProjectsService = {
   validateName(name) {
     name = name.toString();
     if (name.length < 2) {
-      return 'must be 3 or more characters';
+      return 'must be 2 or more characters';
     }
 
     if (name.length > 30) {
