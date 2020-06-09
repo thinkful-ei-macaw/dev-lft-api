@@ -1,5 +1,6 @@
 const xss = require('xss');
 const Service = require('../base-service');
+const REGEX_APLHA_NUMBERS_HYPHENS_UNDERSCORES_AND_SPACES = /^[A-Za-z0-9_/-\s]+$/;
 
 class VacancyService extends Service {
   constructor(table_name) {
@@ -57,6 +58,43 @@ class VacancyService extends Service {
       description: xss(vacancy.description),
       skills: vacancy.skills
     };
+  }
+
+  validateTitle(title) {
+    title = title.toString();
+    if (title.length < 2) {
+      return 'must be 2 or more characters';
+    }
+
+    if (title.length > 30) {
+      return 'must be less than 30 characters';
+    }
+
+    if (!REGEX_APLHA_NUMBERS_HYPHENS_UNDERSCORES_AND_SPACES.test(title)) {
+      return 'must contain only letters, numbers, hyphens, and underscores or spaces';
+    }
+  }
+
+  validateDescription(description) {
+    description = description.toString();
+    if (description.length < 10) {
+      return 'must be 10 or more characters';
+    }
+
+    if (description.length > 255) {
+      return 'must be less than 255 characters';
+    }
+  }
+
+  validateSkills(skills) {
+    skills = skills.toString();
+    if (skills.length < 2) {
+      return 'must be 2 or more characters';
+    }
+
+    if (skills.length > 30) {
+      return 'must be less than 30 characters';
+    }
   }
 }
 

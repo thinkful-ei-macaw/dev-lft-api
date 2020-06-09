@@ -10,7 +10,12 @@ class PostsService extends Service {
     return super
       .getItemsWhere(db, { project_id })
       .join('users', 'users.id', 'posts.user_id')
-      .select('posts.*', 'users.first_name', 'users.last_name');
+      .select(
+        'posts.*',
+        'users.first_name',
+        'users.last_name',
+        'users.username'
+      );
   }
 
   serializePost(post, user_id) {
@@ -20,6 +25,7 @@ class PostsService extends Service {
       date_created: post.date_created,
       first_name: post.first_name,
       last_name: post.last_name,
+      username: post.username,
       canEdit: post.user_id === user_id
     };
   }

@@ -24,15 +24,6 @@ describe('User Endpoints', function () {
 
   afterEach('cleanup', () => helpers.cleanTables(db));
 
-  describe(`GET /api/users`, () => {
-    beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
-    it(`responds with 200 and a number of current users`, () => {
-      return supertest(app)
-        .get('/api/users')
-        .expect(200, { count: testUsers.length });
-    });
-  });
-
   describe(`GET /api/users/:username`, () => {
     beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
 

@@ -140,6 +140,25 @@ usersRouter.patch('/', requireAuth, async (req, res, next) => {
       bio
     };
 
+    // check validity of names if provided
+    for (const name of ['first_name', 'last_name']) {
+      if (req.body[name]) {
+        const nameError = UsersService.validateName(req.body[name]);
+        if (nameError)
+          return res.status(400).json({ error: `${name} ${nameError}` });
+      }
+    }
+
+    for (const url of ['github_url', 'linkedin_url', 'twitter_url']) {
+      if (req.body[url]) {
+        const urlError = UsersService.validateURL(req.body[url]);
+        if (urlError)
+          return res
+            .status(400)
+            .json({ error: `${req.body[url]} ${urlError}` });
+      }
+    }
+
     // check that they gave any values to update
     const numberOfValues = Object.values(updatedUser).filter(Boolean).length;
     if (numberOfValues === 0)
