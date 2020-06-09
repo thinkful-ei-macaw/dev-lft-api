@@ -16,6 +16,7 @@ class PostsService extends Service {
         'users.last_name',
         'users.username'
       );
+    // .orderBy(['date_created', { order: 'desc' }]);
   }
 
   serializePost(post, user_id) {
