@@ -112,7 +112,7 @@ const ProjectsService = {
     const serialized = {
       vacancies: project.vacancies,
       id: project.id,
-      name: project.name,
+      name: xss(project.name),
       description: xss(project.description),
       tags: project.tags,
       live_url: project.live_url,

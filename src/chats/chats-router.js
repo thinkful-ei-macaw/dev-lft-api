@@ -92,10 +92,11 @@ chatsRouter
     and another person */
     const user_id = req.user.id;
     try {
-      const chats = await ChatsService.getLatestChatMessages(
+      let chats = await ChatsService.getLatestChatMessages(
         req.app.get('db'),
         user_id
       );
+      chats = chats.map(ChatsService.serializeChat);
       return res.status(200).json({ chats });
     } catch (e) {
       next(e);
@@ -115,13 +116,13 @@ chatsRouter
         chat_id
       );
 
-      const allMessages = allMessagesNoAuthorStatus.map(msg => {
+      let allMessages = allMessagesNoAuthorStatus.map(msg => {
         return {
           ...msg,
           isAuthor: msg.author_username === username
         };
       });
-
+      allMessages = allMessages.map(ChatsService.serializeMessage);
       return res.status(200).json({ allMessages });
     } catch (e) {
       next(e);

@@ -45,25 +45,25 @@ function makeProjectsArray(users) {
       description:
         'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus consequuntur deserunt commodi, nobis qui inventore corrupti iusto aliquid debitis unde non.Adipisci, pariatur.Molestiae, libero esse hic adipisci autem neque ?',
       date_created: '2029-01-22T16:28:32.615Z',
-      handle: 'test-proj-1',
+      handle: 'test-proj-1'
     },
     {
       id: 2,
       name: 'Test Proj 2',
-      handle: 'test-proj-2',
       creator_id: users[1].id,
       description:
         'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus consequuntur deserunt commodi, nobis qui inventore corrupti iusto aliquid debitis unde non.Adipisci, pariatur.Molestiae, libero esse hic adipisci autem neque ?',
-      date_created: '2029-01-22T16:28:32.615Z'
+      date_created: '2029-01-22T16:28:32.615Z',
+      handle: 'test-proj-2'
     },
     {
       id: 3,
       name: 'Test Proj 3',
-      handle: 'test-proj-3',
       creator_id: users[2].id,
       description:
         'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus consequuntur deserunt commodi, nobis qui inventore corrupti iusto aliquid debitis unde non.Adipisci, pariatur.Molestiae, libero esse hic adipisci autem neque ?',
-      date_created: '2029-01-22T16:28:32.615Z'
+      date_created: '2029-01-22T16:28:32.615Z',
+      handle: 'test-proj-3'
     }
   ];
 }
@@ -334,12 +334,10 @@ function makeExpectedProjects(projects, vacancies) {
       vacancy => vacancy.project_id === project.id && vacancy.user_id == null
     );
   });
-
-
   return filteredProjects.map(project => {
-    let openVacancies = vacancies.filter(vacancy => { 
-      return vacancy.project_id === project.id && vacancy.user_id == null})
-      
+    let openVacancies = vacancies.filter(vacancy => {
+      return vacancy.project_id === project.id && vacancy.user_id == null;
+    });
     return {
       id: project.id,
       name: project.name,
@@ -350,17 +348,100 @@ function makeExpectedProjects(projects, vacancies) {
       github_url: null,
       date_created: project.date_created,
       handle: project.handle,
-      openVacancies: openVacancies.length.toString(),
+      openVacancies: openVacancies.length.toString()
     };
   });
+}
+
+function makeMaliciousData(user, chat) {
+  const maliciousProject = {
+    id: 111,
+    name: 'Malicious data <script>alert("xss");</script>',
+    creator_id: user.id,
+    description: `Bad image <img src="https://url.to.file.which/does-not.exist" onerror="alert(document.cookie);">. But not <strong>all</strong> bad.`,
+    date_created: new Date(),
+    handle: 'bad-handle'
+  };
+  const expectedProject = {
+    ...maliciousProject,
+    name: `Malicious data &lt;script&gt;alert("xss");&lt;/script&gt;`,
+    description: `Bad image <img src="https://url.to.file.which/does-not.exist">. But not <strong>all</strong> bad.`
+  };
+  const maliciousVacancy = {
+    id: 666,
+    project_id: maliciousProject.id,
+    title: 'Malicious data <script>alert("xss");</script>',
+    user_id: null,
+    description: `Bad image <img src="https://url.to.file.which/does-not.exist" onerror="alert(document.cookie);">. But not <strong>all</strong> bad.`,
+    skills: ['<div>skills <script>alert("xss");</script></div>']
+  };
+  const expectedVacancy = {
+    ...maliciousVacancy,
+    title: `Malicious data &lt;script&gt;alert("xss");&lt;/script&gt;`,
+    description: `Bad image <img src="https://url.to.file.which/does-not.exist">. But not <strong>all</strong> bad.`,
+    skills: [`<div>skills &lt;script&gt;alert("xss");&lt;/script&gt;</div>`]
+  };
+  const maliciousPost = {
+    id: 222,
+    project_id: maliciousProject.id,
+    user_id: user.id,
+    message: 'Malicious data <script>alert("xss");</script>',
+    date_created: new Date()
+  };
+  const expectedPost = {
+    ...maliciousPost,
+    message: `Malicious data &lt;script&gt;alert("xss");&lt;/script&gt;`
+  };
+  const maliciousMessage = {
+    id: 999,
+    chat_id: chat.id,
+    author_id: user.id,
+    body: 'Malicious data <script>alert("xss");</script>',
+    date_created: '2029-02-22T16:28:32.615Z'
+  };
+  const expectedMessage = {
+    ...maliciousMessage,
+    body: `Malicious data &lt;script&gt;alert("xss");&lt;/script&gt;`
+  };
+  return {
+    maliciousProject,
+    expectedProject,
+    maliciousVacancy,
+    expectedVacancy,
+    maliciousPost,
+    expectedPost,
+    maliciousMessage,
+    expectedMessage
+  };
+}
+
+async function seedMaliciousProject(db, user, project, vacancy) {
+  await db.into('users').insert(user);
+  await db.into('projects').insert(project);
+  await db.into('vacancies').insert(vacancy);
+}
+
+async function seedMaliciousPost(db, project, post) {
+  await db.into('projects').insert(project);
+  await db.into('posts').insert(post);
+}
+
+async function seedMaliciousVacancy(db, project, vacancy) {
+  await db.into('projects').insert(project);
+  await db.into('vacancies').insert(vacancy);
+}
+
+async function seedMaliciousMessage(db, message) {
+  await db.into('messages').insert(message);
 }
 
 function makeExpectedUserProjects(user_id, projects, vacancies) {
   let userProjects = projects.filter(project => project.creator_id === user_id);
 
   return userProjects.map(project => {
-    let openVacancies = vacancies.filter(vacancy => { 
-      return vacancy.project_id === project.id && vacancy.user_id == null})
+    let openVacancies = vacancies.filter(vacancy => {
+      return vacancy.project_id === project.id && vacancy.user_id == null;
+    });
     return {
       id: project.id,
       name: project.name,
@@ -371,7 +452,7 @@ function makeExpectedUserProjects(user_id, projects, vacancies) {
       github_url: null,
       date_created: project.date_created,
       handle: project.handle,
-      openVacancies: openVacancies.length.toString(),
+      openVacancies: openVacancies.length.toString()
     };
   });
 }
@@ -537,5 +618,11 @@ module.exports = {
   makeFixtures,
   seedProjectsTables,
   seedUsers,
-  cleanTables
+  cleanTables,
+
+  makeMaliciousData,
+  seedMaliciousProject,
+  seedMaliciousPost,
+  seedMaliciousVacancy,
+  seedMaliciousMessage
 };
