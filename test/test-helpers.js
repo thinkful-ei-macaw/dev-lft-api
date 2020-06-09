@@ -487,6 +487,7 @@ function makeExpectedPosts(user, posts, project_id) {
   return projPosts.map(post => {
     return {
       id: post.id,
+      username: user.username,
       message: post.message,
       date_created: post.date_created,
       first_name: user.first_name,
