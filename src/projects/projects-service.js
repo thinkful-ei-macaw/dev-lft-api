@@ -25,7 +25,7 @@ const ProjectsService = {
     }
 
     if (desc.length > 255) {
-      return 'must be less than 255 characters';
+      return 'must be 255 characters or less';
     }
   },
   getAllWithVacancies(db) {

@@ -67,11 +67,10 @@ projectsRouter
     // validate description
     const descError = ProjectsService.validateProjectDescription(description);
     if (descError)
-      return res
-        .status(400)
-        .json({ error: `Description "${description}" ${descError}` });
+      return res.status(400).json({ error: `Description ${descError}` });
     // validate tags
-    if (tags.length > 10) {
+    const TAG_LIMIT = 10;
+    if (tags.length > TAG_LIMIT) {
       return res.status(400).json({ error: `You must enter up to 10 tags!` });
     }
     for (let i = 0; i < tags.length; i++) {
