@@ -53,7 +53,7 @@ class VacancyService extends Service {
       first_name: vacancy.first_name,
       last_name: vacancy.last_name,
       username: vacancy.username,
-      title: vacancy.title,
+      title: xss(vacancy.title),
       description: xss(vacancy.description),
       skills: vacancy.skills
     };

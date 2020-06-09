@@ -72,23 +72,6 @@ usersRouter.post('/', async (req, res, next) => {
   }
 });
 
-// GET `/users` to get a list of all users (just the number)
-usersRouter.get('/', async (req, res, next) => {
-  try {
-    const db = req.app.get('db');
-
-    // get all the users from the table
-    const users = await UsersService.getAllItems(db);
-
-    // send 'em the number
-    return res.status(200).json({
-      count: users.length
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
 usersRouter.get('/profile', requireAuth, async (req, res, next) => {
   try {
     const db = req.app.get('db');
