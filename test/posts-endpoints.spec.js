@@ -45,7 +45,6 @@ describe('Posts Endpoints', () => {
   afterEach('cleanup', () => helpers.cleanTables(db));
 
   describe('GET /api/posts/:project_id', () => {
-
     it('responds with 200 and the posts', () => {
       const testProject = testProjects[0];
       const testUser = testUsers[0];
@@ -62,7 +61,6 @@ describe('Posts Endpoints', () => {
   });
 
   describe(`POST /api/posts/:project_id`, () => {
-
     it('creates a post, responding with 201 and the post', () => {
       const testProject = testProjects[0];
       const testUser = testUsers[0];
@@ -113,7 +111,6 @@ describe('Posts Endpoints', () => {
   });
 
   describe('PATCH /api/posts/:post_id', () => {
-
     it('responds with 204 and updates the post', () => {
       const testUser = testUsers[0];
       const testProject = testProjects[0];

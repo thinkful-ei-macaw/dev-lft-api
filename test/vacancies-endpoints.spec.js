@@ -125,9 +125,9 @@ describe('Vacancies Endpoints', () => {
       });
     });
   });
-  describe('PATCH /api/vacancies/:vacancy_id', () => {
+  describe('PATCH /api/vacancies/:id', () => {
     it('responds with 204 and updates the vacancy', () => {
-      const testUser = testUsers[2];
+      const testUser = testUsers[0];
       const idToUpdate = testVacancies[0].id;
       const updatedVacancy = {
         title: 'updated title',
@@ -143,7 +143,7 @@ describe('Vacancies Endpoints', () => {
     });
 
     it('responds with 400 and an error message when no fields are given to update', () => {
-      const testUser = testUsers[2];
+      const testUser = testUsers[0];
       const idToUpdate = testVacancies[0].id;
 
       const updatedVacancy = {};
@@ -171,12 +171,12 @@ describe('Vacancies Endpoints', () => {
         .set('Authorization', helpers.makeAuthHeader(testUser))
         .send(updatedVacancy)
         .expect(404, {
-          error: 'Vacancy does not exist'
+          error: 'Vacancy not found'
         });
     });
   });
 
-  describe('DELETE /api/vacancies/vacancy_id', () => {
+  describe('DELETE /api/vacancies/:id', () => {
     it('responds with 204 and deletes the vacancy', () => {
       const idToDelete = testVacancies[0].id;
       const testUser = testUsers[0];
@@ -205,7 +205,7 @@ describe('Vacancies Endpoints', () => {
         .delete(`/api/vacancies/${idToDelete}`)
         .set('Authorization', helpers.makeAuthHeader(testUser))
         .expect(404, {
-          error: 'Vacancy does not exist'
+          error: 'Vacancy not found'
         });
     });
   });

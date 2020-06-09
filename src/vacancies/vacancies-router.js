@@ -73,9 +73,7 @@ vacancyRouter
         });
 
       const vacancy = await VacancyService.getItemById(db, vacancy_id);
-      if (!vacancy) {
-        return res.status(404).json({ error: 'Vacancy does not exist' });
-      }
+      if (!vacancy) return;
 
       // delete the request if the user_id is being set to null
       if (user_id === null) {
@@ -105,9 +103,7 @@ vacancyRouter
       const vacancy_id = req.params.id;
       const vacancy = await VacancyService.getItemById(db, vacancy_id);
 
-      if (!vacancy) {
-        return res.status(404).json({ error: 'Vacancy does not exist' });
-      }
+      if (!vacancy) return;
 
       await VacancyService.deleteItem(db, vacancy_id);
       res.status(204).end();
