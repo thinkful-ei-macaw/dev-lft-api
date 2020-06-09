@@ -6,7 +6,7 @@ const REGEX_ALPHA_NO_SPACES_OR_NUMBERS = /^[A-Za-z'-]+$/;
 const REGEX_UPPER_LOWER_NUMBER = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])+/;
 const REGEX_ALPHA_NUMBERS_HYPHENS_UNDERSCORES_NO_SPACES = /^[A-Za-z0-9_/-]+$/;
 const REGEX_URL_SIMPLE = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'*+,;=.]+$/;
-const REGEX_ALPHA_NUMBERS_PERIOD_SPACE_HYPHEN =  /^[A-Za-z0-9_,./-\s]+$/;
+const REGEX_ALPHA_NUMBERS_PERIOD_SPACE_HYPHEN = /^[A-Za-z0-9_,./-\s]+$/;
 
 class UsersService extends Service {
   constructor(table_name) {
@@ -14,7 +14,7 @@ class UsersService extends Service {
   }
 
   validateSkills(skills) {
-    let allSkills = skills.join(',')
+    let allSkills = skills.join(',');
 
     if (!REGEX_ALPHA_NUMBERS_PERIOD_SPACE_HYPHEN.test(allSkills)) {
       return 'skills can only contain letters, numbers, periods, and hyphens';

@@ -173,19 +173,21 @@ usersRouter.patch('/', requireAuth, async (req, res, next) => {
         error: 'User not found'
       });
 
-    if(bio && bio.length > 500) {
-      return res.status(400).json({ error: `bio must be fewer than 500 characters` })
-    } 
+    if (bio && bio.length > 500) {
+      return res
+        .status(400)
+        .json({ error: `bio must be fewer than 500 characters` });
+    }
 
-    if(skills) {
-      let skillError = UsersService.validateSkills(skills)
+    if (skills) {
+      let skillError = UsersService.validateSkills(skills);
       if (skillError) {
-        return res.status(400).json({error: skillError})
+        return res.status(400).json({ error: skillError });
       }
       let validSkills = skills.filter(item => {
-        return /\S/.test(item); 
-      })
-      updatedUser.skills = validSkills
+        return /\S/.test(item);
+      });
+      updatedUser.skills = validSkills;
     }
 
     // update the user
