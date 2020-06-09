@@ -26,9 +26,6 @@ const ProjectsService = {
     if (desc.length > 255) {
       return 'must be less than 255 characters';
     }
-    if (!REGEX_ALPHA_NUMBERS_AND_HYPHENS_UNDERSCORE_SPACE.test(desc)) {
-      return 'must contain only alphabetic characters or numbers and only 1 hyphen, underscore or space between them';
-    }
   },
   getAllWithVacancies(db) {
     return db

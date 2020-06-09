@@ -36,7 +36,7 @@ projectsRouter
     const {
       name,
       description,
-      tags,
+      tags = [],
       live_url,
       trello_url,
       github_url
