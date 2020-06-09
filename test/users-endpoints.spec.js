@@ -187,7 +187,7 @@ describe('User Endpoints', function () {
         });
     });
 
-    it(`responds 400 'Password must be 8 or more characters' when empty password`, () => {
+    it(`responds 400 'password must be 8 or more characters' when empty password`, () => {
       const userShortPassword = {
         username: 'test username',
         password: '1234567',
@@ -197,10 +197,10 @@ describe('User Endpoints', function () {
       return supertest(app)
         .post('/api/users')
         .send(userShortPassword)
-        .expect(400, { error: `Password must be 8 or more characters` });
+        .expect(400, { error: `password must be 8 or more characters` });
     });
 
-    it(`responds 400 'Password must be less than 72 characters' when long password`, () => {
+    it(`responds 400 'password must be less than 72 characters' when long password`, () => {
       const userLongPassword = {
         username: 'test username',
         password: '*'.repeat(73),
@@ -210,7 +210,7 @@ describe('User Endpoints', function () {
       return supertest(app)
         .post('/api/users')
         .send(userLongPassword)
-        .expect(400, { error: `Password must be less than 72 characters` });
+        .expect(400, { error: `password must be less than 72 characters` });
     });
 
     it(`responds 400 error when password starts with spaces`, () => {
@@ -224,7 +224,7 @@ describe('User Endpoints', function () {
         .post('/api/users')
         .send(userPasswordStartsSpaces)
         .expect(400, {
-          error: `Password must not start or end with empty spaces`
+          error: `password must not start or end with empty spaces`
         });
     });
 
@@ -239,7 +239,7 @@ describe('User Endpoints', function () {
         .post('/api/users')
         .send(userPasswordEndsSpaces)
         .expect(400, {
-          error: `Password must not start or end with empty spaces`
+          error: `password must not start or end with empty spaces`
         });
     });
 
@@ -254,7 +254,7 @@ describe('User Endpoints', function () {
         .post('/api/users')
         .send(userPasswordNotComplex)
         .expect(400, {
-          error: `Password must contain at least 1 uppercase, lowercase and number characters`
+          error: `password must contain at least 1 uppercase, lowercase and number characters`
         });
     });
 
