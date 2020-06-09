@@ -108,6 +108,29 @@ describe('/api/chats endpoints', () => {
           expect(res.body.chats).to.eql(expectedMessages);
         });
     });
+
+    // XSS test
+    context(`Given an XSS attack message`, () => {
+      const testUser = testUsers[0];
+      const testChat = testChats[0];
+      const { maliciousMessage, expectedMessage } = helpers.makeMaliciousData(
+        testUser,
+        testChat
+      );
+      beforeEach('insert malicious message', () => {
+        return helpers.seedMaliciousMessage(db, maliciousMessage);
+      });
+
+      it('removes XSS attack content', () => {
+        return supertest(app)
+          .get(`/api/chats`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(200)
+          .expect(res => {
+            expect(res.body.chats[0].body).to.eql(expectedMessage.body);
+          });
+      });
+    });
   });
 
   describe(`GET /api/chats/:chat_id`, () => {
@@ -131,6 +154,28 @@ describe('/api/chats endpoints', () => {
           expect(res.body.allMessages[0]).to.be.an('object');
           expect(res.body.allMessages).to.eql(expectedMessages);
         });
+    });
+    // XSS test - malicious project
+    context(`Given an XSS attack chat`, () => {
+      const testUser = testUsers[0];
+      const { maliciousMessage, expectedMessage } = helpers.makeMaliciousData(
+        testUser,
+        testChats[0]
+      );
+      beforeEach('insert malicious message', () => {
+        return helpers.seedMaliciousMessage(db, maliciousMessage);
+      });
+
+      it('removes XSS attack content', () => {
+        const testMessage = testMessages[0];
+        return supertest(app)
+          .get(`/api/chats/${testMessage.id}`)
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(200)
+          .expect(res => {
+            expect(res.body.allMessages[0].body).to.eql(expectedMessage.body);
+          });
+      });
     });
 
     it(`PATCH /api/chats/:chat_id responds 204 when closing chat`, () => {
