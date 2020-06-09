@@ -1,5 +1,7 @@
 const xss = require('xss');
 
+const REGEX_URL_SIMPLE = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'*+,;=.]+$/;
+
 const ProjectsService = {
   getAllWithVacancies(db) {
     return db
@@ -108,6 +110,13 @@ const ProjectsService = {
   deleteProject(db, id) {
     return db('projects').where({ id }).del();
   },
+
+  validateURL(url) {
+    if (!REGEX_URL_SIMPLE.test(url)) {
+      return 'is an invalid URL';
+    }
+  },
+
   serializeProject(project) {
     const serialized = {
       vacancies: project.vacancies,

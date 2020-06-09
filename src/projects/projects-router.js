@@ -58,6 +58,17 @@ projectsRouter
       }
     }
 
+    // Validate project URLs if they are provided.
+    for (const url of ['live_url', 'trello_url', 'github_url']) {
+      if (req.body[url]) {
+        const urlError = ProjectsService.validateURL(req.body[url]);
+        if (urlError)
+          return res
+            .status(400)
+            .json({ error: `${req.body[url]} ${urlError}` });
+      }
+    }
+
     let handle = name
       .replace(/\s+/g, '-')
       .replace(/[^A-Za-z0-9-]/g, '')
@@ -71,9 +82,7 @@ projectsRouter
 
       if (!doesHandleExist) {
         return handle;
-      }
-
-      else {
+      } else {
         handle = handle + Math.floor(Math.random() * 100);
         return checkHandle(handle);
       }
@@ -183,7 +192,7 @@ projectsRouter
     } catch (e) {
       next(e);
     }
-  })
+  });
 
 projectsRouter
   .route('/:project_id')
