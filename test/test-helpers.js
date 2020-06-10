@@ -55,7 +55,7 @@ function makeProjectsArray(users) {
       name: 'Test Proj 1',
       creator_id: users[0].id,
       description:
-        'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus consequuntur deserunt commodi, nobis qui inventore corrupti iusto aliquid debitis unde non.Adipisci, pariatur.Molestiae, libero esse hic adipisci autem neque ?',
+        'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus consequuntur deserunt commodi, nobis qui inventore corrupti iusto aliquid debitis unde non.',
       date_created: '2029-01-22T16:28:32.615Z',
       handle: 'test-proj-1'
     },
@@ -64,7 +64,7 @@ function makeProjectsArray(users) {
       name: 'Test Proj 2',
       creator_id: users[1].id,
       description:
-        'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus consequuntur deserunt commodi, nobis qui inventore corrupti iusto aliquid debitis unde non.Adipisci, pariatur.Molestiae, libero esse hic adipisci autem neque ?',
+        'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus consequuntur deserunt commodi, nobis qui inventore corrupti iusto aliquid debitis unde non.',
       date_created: '2029-01-22T16:28:32.615Z',
       handle: 'test-proj-2'
     },
@@ -73,7 +73,7 @@ function makeProjectsArray(users) {
       name: 'Test Proj 3',
       creator_id: users[2].id,
       description:
-        'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus consequuntur deserunt commodi, nobis qui inventore corrupti iusto aliquid debitis unde non.Adipisci, pariatur.Molestiae, libero esse hic adipisci autem neque ?',
+        'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus consequuntur deserunt commodi, nobis qui inventore corrupti iusto aliquid debitis unde non.',
       date_created: '2029-01-22T16:28:32.615Z',
       handle: 'test-proj-3'
     }

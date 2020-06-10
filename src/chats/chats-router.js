@@ -28,6 +28,12 @@ chatsRouter
     }
 
     try {
+      const chatError = ChatsService.validateChat(body);
+
+      if (chatError) {
+        return res.status(400).json({ error: chatError });
+      }
+
       // First, retrieve info for user we want to chat with
       const recipient = await UsersService.getItemWhere(db, {
         username: recipient_username

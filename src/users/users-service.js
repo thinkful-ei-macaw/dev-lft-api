@@ -32,6 +32,16 @@ class UsersService extends Service {
     }
   }
 
+  validateBio(bio) {
+    if (bio && bio.length > 500) {
+      return `bio must be fewer than 500 characters`;
+    }
+
+    if (bio && bio.length < 30) {
+      return `bio must be longer than 30 characters`;
+    }
+  }
+
   validateName(name) {
     name = name.toString();
     if (name.length < 2) {
@@ -105,7 +115,7 @@ class UsersService extends Service {
       bio: xss(user.bio),
       skills: user.skills.map(xss),
       notifications: user.notifications,
-      date_created: new Date(user.date_created).toISOString(),
+      date_created: new Date(user.date_created).toISOString()
     };
   }
 }
