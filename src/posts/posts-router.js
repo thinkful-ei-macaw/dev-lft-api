@@ -1,4 +1,5 @@
 const express = require('express');
+const NotificationsService = require('../notifications/notifications-service');
 const PostsService = require('./posts-service');
 const { requireAuth } = require('../middleware/jwt-auth');
 const { requireMember } = require('../middleware/user-role-verification');
@@ -53,6 +54,11 @@ postsRouter
 
     try {
       const resultingPost = await PostsService.insertItem(db, newPost);
+
+      // send notification to project members
+      const usersToNotify = await NotificationsService
+        .findProjectUsers(db, project_id, user_id, 'post');
+      await NotificationsService.insertNotifications(db, usersToNotify, 'post', project_id);
 
       return res
         .status(201)

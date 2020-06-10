@@ -49,7 +49,8 @@ describe('Notifications Endpoints', () => {
       const testUser = testUsers[0];
       const expectedNotifications = helpers.makeExpectedNotifications(
         testUser.id,
-        testNotifications
+        testNotifications,
+        testProjects
       );
 
       return supertest(app)
