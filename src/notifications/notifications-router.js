@@ -1,24 +1,32 @@
 const express = require('express');
-const NotificationsService = require('./notifications-service');
+const Service = require('../base-service');
+const NotificationsService = new Service('notifications');
+
 const notificationsRouter = express.Router();
-const jsonParser = express.json();
+const bodyParser = express.json();
 const { requireAuth } = require('../middleware/jwt-auth');
 
-notificationsRouter.get('/', requireAuth, async (req, res, next) => {
-  try {
-    const notifications = await NotificationsService.getAllNotifications(
-      req.app.get('db'),
-      req.user.id
-    );
-    res.status(200).json(notifications);
-  } catch (error) {
-    next(error);
-  }
-});
+notificationsRouter.use(requireAuth);
+
+notificationsRouter
+  .route('/')
+  .get(async (req, res, next) => {
+    const db = req.app.get('db');
+    const recipient_id = req.user.id;
+
+    try {
+      const notifications = await NotificationsService.getItemsWhere(db, { recipient_id, seen: false })
+      res.status(200).json(notifications);
+    } catch (error) {
+      next(error);
+    }
+  });
 
 notificationsRouter
   .route('/:notification_id')
-  .patch(requireAuth, jsonParser, async (req, res, next) => {
+  .patch(bodyParser, async (req, res, next) => {
+    const db = req.app.get('db');
+
     try {
       const { seen } = req.body;
       const { notification_id } = req.params;
@@ -29,19 +37,16 @@ notificationsRouter
           error: `Request body must contain 'seen'`
         });
 
-      const notification = await NotificationsService.getNotificationById(
-        req.app.get('db'),
-        notification_id
-      );
-      if (!notification) {
-        return res.status(404).json({ error: 'Notification does not exist' });
-      }
+      if (seen !== true && seen !== false)
+        return res.status(400).json({
+          error: `Seen must be 'true' or 'false'`
+        });
 
-      await NotificationsService.updateNotification(
-        req.app.get('db'),
-        notification_id,
-        newNotification
-      );
+      const notification = await NotificationsService.getItemById(db, notification_id);
+      if (!notification)
+        return res.status(404).json({ error: 'Notification does not exist' });
+
+      await NotificationsService.updateItem(db, notification_id, newNotification);
       res.status(204).end();
     } catch (error) {
       next(error);

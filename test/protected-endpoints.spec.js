@@ -2,7 +2,7 @@ const knex = require('knex');
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
-describe('Protected endpoints', () => {
+describe('Protected Endpoints', () => {
   let db;
 
   const { testUsers } = helpers.makeFixtures();
