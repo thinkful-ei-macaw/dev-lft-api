@@ -68,7 +68,6 @@ vacancyRouter
 
       for (let skill of skills) {
         const tagsLengthError = VacancyService.validateTagLength(skill);
-        console.log(skill, tagsLengthError);
         if (tagsLengthError) {
           return res.status(400).json({ error: `${tagsLengthError}` });
         }
