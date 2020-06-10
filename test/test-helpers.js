@@ -588,7 +588,6 @@ function makeExpectedMessages(chat_id, user_id, users, messages) {
     return {
       body: message.body,
       isAuthor: messages.author_username !== user.username,
-      author: user.first_name,
       author_username: user.username,
       date_created: message.date_created
     };
@@ -623,6 +622,7 @@ function makeExpectedChats(
       date_created: message.date_created,
       first_name: recipient.first_name,
       isOwner: project.creator_id === user_id,
+      isReply: message.author_id !== user_id,
       last_name: recipient.last_name,
       project_name: project.name,
       recipient_username: recipient.username,
