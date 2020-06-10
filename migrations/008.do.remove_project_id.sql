@@ -1,6 +1,0 @@
-BEGIN;
-
-ALTER TABLE IF EXISTS requests
-DROP COLUMN project_id;
-
-COMMIT;
