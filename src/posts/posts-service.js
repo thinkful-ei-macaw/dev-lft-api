@@ -20,8 +20,8 @@ class PostsService extends Service {
   }
 
   validateMessage(message) {
-    if (message.length > 255) {
-      return 'message must be fewer than 255 characters'
+    if (message.length > 280) {
+      return 'message must be fewer than 280 characters'
     }
     if (message.length < 2) {
       return 'message must be longer than 2 characters'

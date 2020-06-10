@@ -96,8 +96,8 @@ const ChatsService = {
   },
 
   validateChat(chat) {
-    if (chat.length > 255) {
-      return 'message must be fewer than 255 characters'
+    if (chat.length > 280) {
+      return 'message must be fewer than 280 characters'
     }
     if (chat.length < 2) {
       return 'message must be longer than 2 characters'
