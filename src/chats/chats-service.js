@@ -43,6 +43,7 @@ const ChatsService = {
         SELECT DISTINCT ON (m.chat_id)
         m.chat_id, 
         m.body, 
+        (m.author_id != ?) as is_reply, 
         r.id as request_id, 
         r.status as request_status, 
         m.date_created, 
@@ -72,7 +73,7 @@ const ChatsService = {
         ORDER BY m.chat_id, m.date_created DESC
       ) t
       `,
-        [id, id, id, id]
+        [id, id, id, id, id]
       )
       .then(result => result.rows);
   },
@@ -83,7 +84,6 @@ const ChatsService = {
       SELECT
       m.body, 
       m.date_created, 
-      u.first_name as author,
       u.username as author_username 
       FROM messages m INNER JOIN users u
       ON m.author_id = u.id
@@ -123,6 +123,7 @@ const ChatsService = {
       date_created: chat.date_created,
       project_name: chat.project_name,
       isOwner: chat.project_is_creator,
+      isReply: chat.is_reply,
       vacancy_name: chat.vacancy_name,
       first_name: chat.first_name,
       last_name: chat.last_name,
@@ -134,7 +135,6 @@ const ChatsService = {
     return {
       body: xss(message.body),
       date_created: message.date_created,
-      author: message.author,
       author_username: message.author_username,
       isAuthor: message.isAuthor
     };
