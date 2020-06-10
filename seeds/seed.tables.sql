@@ -3,7 +3,7 @@ BEGIN;
 TRUNCATE "requests", "vacancies", "projects", "users" RESTART IDENTITY CASCADE;
 
 -- all the seed users passwords are 'pass'
-INSERT INTO "users" ("id", "username", "password", "first_name", "last_name", "github_url", "linkedin_url")
+INSERT INTO "users" ("id", "username", "password", "first_name", "last_name", "github_url", "linkedin_url", "bio", "skills")
 VALUES
   (
     1,
@@ -12,7 +12,9 @@ VALUES
     'Malcolm',
     'Kiano',
     'https://github.com/malcolmkiano',
-    'https://www.linkedin.com/in/malcolmkiano'
+    'https://www.linkedin.com/in/malcolmkiano',
+    'Creative JavaScript developer specializing in building scalable web solutions. Passionate about accessibility, crafting great UX, and mastering SaaS.',
+    ARRAY ['HTML', 'CSS', 'JavaScript', 'Node', 'Express', 'PostgreSQL', 'Graphic Design']
   ),
   (
     2,
@@ -21,7 +23,9 @@ VALUES
     'Sara',
     'Mills',
     'https://www.github.com/saraquail',
-    'https://www.linkedin.com/in/sararmills'
+    'https://www.linkedin.com/in/sararmills',
+    'Full stack web developer currently honing my skills in Thinkful''s Engineering Immersion program. To me programming feels like playing a game - every time I do something new I gain experience points and eventually level up. The best part is: there''s no game overs. I can always eventually find the next step to figuring out how to solve the problem, no matter how large the problem may be (i.e. boss fight!).',
+    ARRAY ['HTML', 'CSS', 'JavaScript', 'Node', 'Express', 'PostgreSQL', 'Bird Whispering']
   ),
   (
     3,
@@ -30,7 +34,9 @@ VALUES
     'Muhiddin',
     'Kurbonov',
     'https://www.github.com/muhiddinsgithub',
-    'https://www.linkedin.com/in/muhiddin-kurbonov'
+    'https://www.linkedin.com/in/muhiddin-kurbonov',
+    'A Full Stack Web Developer specialized in JavaScript technologies (Node/Express, React, PostgreSQL). Passionate about building useful/interesting web applications.',
+    ARRAY ['HTML', 'CSS', 'JavaScript', 'Node', 'Express', 'PostgreSQL', 'DevOps']
   ),
   (
     4,
@@ -39,7 +45,9 @@ VALUES
     'Jack',
     'Lansing',
     'https://www.github.com/jacklansing',
-    'https://www.linkedin.com/in/jacklans'
+    'https://www.linkedin.com/in/jacklans',
+    NULL,
+    ARRAY ['HTML', 'CSS', 'JavaScript', 'Node', 'Express', 'PostgreSQL', 'QA Management']
   ),
   (
     5,
@@ -48,7 +56,9 @@ VALUES
     'Andrew',
     'Burchett',
     'https://www.github.com/atwb21786',
-    'https://www.linkedin.com/in/andrew-burchett-67a41856'
+    'https://www.linkedin.com/in/andrew-burchett-67a41856',
+    NULL,
+    ARRAY ['HTML', 'CSS', 'JavaScript', 'Node', 'Express', 'PostgreSQL', 'Testing Frameworks']
   ),
   (
     6,
@@ -57,7 +67,9 @@ VALUES
     'Jordan',
     'Knox',
     'https://www.github.com/jknox24',
-    'https://www.linkedin.com/in/jtknox'
+    'https://www.linkedin.com/in/jtknox',
+    'After 7+ years as a sales and marketing leader, I''ve had the unique opportunity to develop and scale AI products, raise millions of dollars, and successfully sell the last startup I cofounded, Butter.ai, to Box.',
+    ARRAY ['HTML', 'CSS', 'JavaScript', 'Node', 'Express', 'PostgreSQL', 'Sales', 'Marketing']
   );
 
 INSERT INTO "projects" ("id", "name", "description", "creator_id", "handle", "tags", "github_url")
@@ -140,8 +152,14 @@ VALUES
   ( 4, 3, 5, 'pending' ),
   ( 5, 3, 6, 'pending' ),
   ( 6, 4, 1, 'denied' ),
-  ( 7, 4, 2, 'pending' ),
-  ( 8, 5, 3, 'pending' );
+  ( 7, 5, 3, 'pending' );
+
+INSERT INTO "posts" ("id", "project_id", "user_id", "message", "date_created")
+VALUES
+  (1, 1, 1, 'This is the revolution to learning CSS...', now() - '61 minutes'::INTERVAL),
+  (2, 1, 1, 'Welcome to CSS Legends!', now() - '60 minutes'::INTERVAL),
+  (3, 1, 2, 'Glad to be a part of the future!!', now() - '15 minutes'::INTERVAL),
+  (4, 2, 3, 'Welcome all! Get ready to crush your side projects on the go with the new DevLFT mobile app!', now() - '3 hours'::INTERVAL);
 
 -- because we explicitly set the id fields
 -- update the sequencer for future automatic id setting
@@ -149,5 +167,6 @@ SELECT setval('users_id_seq', (SELECT MAX(id) from "users"));
 SELECT setval('projects_id_seq', (SELECT MAX(id) from "projects"));
 SELECT setval('vacancies_id_seq', (SELECT MAX(id) from "vacancies"));
 SELECT setval('requests_id_seq', (SELECT MAX(id) from "requests"));
+SELECT setval('posts_id_seq', (SELECT MAX(id) from "posts"));
 
 COMMIT;
