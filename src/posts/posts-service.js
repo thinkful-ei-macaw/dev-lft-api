@@ -19,6 +19,19 @@ class PostsService extends Service {
       .orderBy('posts.date_created', 'desc');
   }
 
+  validateMessage(message) {
+    if (message.length > 255) {
+      return 'message must be fewer than 255 characters'
+    }
+    if (message.length < 2) {
+      return 'message must be longer than 2 characters'
+    }
+    let trim = message.trim()
+    if(trim === "") {
+      return 'message must have content'
+    }
+  }
+
   serializePost(post, user_id) {
     return {
       id: post.id,

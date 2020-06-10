@@ -37,6 +37,14 @@ postsRouter
         .json({ error: `Missing 'message' in request body` });
     }
 
+    const postError = PostsService.validateMessage(message);
+
+    if (postError) {
+      return res.status(400).json({
+        error: postError
+      });
+    }
+
     const newPost = {
       project_id,
       user_id,
@@ -68,6 +76,14 @@ postsRouter
     }
 
     try {
+      const postError = PostsService.validateMessage(message);
+
+      if (postError) {
+        return res.status(400).json({
+          error: postError
+        });
+      }
+
       const updatedPost = { message };
       await PostsService.updateItem(db, post_id, updatedPost);
       return res.status(204).end();

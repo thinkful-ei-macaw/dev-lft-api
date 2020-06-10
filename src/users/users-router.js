@@ -19,7 +19,7 @@ usersRouter.post('/', async (req, res, next) => {
     for (const field of ['username', 'first_name', 'last_name', 'password'])
       if (!req.body[field])
         return res.status(400).json({
-          error: `Missing '${field}' in request body`
+          error: `missing '${field}' in request body`
         });
 
     // check validity of names provided
@@ -37,7 +37,7 @@ usersRouter.post('/', async (req, res, next) => {
     const user = await UsersService.getItemWhere(db, { username });
     if (user)
       return res.status(400).json({
-        error: 'Username already exists'
+        error: 'username already exists'
       });
 
     // check username validity
@@ -79,7 +79,7 @@ usersRouter.get('/profile', requireAuth, async (req, res, next) => {
     const userProfile = await UsersService.getItemWhere(db, { id: user_id });
 
     if (!userProfile) {
-      return res.status(404).json({ error: `Could not find user profile.` });
+      return res.status(404).json({ error: `could not find user profile.` });
     }
 
     return res.status(200).json(UsersService.serializeUser(userProfile));
@@ -97,7 +97,7 @@ usersRouter.get('/:username', requireAuth, async (req, res, next) => {
     // check that a username was provided
     if (!username) {
       return res.status(400).json({
-        error: `Missing 'username' in request params`
+        error: `missing 'username' in request params`
       });
     }
 
@@ -105,7 +105,7 @@ usersRouter.get('/:username', requireAuth, async (req, res, next) => {
     const user = await UsersService.getItemWhere(db, { username });
     if (!user)
       return res.status(404).json({
-        error: 'User not found'
+        error: 'user not found'
       });
 
     // send 'em the user otherwise
@@ -158,7 +158,7 @@ usersRouter.patch('/', requireAuth, async (req, res, next) => {
         if (urlError)
           return res
             .status(400)
-            .json({ error: `${req.body[url]} ${urlError}` });
+            .json({ error: `${url} ${urlError}` });
       }
     }
 
@@ -166,20 +166,19 @@ usersRouter.patch('/', requireAuth, async (req, res, next) => {
     const numberOfValues = Object.values(updatedUser).filter(Boolean).length;
     if (numberOfValues === 0)
       return res.status(400).json({
-        error: 'Request body must contain content'
+        error: 'request body must contain content'
       });
 
     // check that the user exists
     const user = await UsersService.getItemById(db, user_id);
     if (!user)
       return res.status(404).json({
-        error: 'User not found'
+        error: 'user not found'
       });
 
-    if (bio && bio.length > 500) {
-      return res
-        .status(400)
-        .json({ error: `bio must be fewer than 500 characters` });
+    const bioError = UsersService.validateBio(bio);
+    if (bioError) {
+      return res.status(400).json({ error: bioError });
     }
 
     if (skills) {

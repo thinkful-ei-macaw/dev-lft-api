@@ -63,7 +63,7 @@ projectsRouter
     if (nameError)
       return res
         .status(400)
-        .json({ error: `Project name ${name} ${nameError}` });
+        .json({ error: `Project name ${nameError}` });
     // validate description
     const descError = ProjectsService.validateProjectDescription(description);
     if (descError)

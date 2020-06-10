@@ -38,7 +38,7 @@ describe('User Endpoints', function () {
         .get(`/api/users/${newUser.username}`)
         .set(`Authorization`, helpers.makeAuthHeader(testUser))
         .send(newUser)
-        .expect(404, { error: `User not found` });
+        .expect(404, { error: `user not found` });
     });
 
     it(`responds with a 200 and the user info`, () => {
@@ -105,7 +105,7 @@ describe('User Endpoints', function () {
           .post('/api/users')
           .send(registerAttemptBody)
           .expect(400, {
-            error: `Missing '${field}' in request body`
+            error: `missing '${field}' in request body`
           });
       });
     });
@@ -263,7 +263,7 @@ describe('User Endpoints', function () {
         });
     });
 
-    it(`responds 400 'Username already exists' when username isn't unique`, () => {
+    it(`responds 400 'username already exists' when username isn't unique`, () => {
       const duplicateUser = {
         username: testUser.username,
         password: '11aaA!!b',
@@ -273,7 +273,7 @@ describe('User Endpoints', function () {
       return supertest(app)
         .post('/api/users')
         .send(duplicateUser)
-        .expect(400, { error: `Username already exists` });
+        .expect(400, { error: `username already exists` });
     });
 
     describe(`Given a valid user`, () => {
@@ -338,7 +338,7 @@ describe('User Endpoints', function () {
         .patch(`/api/users`)
         .set(`Authorization`, helpers.makeAuthHeader(testUser))
         .send(updateUser)
-        .expect(400, { error: `Request body must contain content` });
+        .expect(400, { error: `request body must contain content` });
     });
 
     it(`returns a 204 for successful update`, () => {
