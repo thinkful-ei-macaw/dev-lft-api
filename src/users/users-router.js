@@ -156,9 +156,7 @@ usersRouter.patch('/', requireAuth, async (req, res, next) => {
       if (req.body[url]) {
         const urlError = UsersService.validateURL(req.body[url]);
         if (urlError)
-          return res
-            .status(400)
-            .json({ error: `${url} ${urlError}` });
+          return res.status(400).json({ error: `${url} ${urlError}` });
       }
     }
 

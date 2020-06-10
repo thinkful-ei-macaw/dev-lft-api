@@ -21,14 +21,14 @@ class PostsService extends Service {
 
   validateMessage(message) {
     if (message.length > 280) {
-      return 'message must be fewer than 280 characters'
+      return 'message must be fewer than 280 characters';
     }
     if (message.length < 2) {
-      return 'message must be longer than 2 characters'
+      return 'message must be longer than 2 characters';
     }
-    let trim = message.trim()
-    if(trim === "") {
-      return 'message must have content'
+    let trim = message.trim();
+    if (trim === '') {
+      return 'message must have content';
     }
   }
 

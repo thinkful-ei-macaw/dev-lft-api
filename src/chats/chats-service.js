@@ -97,14 +97,14 @@ const ChatsService = {
 
   validateChat(chat) {
     if (chat.length > 280) {
-      return 'message must be fewer than 280 characters'
+      return 'message must be fewer than 280 characters';
     }
     if (chat.length < 2) {
-      return 'message must be longer than 2 characters'
+      return 'message must be longer than 2 characters';
     }
-    let trim = chat.trim()
-    if(trim === "") {
-      return 'message must have content'
+    let trim = chat.trim();
+    if (trim === '') {
+      return 'message must have content';
     }
   },
 
