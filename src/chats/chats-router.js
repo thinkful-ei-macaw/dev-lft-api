@@ -1,4 +1,5 @@
 const express = require('express');
+const NotificationsService = require('../notifications/notifications-service');
 const ChatsService = require('./chats-service');
 const UsersService = require('../users/users-service');
 const { requireAuth } = require('../middleware/jwt-auth');
@@ -74,6 +75,13 @@ chatsRouter
           db,
           newMessage
         );
+
+        // send notification to recipient
+        if (recipient.notifications.includes('chat')) {
+          const usersToNotify = [{ id: recipient.id }];
+          const project_id = await NotificationsService.findProjectId(db, request_id);
+          await NotificationsService.insertNotifications(db, usersToNotify, 'chat', project_id);
+        }
 
         return res.status(201).json({ resultingMessage });
       } else {

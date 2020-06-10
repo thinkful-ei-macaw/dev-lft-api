@@ -57,6 +57,18 @@ class Service {
   }
 
   /**
+   * inserts multiple items into the table
+   * @param {{}} db an instance of the Knex database object
+   * @param {{}} item array of objects with data to be inserted
+   */
+  insertItems(db, items) {
+    return db
+      .into(this.table)
+      .insert(items)
+      .returning('*');
+  }
+
+  /**
    * inserts a single item into the table
    * @param {{}} db an instance of the Knex database object
    * @param {{}} item object with data to be inserted

@@ -1,6 +1,5 @@
 const express = require('express');
-const Service = require('../base-service');
-const NotificationsService = new Service('notifications');
+const NotificationsService = require('./notifications-service');
 
 const notificationsRouter = express.Router();
 const bodyParser = express.json();
@@ -15,7 +14,7 @@ notificationsRouter
     const recipient_id = req.user.id;
 
     try {
-      const notifications = await NotificationsService.getItemsWhere(db, { recipient_id, seen: false })
+      const notifications = await NotificationsService.getNotifications(db, recipient_id)
       res.status(200).json(notifications);
     } catch (error) {
       next(error);

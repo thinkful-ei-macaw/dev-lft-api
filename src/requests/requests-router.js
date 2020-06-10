@@ -1,4 +1,5 @@
 const express = require('express');
+const NotificationsService = require('../notifications/notifications-service');
 const VacanciesService = require('../vacancies/vacancies-service');
 const RequestsService = require('./requests-service');
 const { requireAuth } = require('../middleware/jwt-auth');
@@ -84,7 +85,12 @@ requestsRouter
         // put the user into the vacancy
         const { user_id, vacancy_id } = request;
         const updatedVacancy = { user_id };
-        await VacanciesService.updateItem(db, vacancy_id, updatedVacancy);
+        const vacancy = await VacanciesService.updateItem(db, vacancy_id, updatedVacancy);
+
+        // send notification to project members
+        const usersToNotify = await NotificationsService
+          .findProjectUsers(db, vacancy.project_id, user_id, 'join');
+        await NotificationsService.insertNotifications(db, usersToNotify, 'join', vacancy.project_id);
 
         // deny all other requests for the same vacancy
         const deniedRequest = { status: 'denied' };

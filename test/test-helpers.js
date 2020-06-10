@@ -562,7 +562,7 @@ function makeExpectedVacancies(
   });
 }
 
-function makeExpectedNotifications(user_id, notifications) {
+function makeExpectedNotifications(user_id, notifications, projects) {
   let userNotifications = notifications.filter(
     item => item.recipient_id === user_id
   );
@@ -572,6 +572,8 @@ function makeExpectedNotifications(user_id, notifications) {
       id: notification.id,
       recipient_id: notification.recipient_id,
       project_id: notification.project_id,
+      handle: projects.find(project => project.id === notification.project_id).handle,
+      name: projects.find(project => project.id === notification.project_id).name,
       type: notification.type,
       seen: false,
       date_created: '2029-01-22T16:28:32.615Z'

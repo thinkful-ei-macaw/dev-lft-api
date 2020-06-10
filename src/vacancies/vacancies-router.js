@@ -1,4 +1,5 @@
 const express = require('express');
+const NotificationsService = require('../notifications/notifications-service');
 const RequestsService = require('../requests/requests-service');
 const VacancyService = require('./vacancies-service');
 const vacancyRouter = express.Router();
@@ -117,6 +118,11 @@ vacancyRouter
       }
 
       await VacancyService.updateItem(db, vacancy_id, newVacancy);
+
+      // send notification to project members
+      const usersToNotify = await NotificationsService
+        .findProjectUsers(db, vacancy.project_id, vacancy.user_id, 'leave');
+      await NotificationsService.insertNotifications(db, usersToNotify, 'leave', vacancy.project_id);
 
       return res.status(204).end();
     } catch (error) {
