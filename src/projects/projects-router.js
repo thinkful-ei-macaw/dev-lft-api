@@ -61,9 +61,7 @@ projectsRouter
     // validate project name
     const nameError = ProjectsService.validateName(name);
     if (nameError)
-      return res
-        .status(400)
-        .json({ error: `Project name ${name} ${nameError}` });
+      return res.status(400).json({ error: `Project name ${nameError}` });
     // validate description
     const descError = ProjectsService.validateProjectDescription(description);
     if (descError)
@@ -83,9 +81,7 @@ projectsRouter
       if (req.body[url]) {
         const urlError = ProjectsService.validateURL(req.body[url]);
         if (urlError)
-          return res
-            .status(400)
-            .json({ error: `${req.body[url]} ${urlError}` });
+          return res.status(400).json({ error: `${url} ${urlError}` });
       }
     }
 
