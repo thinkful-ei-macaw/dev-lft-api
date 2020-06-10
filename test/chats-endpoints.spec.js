@@ -2,7 +2,7 @@ const knex = require('knex');
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
-describe('/api/chats endpoints', () => {
+describe('Chats Endpoints', () => {
   let db;
 
   const {
@@ -101,12 +101,7 @@ describe('/api/chats endpoints', () => {
       return supertest(app)
         .get('/api/chats')
         .set('Authorization', helpers.makeAuthHeader(testUser))
-        .expect(200)
-        .expect(res => {
-          expect(res.body).to.be.an('object');
-          expect(res.body.chats).to.be.an('array');
-          expect(res.body.chats).to.eql(expectedMessages);
-        });
+        .expect(200, expectedMessages);
     });
 
     // XSS test
@@ -127,7 +122,7 @@ describe('/api/chats endpoints', () => {
           .set('Authorization', helpers.makeAuthHeader(testUser))
           .expect(200)
           .expect(res => {
-            expect(res.body.chats[0].body).to.eql(expectedMessage.body);
+            expect(res.body[0].body).to.eql(expectedMessage.body);
           });
       });
     });
