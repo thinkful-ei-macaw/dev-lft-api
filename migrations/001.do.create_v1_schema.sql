@@ -11,6 +11,7 @@ CREATE TABLE users (
     github_url TEXT,
     linkedin_url TEXT,
     twitter_url TEXT,
+    notifications TEXT ARRAY DEFAULT ARRAY['join', 'leave', 'post', 'chat'],
     date_created TIMESTAMPTZ DEFAULT now() NOT NULL
 );
 

@@ -10,28 +10,40 @@ function makeUsersArray() {
       first_name: 'Test FN1',
       last_name: 'Test LN1',
       github_url: 'https://github.com',
-      linkedin_url: 'https://linkedin.com'
+      linkedin_url: 'https://linkedin.com',
+      skills: ['Test Skill 1a', 'Test Skill 1b'],
+      bio: 'Lorem ipsum test bio 1',
+      notifications: ['join', 'leave', 'post', 'chat']
     },
     {
       id: 2,
       username: 'test-user-2',
       password: 'testPass123!',
       first_name: 'Test FN2',
-      last_name: 'Test LN2'
+      last_name: 'Test LN2',
+      skills: ['Test Skill 2a', 'Test Skill 2b'],
+      bio: 'Lorem ipsum test bio 2',
+      notifications: ['join', 'leave', 'post']
     },
     {
       id: 3,
       username: 'test-user-3',
       password: 'testPass123!',
       first_name: 'Test FN3',
-      last_name: 'Test LN3'
+      last_name: 'Test LN3',
+      skills: ['Test Skill 3a', 'Test Skill 3b'],
+      bio: 'Lorem ipsum test bio 3',
+      notifications: ['join', 'leave']
     },
     {
       id: 4,
       username: 'test-user-4',
       password: 'testPass123!',
       first_name: 'Test FN4',
-      last_name: 'Test LN4'
+      last_name: 'Test LN4',
+      skills: ['Test Skill 4a', 'Test Skill 4b'],
+      bio: 'Lorem ipsum test bio 4',
+      notifications: ['chat']
     }
   ];
 }

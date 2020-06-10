@@ -95,12 +95,6 @@ class UsersService extends Service {
   }
 
   serializeUser(user) {
-    let skills = user.skills
-      ? user.skills.map(skill => {
-          return xss(skill);
-        })
-      : '';
-
     return {
       username: user.username,
       first_name: user.first_name,
@@ -109,8 +103,9 @@ class UsersService extends Service {
       linkedin_url: xss(user.linkedin_url),
       twitter_url: xss(user.twitter_url),
       bio: xss(user.bio),
+      skills: user.skills.map(xss),
+      notifications: user.notifications,
       date_created: new Date(user.date_created).toISOString(),
-      skills
     };
   }
 }
