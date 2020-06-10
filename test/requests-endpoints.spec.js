@@ -2,7 +2,7 @@ const knex = require('knex');
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
-describe('Requests endpoints', () => {
+describe('Requests Endpoints', () => {
   let db;
 
   let {
@@ -33,7 +33,7 @@ describe('Requests endpoints', () => {
   before('make knex instance', () => {
     db = knex({
       client: 'pg',
-      connection: process.env.TEST_DB_URL
+      connection: process.env.TEST_DATABASE_URL
     });
     app.set('db', db);
   });

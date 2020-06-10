@@ -2,7 +2,7 @@ const knex = require('knex');
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
-describe('Protected endpoints', () => {
+describe('Protected Endpoints', () => {
   let db;
 
   const { testUsers } = helpers.makeFixtures();
@@ -10,7 +10,7 @@ describe('Protected endpoints', () => {
   before('make a knex instance', () => {
     db = knex({
       client: 'pg',
-      connection: process.env.TEST_DB_URL
+      connection: process.env.TEST_DATABASE_URL
     });
     app.set('db', db);
   });

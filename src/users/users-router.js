@@ -128,7 +128,8 @@ usersRouter.patch('/', requireAuth, async (req, res, next) => {
       linkedin_url,
       twitter_url,
       bio,
-      skills
+      skills,
+      notifications
     } = req.body;
 
     const updatedUser = {
@@ -137,7 +138,9 @@ usersRouter.patch('/', requireAuth, async (req, res, next) => {
       github_url,
       linkedin_url,
       twitter_url,
-      bio
+      bio,
+      skills,
+      notifications
     };
 
     // check validity of names if provided

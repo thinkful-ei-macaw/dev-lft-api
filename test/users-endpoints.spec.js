@@ -13,7 +13,7 @@ describe('User Endpoints', function () {
   before('make knex instance', () => {
     db = knex({
       client: 'pg',
-      connection: process.env.TEST_DB_URL
+      connection: process.env.TEST_DATABASE_URL
     });
     app.set('db', db);
   });
@@ -50,6 +50,11 @@ describe('User Endpoints', function () {
           expect(res.body.username).to.eql(testUser.username);
           expect(res.body.first_name).to.eql(testUser.first_name);
           expect(res.body.last_name).to.eql(testUser.last_name);
+          expect(res.body.username).to.eql(testUser.username);
+          expect(res.body.skills).to.eql(testUser.skills);
+          expect(res.body.bio).to.eql(testUser.bio);
+          expect(res.body.username).to.eql(testUser.username);
+          expect(res.body.notifications).to.eql(testUser.notifications);
           expect(res.body).to.not.have.property('password');
           expect(res.body).to.have.property('github_url');
           expect(res.body).to.have.property('linkedin_url');

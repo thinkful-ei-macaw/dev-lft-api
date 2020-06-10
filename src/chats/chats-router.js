@@ -6,9 +6,10 @@ const { requireAuth } = require('../middleware/jwt-auth');
 const chatsRouter = express.Router();
 const bodyParser = express.json();
 
+chatsRouter.use(requireAuth);
+
 chatsRouter
   .route('/')
-  .all(requireAuth)
   .post(bodyParser, async (req, res, next) => {
     const db = req.app.get('db');
     const author_id = req.user.id;
@@ -97,7 +98,7 @@ chatsRouter
         user_id
       );
       chats = chats.map(ChatsService.serializeChat);
-      return res.status(200).json({ chats });
+      return res.status(200).json(chats);
     } catch (e) {
       next(e);
     }
@@ -105,7 +106,6 @@ chatsRouter
 
 chatsRouter
   .route('/:chat_id')
-  .all(requireAuth)
   .get(async (req, res, next) => {
     // Get all the messages from a specific chat
     const { chat_id } = req.params;
