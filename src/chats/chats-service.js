@@ -51,6 +51,11 @@ const ChatsService = {
           ON v.project_id = p.id 
           WHERE r.vacancy_id = v.id 
           LIMIT 1) as project_name, 
+        (SELECT (p.creator_id = ?) as ic FROM projects p 
+          INNER JOIN vacancies v 
+          ON v.project_id = p.id 
+          WHERE r.vacancy_id = v.id 
+          LIMIT 1) as project_is_creator, 
         (SELECT v.title FROM vacancies v 
           WHERE v.id = r.vacancy_id LIMIT 1) as vacancy_name, 
         u.first_name,
@@ -67,7 +72,7 @@ const ChatsService = {
         ORDER BY m.chat_id, m.date_created DESC
       ) t
       `,
-        [id, id, id]
+        [id, id, id, id]
       )
       .then(result => result.rows);
   },
@@ -103,6 +108,7 @@ const ChatsService = {
       request_status: chat.request_status,
       date_created: chat.date_created,
       project_name: chat.project_name,
+      isOwner: chat.project_is_creator,
       vacancy_name: chat.vacancy_name,
       first_name: chat.first_name,
       last_name: chat.last_name,
