@@ -610,6 +610,7 @@ function makeExpectedChats(
       closed: false,
       date_created: message.date_created,
       first_name: recipient.first_name,
+      isOwner: project.creator_id === user_id,
       last_name: recipient.last_name,
       project_name: project.name,
       recipient_username: recipient.username,
