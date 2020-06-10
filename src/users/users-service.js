@@ -38,7 +38,7 @@ class UsersService extends Service {
     }
 
     if (bio && bio.length < 30) {
-      return `bio must be fewer than 30 characters`;
+      return `bio must be longer than 30 characters`;
     }
   }
 
