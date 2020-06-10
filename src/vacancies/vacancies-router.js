@@ -4,7 +4,10 @@ const VacancyService = require('./vacancies-service');
 const vacancyRouter = express.Router();
 const jsonParser = express.json();
 const { requireAuth } = require('../middleware/jwt-auth');
-const { requireOwner } = require('../middleware/user-role-verification');
+const {
+  requireOwner,
+  requireMember
+} = require('../middleware/user-role-verification');
 
 vacancyRouter.get('/:project_id', requireAuth, async (req, res, next) => {
   try {
@@ -60,22 +63,16 @@ vacancyRouter
         ? VacancyService.validateSkills(skills)
         : false;
       if (wrongSkills) {
-        return res.status(400).json({ error: `${skills} ${wrongSkills}` });
+        return res.status(400).json({ error: `Skills ${wrongSkills}` });
       }
 
-      const tagsLimit = VacancyService.validateTags(skills);
-      if (tagsLimit) {
-        return res.status(400).json({ error: `${skills} ${tagsLimit}` });
-      }
-
-      skills.forEach(skill => {
+      for (let skill of skills) {
         const tagsLengthError = VacancyService.validateTagLength(skill);
+        console.log(skill, tagsLengthError);
         if (tagsLengthError) {
-          return res
-            .status(400)
-            .json({ error: `${skills} ${tagsLengthError}` });
+          return res.status(400).json({ error: `${tagsLengthError}` });
         }
-      });
+      }
 
       const vacancy = await VacancyService.insertItem(db, newVacancy);
       res.status(201).json(VacancyService.serializeVacancy(vacancy));
@@ -86,7 +83,7 @@ vacancyRouter
 
 vacancyRouter
   .route('/:id')
-  .patch(requireAuth, requireOwner, jsonParser, async (req, res, next) => {
+  .patch(requireAuth, requireMember, jsonParser, async (req, res, next) => {
     try {
       const db = req.app.get('db');
       const { title, description, skills, user_id } = req.body;
