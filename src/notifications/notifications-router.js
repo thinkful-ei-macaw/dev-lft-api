@@ -1,8 +1,6 @@
 const express = require('express');
 const NotificationsService = require('./notifications-service');
-
 const notificationsRouter = express.Router();
-const bodyParser = express.json();
 const { requireAuth } = require('../middleware/jwt-auth');
 
 notificationsRouter.use(requireAuth);
@@ -27,7 +25,7 @@ notificationsRouter
     }
   })
 
-  .patch(bodyParser, async (req, res, next) => {
+  .patch(async (req, res, next) => {
     const db = req.app.get('db');
     const user_id = { recipient_id: req.user.id };
     const data = { seen: true };
