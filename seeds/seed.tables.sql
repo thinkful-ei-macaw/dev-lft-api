@@ -185,16 +185,15 @@ VALUES
 INSERT INTO "messages"
   ("id", "chat_id", "author_id", "body", "date_created")
 VALUES
-  ( 1, 1, 7, 'Hey, I would like to join your team!', now() - '20 minutes'
+  ( 1, 1, 1, 'Hey, would like to join our team?', now() - '20 minutes'
 ::INTERVAL ),
-( 2, 1, 1, 'Cool! Let''s see
-if you are a fit for the role!', now
+( 2, 1, 7, 'Absolutely!', now
 () - '5 minutes'::INTERVAL ),
-( 3, 2, 7, 'Hi! Can I join your team?', now
+( 3, 2, 3, 'Hi! Did you know that Corgis invented electricity?', now
 () - '10 minutes'::INTERVAL ),
-( 4, 2, 3, 'Maybe. Did you know that Corgis invented electricity?', now
+( 4, 2, 7, 'Yes. Yes I did', now
 () - '7 minutes'::INTERVAL ),
-( 5, 2, 7, 'Yes. Common knowledge.', now
+( 5, 2, 3, 'Welcome to the team.', now
 () - '4 minutes'::INTERVAL);
 
 INSERT INTO "posts"
