@@ -94,8 +94,8 @@ class VacancyService extends Service {
 
   validateTagLength(tag) {
     tag = tag.toString();
-    if (tag.length < 3) {
-      return 'Each skill must be at least 3 characters';
+    if (tag.length < 2) {
+      return 'Each skill must be at least 2 characters';
     }
 
     if (tag.length > 30) {
