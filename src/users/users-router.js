@@ -164,7 +164,7 @@ usersRouter.patch('/', requireAuth, async (req, res, next) => {
     const numberOfValues = Object.values(updatedUser).filter(Boolean).length;
     if (numberOfValues === 0)
       return res.status(400).json({
-        error: 'request body must contain content'
+        error: 'no content provided to update'
       });
 
     // check that the user exists
@@ -179,7 +179,14 @@ usersRouter.patch('/', requireAuth, async (req, res, next) => {
       return res.status(400).json({ error: bioError });
     }
 
-    if (skills) {
+    if (skills && skills.length) {
+
+      if (skills.length > 10) {
+        return res.status(400).json({
+          error: 'you may add a maximum of 10 skills'
+        })
+      }
+
       let skillError = UsersService.validateSkills(skills);
       if (skillError) {
         return res.status(400).json({ error: skillError });
