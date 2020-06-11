@@ -7,19 +7,23 @@ const { requireAuth } = require('../middleware/jwt-auth');
 
 notificationsRouter.use(requireAuth);
 
-notificationsRouter
-  .route('/')
-  .get(async (req, res, next) => {
-    const db = req.app.get('db');
-    const recipient_id = req.user.id;
+notificationsRouter.route('/').get(async (req, res, next) => {
+  const db = req.app.get('db');
+  const recipient_id = req.user.id;
 
-    try {
-      const notifications = await NotificationsService.getNotifications(db, recipient_id)
-      res.status(200).json(notifications);
-    } catch (error) {
-      next(error);
-    }
-  });
+  try {
+    let notifications = await NotificationsService.getNotifications(
+      db,
+      recipient_id
+    );
+    notifications = notifications.map(
+      NotificationsService.serializeNotifications
+    );
+    res.status(200).json(notifications);
+  } catch (error) {
+    next(error);
+  }
+});
 
 notificationsRouter
   .route('/:notification_id')
@@ -41,11 +45,18 @@ notificationsRouter
           error: `Seen must be 'true' or 'false'`
         });
 
-      const notification = await NotificationsService.getItemById(db, notification_id);
+      const notification = await NotificationsService.getItemById(
+        db,
+        notification_id
+      );
       if (!notification)
         return res.status(404).json({ error: 'Notification does not exist' });
 
-      await NotificationsService.updateItem(db, notification_id, newNotification);
+      await NotificationsService.updateItem(
+        db,
+        notification_id,
+        newNotification
+      );
       res.status(204).end();
     } catch (error) {
       next(error);

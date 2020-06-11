@@ -43,6 +43,16 @@ class NotificationsService extends Service {
 
     return super.insertItems(db, notifications);
   }
+
+  serializeNotifications(notification) {
+    return {
+      type: notification.type,
+      seen: notification.seen,
+      date_created: notification.date_created,
+      handle: notification.handle,
+      name: notification.name
+    }
+  }
 }
 
 module.exports = new NotificationsService('notifications');
