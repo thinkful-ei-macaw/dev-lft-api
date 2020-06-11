@@ -177,9 +177,9 @@ VALUES
 INSERT INTO "chats"
   ("id", "request_id", "author_id", "recipient_id", "closed", "date_created")
 VALUES
-  ( 1, 8, 7, 1, false, now() - '10 minutes'
+  ( 1, 8, 1, 7, false, now() - '10 minutes'
 ::INTERVAL),
-( 2, 9, 7, 3, false, now
+( 2, 9, 3, 7, false, now
 () - '20 minutes'::INTERVAL);
 
 INSERT INTO "messages"
