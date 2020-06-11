@@ -312,6 +312,162 @@ describe('Projects Endpoints', function () {
               })
           );
       });
+
+      it(`responds with 400 error when name is less than 2 characters`, () => {
+        const testUser = testUsers[0];
+        const testProject = testProjects[0];
+        const newProject = {
+          id: testProject.id,
+          name: 'a',
+          creator_id: testProject.creator_id,
+          handle: 'new-name',
+          description: testProject.description,
+          date_created: testProject.date_created
+        };
+
+        return supertest(app)
+          .post('/api/projects')
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send(newProject)
+          .expect(400, { error: `Project name must be 2 or more characters` });
+      });
+
+      it(`responds with 400 error when name is more than than 30 characters`, () => {
+        const testUser = testUsers[0];
+        const testProject = testProjects[0];
+        const newProject = {
+          id: testProject.id,
+          name: 'a'.repeat(31),
+          creator_id: testProject.creator_id,
+          handle: 'new-name',
+          description: testProject.description,
+          date_created: testProject.date_created
+        };
+
+        return supertest(app)
+          .post('/api/projects')
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send(newProject)
+          .expect(400, {
+            error: `Project name must be less than 30 characters`
+          });
+      });
+
+      it(`responds with 400 error when breaking name constraints`, () => {
+        const testUser = testUsers[0];
+        const testProject = testProjects[0];
+        const newProject = {
+          id: testProject.id,
+          name: 'invalid@project@name!',
+          creator_id: testProject.creator_id,
+          handle: 'new-name',
+          description: testProject.description,
+          date_created: testProject.date_created
+        };
+
+        return supertest(app)
+          .post('/api/projects')
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send(newProject)
+          .expect(400, {
+            error: `Project name must contain only alphabetic characters or numbers and only 1 hyphen, underscore or space between them`
+          });
+      });
+
+      it(`responds with 400 error when description is less than 10 characters`, () => {
+        const testUser = testUsers[0];
+        const testProject = testProjects[0];
+        const newProject = {
+          id: testProject.id,
+          name: 'valid-name',
+          creator_id: testProject.creator_id,
+          handle: 'valid-handle',
+          description: '123456789',
+          date_created: testProject.date_created
+        };
+
+        return supertest(app)
+          .post('/api/projects')
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send(newProject)
+          .expect(400, {
+            error: `Description must be 10 or more characters`
+          });
+      });
+
+      it(`responds with 400 error when description is more than 255 characters`, () => {
+        const testUser = testUsers[0];
+        const testProject = testProjects[0];
+        const newProject = {
+          id: testProject.id,
+          name: 'valid-name',
+          creator_id: testProject.creator_id,
+          handle: 'valid-handle',
+          description: 'a'.repeat(256),
+          date_created: testProject.date_created
+        };
+
+        return supertest(app)
+          .post('/api/projects')
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send(newProject)
+          .expect(400, {
+            error: `Description must be 255 characters or less`
+          });
+      });
+
+      it(`responds with 400 error when project has more than 10 tags`, () => {
+        const testUser = testUsers[0];
+        const testProject = testProjects[0];
+        const newProject = {
+          id: testProject.id,
+          name: 'valid-name',
+          creator_id: testProject.creator_id,
+          handle: 'valid-handle',
+          description: testProject.description,
+          tags: new Array(11).fill('TAG'),
+          date_created: testProject.date_created
+        };
+
+        return supertest(app)
+          .post('/api/projects')
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send(newProject)
+          .expect(400, {
+            error: `You may only enter up to 10 tags!`
+          });
+      });
+
+      const projectUrls = ['live_url', 'trello_url', 'github_url'];
+
+      projectUrls.forEach(projectUrl => {
+        it(`responds with 400 error when project has an invalid ${projectUrl}`, () => {
+          const testUser = testUsers[0];
+          const testProject = testProjects[0];
+          const newProject = {
+            id: testProject.id,
+            name: 'valid-name',
+            creator_id: testProject.creator_id,
+            handle: 'valid-handle',
+            description: testProject.description,
+            tags: new Array(10).fill('VALID-TAG'),
+            live_url: 'https://www.my-app.com/',
+            trello_url: 'https://trello.com/b/CoAbb51N/sample-app',
+            github_url: 'https://github.com/some-github-repo',
+            date_created: testProject.date_created
+          };
+
+          newProject[projectUrl] = 'b@d_url';
+
+          return supertest(app)
+            .post('/api/projects')
+            .set('Authorization', helpers.makeAuthHeader(testUser))
+            .send(newProject)
+            .expect(400, {
+              error: `${projectUrl} is an invalid URL`
+            });
+        });
+      });
     });
   });
 
