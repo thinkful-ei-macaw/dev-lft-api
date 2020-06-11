@@ -15,9 +15,8 @@ class UsersService extends Service {
 
   validateSkills(skills) {
     let allSkills = skills.join(',');
-
-    if (!REGEX_ALPHA_NUMBERS_PERIOD_SPACE_HYPHEN.test(allSkills)) {
-      return 'skills can only contain letters, numbers, periods, and hyphens';
+    if (skills.length && !REGEX_ALPHA_NUMBERS_PERIOD_SPACE_HYPHEN.test(allSkills)) {
+      return 'skills can only contain letters, numbers, spaces, periods, and hyphens';
     }
   }
 
