@@ -15,8 +15,28 @@ class UsersService extends Service {
 
   validateSkills(skills) {
     let allSkills = skills.join(',');
-    if (skills.length && !REGEX_ALPHA_NUMBERS_PERIOD_SPACE_HYPHEN.test(allSkills)) {
+    let error;
+    if (
+      skills.length &&
+      !REGEX_ALPHA_NUMBERS_PERIOD_SPACE_HYPHEN.test(allSkills)
+    ) {
+      console.log({skills});
       return 'skills can only contain letters, numbers, spaces, periods, and hyphens';
+    }
+
+    if (skills.length) {
+      skills.forEach(skill => {
+        if (skill.length > 30) {
+          error = 'skills must be fewer than 30 characters';
+        }
+        if (skill.length < 2) {
+          error = 'skills must be longer than 2 characters';
+        }
+      });
+    }
+
+    if (error) {
+      return error;
     }
   }
 
@@ -48,7 +68,7 @@ class UsersService extends Service {
     }
 
     if (name.length > 30) {
-      return 'must be less than 30 characters';
+      return 'must be fewer than 30 characters';
     }
 
     if (!REGEX_ALPHA_NO_SPACES_OR_NUMBERS.test(name)) {
@@ -64,7 +84,7 @@ class UsersService extends Service {
     }
 
     if (username.length > 30) {
-      return 'must be less than 30 characters';
+      return 'must be fewer than 30 characters';
     }
 
     if (username.startsWith('_') || username.endsWith('_')) {
@@ -87,7 +107,7 @@ class UsersService extends Service {
     }
 
     if (password.length > 72) {
-      return 'password must be less than 72 characters';
+      return 'password must be fewer than 72 characters';
     }
 
     if (password.startsWith(' ') || password.endsWith(' ')) {

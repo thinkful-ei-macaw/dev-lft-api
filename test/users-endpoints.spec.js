@@ -136,7 +136,7 @@ describe('User Endpoints', function () {
         .expect(400, { error: `last_name must be 2 or more characters` });
     });
 
-    it(`responds 400 'must be less than 30 characters' when long first name`, () => {
+    it(`responds 400 'must be fewer than 30 characters' when long first name`, () => {
       const userShortUsername = {
         username: 'test username',
         password: '1234ABcd@',
@@ -146,10 +146,10 @@ describe('User Endpoints', function () {
       return supertest(app)
         .post('/api/users')
         .send(userShortUsername)
-        .expect(400, { error: `first_name must be less than 30 characters` });
+        .expect(400, { error: `first_name must be fewer than 30 characters` });
     });
 
-    it(`responds 400 'must be less than 30 characters' when long last name`, () => {
+    it(`responds 400 'must be fewer than 30 characters' when long last name`, () => {
       const userShortUsername = {
         username: 'test username',
         password: '1234ABcd@',
@@ -159,7 +159,7 @@ describe('User Endpoints', function () {
       return supertest(app)
         .post('/api/users')
         .send(userShortUsername)
-        .expect(400, { error: `last_name must be less than 30 characters` });
+        .expect(400, { error: `last_name must be fewer than 30 characters` });
     });
 
     it(`responds 400 'must contain only alphabetic characters and no spaces' when first name contains numbers or spaces`, () => {
@@ -205,7 +205,7 @@ describe('User Endpoints', function () {
         .expect(400, { error: `password must be 8 or more characters` });
     });
 
-    it(`responds 400 'password must be less than 72 characters' when long password`, () => {
+    it(`responds 400 'password must be fewer than 72 characters' when long password`, () => {
       const userLongPassword = {
         username: 'test username',
         password: '*'.repeat(73),
@@ -215,7 +215,7 @@ describe('User Endpoints', function () {
       return supertest(app)
         .post('/api/users')
         .send(userLongPassword)
-        .expect(400, { error: `password must be less than 72 characters` });
+        .expect(400, { error: `password must be fewer than 72 characters` });
     });
 
     it(`responds 400 error when password starts with spaces`, () => {
@@ -332,13 +332,149 @@ describe('User Endpoints', function () {
 
   describe(`PATCH /api/users`, () => {
     beforeEach('insert users', () => helpers.seedUsers(db, testUsers));
+
+    it('returns 400 and an error message if firstname too short', () => {
+      const updateUser = { first_name: 'k' };
+      return supertest(app)
+        .patch(`/api/users`)
+        .set(`Authorization`, helpers.makeAuthHeader(testUser))
+        .send(updateUser)
+        .expect(400, { error: `first_name must be 2 or more characters` });
+    });
+
+    it('returns 400 and an error message if lastname too short', () => {
+      const updateUser = { last_name: 'k' };
+      return supertest(app)
+        .patch(`/api/users`)
+        .set(`Authorization`, helpers.makeAuthHeader(testUser))
+        .send(updateUser)
+        .expect(400, { error: `last_name must be 2 or more characters` });
+    });
+
+    it('returns 400 and an error message if firstname too long', () => {
+      const updateUser = { first_name: 'f'.repeat(31) };
+      return supertest(app)
+        .patch(`/api/users`)
+        .set(`Authorization`, helpers.makeAuthHeader(testUser))
+        .send(updateUser)
+        .expect(400, { error: `first_name must be fewer than 30 characters` });
+    });
+
+    it('returns 400 and an error message if lastname too long', () => {
+      const updateUser = { last_name: 'f'.repeat(31) };
+      return supertest(app)
+        .patch(`/api/users`)
+        .set(`Authorization`, helpers.makeAuthHeader(testUser))
+        .send(updateUser)
+        .expect(400, { error: `last_name must be fewer than 30 characters` });
+    });
+
+    it('returns 400 and an error message if firstname contains forbidden characters', () => {
+      const updateUser = { first_name: '$3.50' };
+      return supertest(app)
+        .patch(`/api/users`)
+        .set(`Authorization`, helpers.makeAuthHeader(testUser))
+        .send(updateUser)
+        .expect(400, {
+          error:
+            'first_name must contain only alphabetic characters and no spaces'
+        });
+    });
+
+    it('returns 400 and an error message if lastname contains forbidden characters', () => {
+      const updateUser = { last_name: '$3.50' };
+      return supertest(app)
+        .patch(`/api/users`)
+        .set(`Authorization`, helpers.makeAuthHeader(testUser))
+        .send(updateUser)
+        .expect(400, {
+          error:
+            'last_name must contain only alphabetic characters and no spaces'
+        });
+    });
+
+    it('returns 400 and an error message if bio too long', () => {
+      const updateUser = { bio: 'f'.repeat(501) };
+      return supertest(app)
+        .patch(`/api/users`)
+        .set(`Authorization`, helpers.makeAuthHeader(testUser))
+        .send(updateUser)
+        .expect(400, { error: `bio must be fewer than 500 characters` });
+    });
+
+    it('returns 400 and an error message if lastname too short', () => {
+      const updateUser = { bio: 'f' };
+      return supertest(app)
+        .patch(`/api/users`)
+        .set(`Authorization`, helpers.makeAuthHeader(testUser))
+        .send(updateUser)
+        .expect(400, { error: `bio must be longer than 30 characters` });
+    });
+
+    it('returns 400 and an error message if user adds more than 10 skills', () => {
+      const updateUser = {
+        skills: [
+          'test0',
+          'test1',
+          'test2',
+          'test3',
+          'test4',
+          'test5',
+          'test6',
+          'test7',
+          'test8',
+          'test9',
+          'test10'
+        ]
+      };
+      return supertest(app)
+        .patch(`/api/users`)
+        .set(`Authorization`, helpers.makeAuthHeader(testUser))
+        .send(updateUser)
+        .expect(400, { error: `you may add a maximum of 10 skills` });
+    });
+
+    it('returns 400 and an error message if any skill is too long', () => {
+      const updateUser = { skills: ['f'.repeat(31)] };
+      return supertest(app)
+        .patch(`/api/users`)
+        .set(`Authorization`, helpers.makeAuthHeader(testUser))
+        .send(updateUser)
+        .expect(400, { error: `skills must be fewer than 30 characters` });
+    });
+
+    it('returns 400 and an error message if any skill is too short', () => {
+      const updateUser = { skills: ['f'] };
+      return supertest(app)
+        .patch(`/api/users`)
+        .set(`Authorization`, helpers.makeAuthHeader(testUser))
+        .send(updateUser)
+        .expect(400, { error: `skills must be longer than 2 characters` });
+    });
+
+    const skills = [':', '$', '%', '{', '|', '*', '^'];
+
+    skills.forEach(skill => {
+      it('returns 400 and an error message if skill has forbidden characters', () => {
+        const updateUser = { skills: [skill] };
+        return supertest(app)
+          .patch(`/api/users`)
+          .set(`Authorization`, helpers.makeAuthHeader(testUser))
+          .send(updateUser)
+          .expect(400, {
+            error:
+              'skills can only contain letters, numbers, spaces, periods, and hyphens'
+          });
+      });
+    });
+
     it(`returns a 400 if no values provided to update`, () => {
       const updateUser = {};
       return supertest(app)
         .patch(`/api/users`)
         .set(`Authorization`, helpers.makeAuthHeader(testUser))
         .send(updateUser)
-        .expect(400, { error: `request body must contain content` });
+        .expect(400, { error: `no content provided to update` });
     });
 
     it(`returns a 204 for successful update`, () => {

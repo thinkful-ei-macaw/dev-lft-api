@@ -9,26 +9,34 @@ class NotificationsService extends Service {
     return super
       .getItemsWhere(db, { recipient_id, seen: false })
       .select('notifications.*', 'projects.name', 'projects.handle')
-      .join('projects', 'notifications.project_id', 'projects.id')
+      .join('projects', 'notifications.project_id', 'projects.id');
   }
 
   findProjectUsers(db, project_id, user_id, notification_type) {
-    return db.raw(`
+    return db
+      .raw(
+        `
       SELECT DISTINCT u.id FROM projects p 
       INNER JOIN vacancies v on v.project_id = p.id 
       INNER JOIN users u on (u.id = v.user_id or p.creator_id = u.id)
       WHERE p.id = ? AND u.id != ? AND ? = ANY(u.notifications);
-    `, [project_id, user_id, notification_type])
+    `,
+        [project_id, user_id, notification_type]
+      )
       .then(result => result.rows);
   }
 
   findProjectId(db, request_id) {
-    return db.raw(`
+    return db
+      .raw(
+        `
       SELECT v.project_id FROM requests r
       INNER JOIN vacancies v on r.vacancy_id = v.id
       WHERE r.id = ?
       LIMIT 1;
-    `, [request_id])
+    `,
+        [request_id]
+      )
       .then(result => result.rows[0].project_id);
   }
 
@@ -38,10 +46,20 @@ class NotificationsService extends Service {
         recipient_id: recipient.id,
         project_id,
         type
-      }
+      };
     });
 
     return super.insertItems(db, notifications);
+  }
+
+  serializeNotifications(notification) {
+    return {
+      type: notification.type,
+      seen: notification.seen,
+      date_created: notification.date_created,
+      handle: notification.handle,
+      name: notification.name
+    };
   }
 }
 
