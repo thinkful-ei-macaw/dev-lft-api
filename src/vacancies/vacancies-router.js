@@ -50,14 +50,14 @@ vacancyRouter
 
       const wrongTitle = VacancyService.validateTitle(title);
       if (wrongTitle) {
-        return res.status(400).json({ error: `${title} ${wrongTitle}` });
+        return res.status(400).json({ error: `Title ${wrongTitle}` });
       }
 
       const wrongDescription = VacancyService.validateDescription(description);
       if (wrongDescription) {
         return res
           .status(400)
-          .json({ error: `${description} ${wrongDescription}` });
+          .json({ error: `Description ${wrongDescription}` });
       }
 
       const wrongSkills = skills.length
@@ -120,9 +120,18 @@ vacancyRouter
       await VacancyService.updateItem(db, vacancy_id, newVacancy);
 
       // send notification to project members
-      const usersToNotify = await NotificationsService
-        .findProjectUsers(db, vacancy.project_id, vacancy.user_id, 'leave');
-      await NotificationsService.insertNotifications(db, usersToNotify, 'leave', vacancy.project_id);
+      const usersToNotify = await NotificationsService.findProjectUsers(
+        db,
+        vacancy.project_id,
+        vacancy.user_id,
+        'leave'
+      );
+      await NotificationsService.insertNotifications(
+        db,
+        usersToNotify,
+        'leave',
+        vacancy.project_id
+      );
 
       return res.status(204).end();
     } catch (error) {

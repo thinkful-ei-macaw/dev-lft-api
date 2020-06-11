@@ -151,8 +151,153 @@ describe('Vacancies Endpoints', () => {
             error: `Missing '${field}' in request body`
           });
       });
+
+      it('responds with a 400 and an error message if `title` has less than 2 characters', () => {
+        const testProject = testProjects[0];
+        const testUser = testUsers[0];
+        const newVacancy = {
+          user_id: testUser.id,
+          title: 'a',
+          description: 'test new desc',
+          skills: []
+        };
+        return supertest(app)
+          .post(`/api/vacancies/${testProject.id}`)
+          .set(`Authorization`, helpers.makeAuthHeader(testUser))
+          .send(newVacancy)
+          .expect(400, {
+            error: `Title must be 2 or more characters`
+          });
+      });
+
+      it('responds with a 400 and an error message if `title` has more than 30 characters', () => {
+        const testProject = testProjects[0];
+        const testUser = testUsers[0];
+        const newVacancy = {
+          user_id: testUser.id,
+          title: 'a'.repeat(31),
+          description: 'test new desc',
+          skills: []
+        };
+        return supertest(app)
+          .post(`/api/vacancies/${testProject.id}`)
+          .set(`Authorization`, helpers.makeAuthHeader(testUser))
+          .send(newVacancy)
+          .expect(400, {
+            error: `Title must be less than 30 characters`
+          });
+      });
+
+      it('responds with a 400 and an error message if `title` includes non-alphanumeric characters', () => {
+        const testProject = testProjects[0];
+        const testUser = testUsers[0];
+        const newVacancy = {
+          user_id: testUser.id,
+          title: 'test@new/vacancy$',
+          description: 'test new desc',
+          skills: []
+        };
+        return supertest(app)
+          .post(`/api/vacancies/${testProject.id}`)
+          .set(`Authorization`, helpers.makeAuthHeader(testUser))
+          .send(newVacancy)
+          .expect(400, {
+            error: `Title must contain only letters, numbers, hyphens, and underscores or spaces`
+          });
+      });
+
+      it('responds with a 400 and an error message if `description` has less than 10 characters', () => {
+        const testProject = testProjects[0];
+        const testUser = testUsers[0];
+        const newVacancy = {
+          user_id: testUser.id,
+          title: 'test new vacancy',
+          description: 'new desc',
+          skills: []
+        };
+        return supertest(app)
+          .post(`/api/vacancies/${testProject.id}`)
+          .set(`Authorization`, helpers.makeAuthHeader(testUser))
+          .send(newVacancy)
+          .expect(400, {
+            error: `Description must be 10 or more characters`
+          });
+      });
+
+      it('responds with a 400 and an error message if `description` has more than 255 characters', () => {
+        const testProject = testProjects[0];
+        const testUser = testUsers[0];
+        const newVacancy = {
+          user_id: testUser.id,
+          title: 'test new vacancy',
+          description: 'a'.repeat(256),
+          skills: []
+        };
+        return supertest(app)
+          .post(`/api/vacancies/${testProject.id}`)
+          .set(`Authorization`, helpers.makeAuthHeader(testUser))
+          .send(newVacancy)
+          .expect(400, {
+            error: `Description must be less than 255 characters`
+          });
+      });
+
+      it('responds with a 400 and an error message if `skills` has more than 10 items', () => {
+        const testProject = testProjects[0];
+        const testUser = testUsers[0];
+        const newVacancy = {
+          user_id: testUser.id,
+          title: 'test new vacancy',
+          description: 'test new desc',
+          skills: new Array(11).fill('HTML')
+        };
+        return supertest(app)
+          .post(`/api/vacancies/${testProject.id}`)
+          .set(`Authorization`, helpers.makeAuthHeader(testUser))
+          .send(newVacancy)
+          .expect(400, {
+            error: `Skills must be no more than 10 skills`
+          });
+      });
+
+      it('responds with a 400 and an error message if any of the `skills` has less than 2 characters', () => {
+        const testProject = testProjects[0];
+        const testUser = testUsers[0];
+        const newVacancy = {
+          user_id: testUser.id,
+          title: 'test new vacancy',
+          description: 'test new desc',
+          skills: ['HTML', 'CSS', 'J', 'REACT']
+        };
+        return supertest(app)
+          .post(`/api/vacancies/${testProject.id}`)
+          .set(`Authorization`, helpers.makeAuthHeader(testUser))
+          .send(newVacancy)
+          .expect(400, {
+            error: `Each skill must be at least 2 characters`
+          });
+      });
+
+      it('responds with a 400 and an error message if any of the `skills` has more than 30 characters', () => {
+        const testProject = testProjects[0];
+        const testUser = testUsers[0];
+        const newVacancy = {
+          user_id: testUser.id,
+          title: 'test new vacancy',
+          description: 'test new desc',
+          skills: ['HTML', 'CSS', 'J'.repeat(31)]
+        };
+        return supertest(app)
+          .post(`/api/vacancies/${testProject.id}`)
+          .set(`Authorization`, helpers.makeAuthHeader(testUser))
+          .send(newVacancy)
+          .expect(400, {
+            error: `Each skill must be no more than 30 characters`
+          });
+      });
     });
   });
+
   describe('PATCH /api/vacancies/:id', () => {
     it('responds with 204 and updates the vacancy', () => {
       const testUser = testUsers[0];
