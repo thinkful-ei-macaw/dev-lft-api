@@ -60,65 +60,26 @@ describe('Notifications Endpoints', () => {
     });
   });
 
-  describe('PATCH /api/notifications/:notification_id', () => {
+  describe('PATCH /api/notifications', () => {
     it('responds with 204 and updates the notification', () => {
       const testUser = testUsers[0];
-      const idToUpdate = testNotifications[0].id;
       const updatedNotification = {
         seen: true
       };
 
       return supertest(app)
-        .patch(`/api/notifications/${idToUpdate}`)
+        .patch(`/api/notifications`)
         .set('Authorization', helpers.makeAuthHeader(testUser))
         .send(updatedNotification)
-        .expect(204);
-    });
-
-    it('responds with 404 and error message when notification does not exist', () => {
-      const testUser = testUsers[0];
-      const idToUpdate = 5423;
-      const updatedNotification = {
-        seen: true
-      };
-
-      return supertest(app)
-        .patch(`/api/notifications/${idToUpdate}`)
-        .set('Authorization', helpers.makeAuthHeader(testUser))
-        .send(updatedNotification)
-        .expect(404, {
-          error: 'Notification does not exist'
-        });
-    });
-
-    it('responds with 400 and error message when invalid body', () => {
-      const testUser = testUsers[0];
-      const idToUpdate = testNotifications[0].id;
-      const updatedNotification = {
-        invalid: 'invalid'
-      };
-
-      return supertest(app)
-        .patch(`/api/notifications/${idToUpdate}`)
-        .set('Authorization', helpers.makeAuthHeader(testUser))
-        .send(updatedNotification)
-        .expect(400, {
-          error: `Request body must contain 'seen'`
-        });
-    });
-
-    it('responds with 400 and error message when missing body', () => {
-      const testUser = testUsers[0];
-      const idToUpdate = testNotifications[0].id;
-      const updatedNotification = {};
-
-      return supertest(app)
-        .patch(`/api/notifications/${idToUpdate}`)
-        .set('Authorization', helpers.makeAuthHeader(testUser))
-        .send(updatedNotification)
-        .expect(400, {
-          error: `Request body must contain 'seen'`
-        });
+        .expect(204)
+        .then(() =>
+          supertest(app)
+            .get(`/api/notifications`)
+            .set('Authorization', helpers.makeAuthHeader(testUser))
+            .expect(res => {
+              expect(res.body).to.eql([]);
+            })
+        );
     });
   });
 });
