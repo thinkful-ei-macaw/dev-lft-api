@@ -4,10 +4,6 @@
 
 Dev LFT is a platform that brings together software engineers, web developers and web designers to build perfect teams to conquer side projects.
 
-## Prerequisites
-
-Dev LFT requires Node.js v6.0+ to run.
-
 ## Installing
 
 Dev LFT requires Node.js v12.14+ and npm 6.14+ to run.
@@ -19,7 +15,7 @@ npm install
 
 ## Running the tests
 
-To run front-end or back-end tests, simply run `npm test` in the terminal.
+To run tests, simply run `npm test` in the terminal.
 
 ## API Overview
 
@@ -31,20 +27,19 @@ To run front-end or back-end tests, simply run `npm test` in the terminal.
 │       └── /login
 ├── /users
 │   └── GET
-│       ├── /:user_id
+│       ├── /:username
+│       ├── /profile
 │   └── POST
 │       └── /
 │   └── PATCH
-│       └── /:user_id
+│       └── /
 ├── /projects
 │   └── GET
 │       ├── /
 │       ├── /user
-│       ├── /:project_id
+│       ├── /:project_handle
 │   └── POST
 │       └── /
-│   └── PATCH
-│       └── /:project_id
 │   └── DELETE
 │       └── /:project_id
 ├── /requests
@@ -53,16 +48,16 @@ To run front-end or back-end tests, simply run `npm test` in the terminal.
 │   └── POST
 │       └── /:vacancy_id
 │   └── PATCH
-│       └── /:request_id
+│       └── /:id
 ├── /vacancies
 │   └── GET
 │       └── /:project_id
 │   └── POST
 │       └── /:project_id
 │   └── PATCH
-│       └── /:vacancy_id
+│       └── /:id
 │   └── DELETE
-│       └── /:vacancy_id
+│       └── /:id
 ├── /chats
 │   └── GET
 |       └── /
@@ -77,10 +72,10 @@ To run front-end or back-end tests, simply run `npm test` in the terminal.
 │   └── POST
 │       └── /:project_id
 │   └── PATCH
-│       └── /:post_id
+│       └── /:id
 ├── /notifications
 │   └── GET
-        └── /
+│       └── /
 │   └── PATCH
 │       └── /:notification_id
 ```
@@ -100,37 +95,44 @@ To run front-end or back-end tests, simply run `npm test` in the terminal.
 }
 ```
 
-### GET `/api/users/`
+### GET `/api/users/profile`
 
 ```js
-// req.query
-{
-  ?
-}
-
 // res.body
 {
-  count: Number
+  "username": String,
+  "first_name": String,
+  "last_name": String,
+  "github_url": String,
+  "linkedin_url": String,
+  "twitter_url": String,
+  "bio": String,
+  "skills": [String],
+  "notifications": [String],
+  "date_created": String
 }
 ```
 
-### GET `/api/users/:user_id`
+### GET `/api/users/:username`
 
 ```js
 // req.params
 {
-  user_id: ID
+  username: String
 }
 
 // res.body
 {
-    username: String,
-    first_name: String,
-    last_name: String,
-    github_url: String,
-    linkedin_url: String,
-    twitter_url: String,
-    date_created: String
+  "username": String,
+  "first_name": String,
+  "last_name": String,
+  "github_url": String,
+  "linkedin_url": String,
+  "twitter_url": String,
+  "bio": String,
+  "skills": [String],
+  "notifications": [String],
+  "date_created": String
 }
 ```
 
@@ -151,7 +153,7 @@ To run front-end or back-end tests, simply run `npm test` in the terminal.
 }
 ```
 
-### PATCH `/api/users/:user_id`
+### PATCH `/api/users/`
 
 ```js
 // req.body
@@ -161,7 +163,10 @@ To run front-end or back-end tests, simply run `npm test` in the terminal.
   last_name: String,
   github_url: String,
   linkedin_url: String,
-  twitter_url: String
+  twitter_url: String,
+  bio: String,
+  skills: [String],
+  notifications: [String]
 }
 
 // res.body
@@ -174,76 +179,74 @@ To run front-end or back-end tests, simply run `npm test` in the terminal.
 ### GET `/api/projects/`
 
 ```js
-// req.query
-{
-  ?
-}
-
 // res.body
 
 [
   {
     id: String,
     name: String,
-    creator: String,
     description: String,
-    tags: [],
+    tags: [String],
     live_url: String,
     trello_url: String,
     github_url: String,
-    date_created: String
-  }, ...
-]
+    date_created: String,
+    handle: String,
+    openVacancies: String,
+  },
+];
 ```
 
 ### GET `/api/projects/user/`
 
 ```js
-// req.user.id
-
-{
-  user_id: Number;
-}
-
 // res.body
 
 [
   {
     id: String,
     name: String,
-    creator: String,
     description: String,
-    tags: [],
+    tags: [String],
     live_url: String,
     trello_url: String,
     github_url: String,
-    date_created: String
-  }, ...
-]
+    date_created: String,
+    handle: String,
+    openVacancies: String,
+  },
+];
 ```
 
-### GET `/api/projects/:project_id`
+### GET `/api/projects/:project_handle`
 
 ```js
 // req.params
 
 {
-  project_id: Number;
+  project_handle: String;
 }
 
 // res.body
 
-  {
-    id: String,
+{
+    id: Number,
     name: String,
-    creator: String,
     description: String,
-    tags: [],
+    tags: [String],
     live_url: String,
     trello_url: String,
     github_url: String,
-    date_created: String
-  }
+    date_created: String,
+    userRole: String,
+    handle: String,
+    openVacancies: String,
+    project_creator: {
+        first_name: String,
+        last_name: String,
+        username: String
+    }
+}
 ```
 
 ### POST `/api/projects/`
@@ -254,7 +257,7 @@ To run front-end or back-end tests, simply run `npm test` in the terminal.
 {
   name: String,
   description: String,
-  tags: [],
+  tags: [String],
   live_url: String,
   trello_url: String,
   github_url: String
@@ -265,13 +268,13 @@ To run front-end or back-end tests, simply run `npm test` in the terminal.
   {
     id: String,
     name: String,
-    creator: String,
     description: String,
-    tags: [],
+    tags: [String],
     live_url: String,
     trello_url: String,
     github_url: String,
-    date_created: String
+    date_created: String,
+    handle: String
   }
 ```
 
@@ -283,7 +286,7 @@ To run front-end or back-end tests, simply run `npm test` in the terminal.
 {
   name: String,
   description: String,
-  tags: [],
+  tags: [String],
   live_url: String,
   trello_url: String,
   github_url: String
@@ -308,8 +311,6 @@ To run front-end or back-end tests, simply run `npm test` in the terminal.
 {
   project_id: Number;
 }
-// req.user.id
-creator_id: Number;
 
 // res.body
 
@@ -333,12 +334,12 @@ creator_id: Number;
     id: Number,
     vacancy_id: Number,
     vacancy_title: String,
-    user_id: Number,
+    username: String,
     status: String,
     project_id: Number,
     first_name: String,
     last_name: String,
-  }, ...
+  },
 ];
 ```
 
@@ -349,15 +350,18 @@ creator_id: Number;
 {
   vacancy_id: Number;
 }
-// req.user.id
-user_id: Number;
-
 // res.body
 
-//fill in here with res.body
+{
+    id: Number,
+    vacancy_id: Number,
+    user_id: Number,
+    status: String,
+    date_created: String
+}
 ```
 
-### PATCH `/api/requests/:vacancy_id`
+### PATCH `/api/requests/:id`
 
 ```js
 // req.params
@@ -390,12 +394,13 @@ user_id: Number;
   {
     id: Number,
     project_id: Number,
-    user_id: Number,
+    request_status: String,
     first_name: String,
     last_name: String,
+    username: String,
     title: String,
     description: String,
-    skills: [],
+    skills: [String],
   },
 ];
 ```
@@ -407,7 +412,7 @@ user_id: Number;
 {
   title: String,
   description: String,
-  skills: []
+  skills: [String]
 }
 //req.params
 {
@@ -419,27 +424,24 @@ user_id: Number;
 {
   id: Number,
   project_id: Number,
-  user_id: Number,
   title: String,
   description: String,
-  skills: []
+  skills: [String]
 }
 ```
 
-### PATCH `/api/vacancies/:vacancy_id`
+### PATCH `/api/vacancies/:id`
 
 ```js
 // req.body
 {
   title: String,
   description: String,
-  skills: [],
+  skills: [String],
   user_id: Number
 }
-//req.params
-{
+//req.params.id
   vacancy_id: Number
-}
 
 // res.body
 
@@ -448,13 +450,11 @@ user_id: Number;
 }
 ```
 
-### DELETE `/api/vacancies/:vacancy_id`
+### DELETE `/api/vacancies/:id`
 
 ```js
-//req.params
-{
-  vacancy_id: Number;
-}
+//req.params.id
+vacancy_id: Number;
 
 // res.body
 {
@@ -471,13 +471,13 @@ user_id: Number;
 }
 // res.body
 {
-  [
+  allMessages: [
     {
-      id: Number,
-      chat_id: Number,
-      author_id: Number,
       body: String,
-    }, ...
+      date_created: String,
+      author_username: String,
+      isAuthor: Boolean,
+    },
   ];
 }
 ```
@@ -487,27 +487,26 @@ user_id: Number;
 ```js
 // req.body
 {
-  recipient_id: Number,
-  project_id: Number,
+  recipient_username: String,
+  request_id: Number,
   body: String
 }
 // res.body
 
 {
-  id: Number,
-  chat_id: Number,
-  author_id: Number,
-  body: String,
-  date_created: String
+  resultingMessage: {
+    id: Number,
+    chat_id: Number,
+    author_id: Number,
+    body: String,
+    date_created: String
+  }
 }
 ```
 
 ### PATCH `/api/chats/:chat_id`
 
 ```js
-let { closed } = req.body;
-const { chat_id } = req.params;
-const user_id = req.user.id;
 // req.body
 {
   closed: Boolean;
@@ -537,29 +536,25 @@ user_id: Number;
 [
   {
     id: Number,
-    user_id: Number,
     message: String,
     date_created: String,
     first_name: String,
-    last_name: String
-  }, ...
-]
+    last_name: String,
+    user_name: String,
+    canEdit: Boolean,
+  },
+];
 ```
 
 ### POST `/api/posts/:project_id`
 
 ```js
-const { project_id } = req.params;
-const user_id = req.user.id;
-const { message } = req.body;
 // req.params
 {
   project_id: Number;
 }
 // req.user.id
-{
   user_id: Number;
-}
 // req.body
 {
   message: String;
@@ -568,51 +563,20 @@ const { message } = req.body;
 
 {
   id: Number,
-  user_id: Number,
   message: String,
-  date_created: String
+  date_created: String,
+  canEdit: Boolean
 }
 ```
 
 ### PATCH `/api/posts/:post_id`
 
 ```js
-// req.params
-{
-  post_id: Number;
-}
+// req.params.id
+post_id: Number;
 // req.body
 {
   message: String;
-}
-// res.body
-{
-  id: Number,
-  user_id: Number,
-  message: String,
-  date_created: String
-}
-```
-
-### GET `/api/notifications/`
-
-```js
-req.user.id: Number
-
-// res.body
-[]
-```
-
-### PATCH `/api/notifications/:notification_id`
-
-```js
-// req.body
-{
-  seen: Boolean;
-}
-// req.params
-{
-  notification_id: Number;
 }
 // res.body
 {
@@ -620,27 +584,58 @@ req.user.id: Number
 }
 ```
 
-## Built With
+### GET `/api/notifications/`
 
-- [Node](https://nodejs.org/en/) - Run-time environment
-- [Express](https://expressjs.com/) - Web application framework
-- [PostgreSQL](https://www.postgresql.org/) - Database
+```js
+// req.user.id
+recipient_id: Number;
+
+// res.body
+[
+  {
+    type: String,
+    seen: Boolean,
+    date_created: String,
+    name: String,
+    handle: String,
+  },
+];
+```
+
+### PATCH `/api/notifications/:notification_id`
+
+```js
+// req.params
+{
+  recipient_id: Number;
+}
+{
+  seen: Boolean;
+}
+
+// res.body
+{
+  status: 204;
+}
+```
+
+## Tech Stack
+
+- [Node](https://nodejs.org/en/) - Asynchronous event-driven JavaScript runtime
+- [Express](https://expressjs.com/) - Fast, unopinionated, minimalist web framework for Node.js
+- [PostgreSQL](https://www.postgresql.org/) - The World's Most Advanced Open Source Relational Database
 - [Knex](http://knexjs.org/) - SQL query builder
 - [JWT](https://jwt.io/) - Authentication
-- [Mocha](https://mochajs.org/) - Testing
-- [Chai](https://www.chaijs.com/) - Testing
+- [Mocha](https://mochajs.org/) - A feature-rich JavaScript test framework
+- [Chai](https://www.chaijs.com/) - BDD/TDD assertion library for node and the browser
 
 ## Authors
 
-- **Malcolm Kiano** - _Full-Stack_ - [malcolmkiano](https://github.com/malcolmkiano)
-
-- **Sara Mills** - _Full-Stack_ - [saraquail](https://github.com/Saraquail)
-
-- **Jack Lansing** - _Full-Stack_ - [jackLansing](https://github.com/jacklansing)
-
-- **Andrew Burchett** - _Full-Stack_ - [atwb21786](https://github.com/atwb21786)
-
-- **Muhiddin Kurbonov** - _Full-Stack_ - [muhiddinsgithub](https://github.com/muhiddinsgithub)
+- Project Manager - [Malcolm Kiano](https://github.com/malcolmkiano)
+- Product Manager - [Sara Mills](https://github.com/Saraquail)
+- QA Lead - [Jack Lansing](https://github.com/jacklansing)
+- Design Lead - [Andrew Burchett](https://github.com/atwb21786)
+- Documentation Manager - [Muhiddin Kurbonov](https://github.com/muhiddinsgithub)
 
 See also the list of [contributors](https://github.com/thinkful-ei-macaw/dev-lft-api/graphs/contributors) who participated in this project.
 
