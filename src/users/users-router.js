@@ -180,11 +180,10 @@ usersRouter.patch('/', requireAuth, async (req, res, next) => {
     }
 
     if (skills && skills.length) {
-
       if (skills.length > 10) {
         return res.status(400).json({
           error: 'you may add a maximum of 10 skills'
-        })
+        });
       }
 
       let skillError = UsersService.validateSkills(skills);

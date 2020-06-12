@@ -79,8 +79,16 @@ chatsRouter
         // send notification to recipient
         if (recipient.notifications.includes('chat')) {
           const usersToNotify = [{ id: recipient.id }];
-          const project_id = await NotificationsService.findProjectId(db, request_id);
-          await NotificationsService.insertNotifications(db, usersToNotify, 'chat', project_id);
+          const project_id = await NotificationsService.findProjectId(
+            db,
+            request_id
+          );
+          await NotificationsService.insertNotifications(
+            db,
+            usersToNotify,
+            'chat',
+            project_id
+          );
         }
 
         return res.status(201).json({ resultingMessage });
