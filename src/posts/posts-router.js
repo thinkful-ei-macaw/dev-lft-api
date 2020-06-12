@@ -56,9 +56,18 @@ postsRouter
       const resultingPost = await PostsService.insertItem(db, newPost);
 
       // send notification to project members
-      const usersToNotify = await NotificationsService
-        .findProjectUsers(db, project_id, user_id, 'post');
-      await NotificationsService.insertNotifications(db, usersToNotify, 'post', project_id);
+      const usersToNotify = await NotificationsService.findProjectUsers(
+        db,
+        project_id,
+        user_id,
+        'post'
+      );
+      await NotificationsService.insertNotifications(
+        db,
+        usersToNotify,
+        'post',
+        project_id
+      );
 
       return res
         .status(201)
