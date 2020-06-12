@@ -1,6 +1,6 @@
 BEGIN;
 
-  TRUNCATE "requests", "vacancies", "projects", "users" RESTART IDENTITY CASCADE;
+  TRUNCATE "requests", "vacancies", "projects", "users", "chats", "messages" RESTART IDENTITY CASCADE;
 
   -- all the seed users passwords are 'pass'
   INSERT INTO "users"
