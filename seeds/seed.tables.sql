@@ -185,7 +185,7 @@ VALUES
 INSERT INTO "messages"
   ("id", "chat_id", "author_id", "body", "date_created")
 VALUES
-  ( 1, 1, 1, 'Hey, would like to join our team?', now() - '20 minutes'
+  ( 1, 1, 1, 'Hey, would you like to join our team?', now() - '20 minutes'
 ::INTERVAL ),
 ( 2, 1, 7, 'Absolutely!', now
 () - '5 minutes'::INTERVAL ),
@@ -194,7 +194,7 @@ VALUES
 ( 4, 2, 7, 'Yes. Yes I did', now
 () - '7 minutes'::INTERVAL ),
 ( 5, 2, 3, 'Welcome to the team.', now
-() - '4 minutes'::INTERVAL);
+() - '3 minutes'::INTERVAL);
 
 INSERT INTO "posts"
   ("id", "project_id", "user_id", "message", "date_created")
@@ -220,5 +220,9 @@ SELECT setval('requests_id_seq', (SELECT MAX(id)
   from "requests"));
 SELECT setval('posts_id_seq', (SELECT MAX(id)
   from "posts"));
+SELECT setval('chats_id_seq', (SELECT MAX(id)
+  from "chats"));
+SELECT setval('messages_id_seq', (SELECT MAX(id)
+  from "messages"))
 
 COMMIT;
