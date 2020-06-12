@@ -223,6 +223,6 @@ SELECT setval('posts_id_seq', (SELECT MAX(id)
 SELECT setval('chats_id_seq', (SELECT MAX(id)
   from "chats"));
 SELECT setval('messages_id_seq', (SELECT MAX(id)
-  from "messages"))
+  from "messages"));
 
 COMMIT;
