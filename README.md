@@ -278,32 +278,6 @@ To run tests, simply run `npm test` in the terminal.
   }
 ```
 
-### PATCH `/api/projects/:project_id`
-
-```js
-// req.body
-
-{
-  name: String,
-  description: String,
-  tags: [String],
-  live_url: String,
-  trello_url: String,
-  github_url: String
-}
-
-// req.params
-{
-  project_id: Number
-}
-
-//res.body
-
-{
-  status: 204
-}
-```
-
 ### DELETE `/api/projects/:project_id`
 
 ```js
