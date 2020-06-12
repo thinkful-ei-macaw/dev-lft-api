@@ -58,7 +58,7 @@ async function findProjectId(req, res) {
             error: 'Vacancy not found'
           });
 
-        return { project_id: null }
+        return { project_id: null };
       }
 
       project_id = item.project_id;
