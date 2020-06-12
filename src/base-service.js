@@ -2,7 +2,6 @@
  * Extensible Knex instance class to interact with PSQL database
  */
 class Service {
-
   /**
    * Instantiates the Service class
    * @param {string} table_name PSQL table to be queried
@@ -16,9 +15,7 @@ class Service {
    * @param {{}} db an instance of the Knex database object
    */
   getAllItems(db) {
-    return db
-      .from(this.table)
-      .select();
+    return db.from(this.table).select();
   }
 
   /**
@@ -27,11 +24,7 @@ class Service {
    * @param {string} id the ID of the record to be queried
    */
   getItemById(db, id) {
-    return db
-      .from(this.table)
-      .select()
-      .where({ id })
-      .first();
+    return db.from(this.table).select().where({ id }).first();
   }
 
   /**
@@ -40,10 +33,7 @@ class Service {
    * @param {{}} criteria key-value pairs to check the table for
    */
   getItemsWhere(db, criteria) {
-    return db
-      .from(this.table)
-      .select()
-      .where(criteria)
+    return db.from(this.table).select().where(criteria);
   }
 
   /**
@@ -52,8 +42,7 @@ class Service {
    * @param {{}} criteria key-value pairs to check the table for
    */
   getItemWhere(db, criteria) {
-    return this.getItemsWhere(db, criteria)
-      .first();
+    return this.getItemsWhere(db, criteria).first();
   }
 
   /**
@@ -62,10 +51,7 @@ class Service {
    * @param {{}} item array of objects with data to be inserted
    */
   insertItems(db, items) {
-    return db
-      .into(this.table)
-      .insert(items)
-      .returning('*');
+    return db.into(this.table).insert(items).returning('*');
   }
 
   /**
@@ -103,11 +89,7 @@ class Service {
    * @param {{}} data object with data to merge into the current record
    */
   updateItemsWhere(db, criteria, data) {
-    return db
-      .from(this.table)
-      .where(criteria)
-      .update(data)
-      .returning('*');
+    return db.from(this.table).where(criteria).update(data).returning('*');
   }
 
   /**
@@ -116,10 +98,7 @@ class Service {
    * @param {string} id the ID of the record to be deleted
    */
   deleteItem(db, id) {
-    return db
-      .from(this.table)
-      .where({ id })
-      .delete();
+    return db.from(this.table).where({ id }).delete();
   }
 }
 

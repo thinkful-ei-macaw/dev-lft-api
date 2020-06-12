@@ -20,7 +20,6 @@ class UsersService extends Service {
       skills.length &&
       !REGEX_ALPHA_NUMBERS_PERIOD_SPACE_HYPHEN.test(allSkills)
     ) {
-      console.log({skills});
       return 'skills can only contain letters, numbers, spaces, periods, and hyphens';
     }
 
