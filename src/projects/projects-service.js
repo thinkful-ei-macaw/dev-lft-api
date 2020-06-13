@@ -45,12 +45,7 @@ const ProjectsService = {
         p.date_created,
         p.handle 
       FROM
-        projects p 
-        INNER JOIN
-          vacancies v 
-          ON v.project_id = p.id 
-      WHERE
-        v.user_id IS NULL
+        projects p
         ) t ORDER BY date_created DESC;
       `
       )

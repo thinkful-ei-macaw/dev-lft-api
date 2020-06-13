@@ -55,7 +55,7 @@ describe('Projects Endpoints', function () {
         )
       );
 
-      it('responds with 200 and all of the projects with vacancies', () => {
+      it('responds with 200 and all of the projects', () => {
         const expectedProjects = helpers.makeExpectedProjects(
           testProjects,
           testVacancies

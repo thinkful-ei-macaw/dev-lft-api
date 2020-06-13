@@ -192,8 +192,8 @@ To run tests, simply run `npm test` in the terminal.
     github_url: String,
     date_created: String,
     handle: String,
-    openVacancies: String,
-  },
+    openVacancies: String
+  }
 ];
 ```
 
@@ -213,8 +213,8 @@ To run tests, simply run `npm test` in the terminal.
     github_url: String,
     date_created: String,
     handle: String,
-    openVacancies: String,
-  },
+    openVacancies: String
+  }
 ];
 ```
 
@@ -312,8 +312,8 @@ To run tests, simply run `npm test` in the terminal.
     status: String,
     project_id: Number,
     first_name: String,
-    last_name: String,
-  },
+    last_name: String
+  }
 ];
 ```
 
@@ -374,8 +374,8 @@ To run tests, simply run `npm test` in the terminal.
     username: String,
     title: String,
     description: String,
-    skills: [String],
-  },
+    skills: [String]
+  }
 ];
 ```
 
@@ -450,8 +450,8 @@ vacancy_id: Number;
       body: String,
       date_created: String,
       author_username: String,
-      isAuthor: Boolean,
-    },
+      isAuthor: Boolean
+    }
   ];
 }
 ```
@@ -515,8 +515,8 @@ user_id: Number;
     first_name: String,
     last_name: String,
     user_name: String,
-    canEdit: Boolean,
-  },
+    canEdit: Boolean
+  }
 ];
 ```
 
@@ -571,8 +571,8 @@ recipient_id: Number;
     seen: Boolean,
     date_created: String,
     name: String,
-    handle: String,
-  },
+    handle: String
+  }
 ];
 ```
 

@@ -31,6 +31,28 @@ class VacancyService extends Service {
       .then(result => result.rows);
   }
 
+  getVacanciesNoAuth(db, project_id) {
+    return db
+      .raw(
+        `
+      SELECT 
+      v.id, 
+      v.project_id,
+      v.title, 
+      v.description, 
+      v.skills,
+      u.first_name,
+      u.last_name,
+      u.username
+      FROM vacancies v
+      LEFT JOIN users u ON v.user_id = u.id
+      WHERE v.project_id = ?
+      `,
+        [project_id]
+      )
+      .then(result => result.rows);
+  }
+
   // Helps us find out if a user is part of the project
   findFilledVacancy(db, project_id, user_id) {
     return db
@@ -50,10 +72,10 @@ class VacancyService extends Service {
     return {
       id: vacancy.id,
       project_id: vacancy.project_id,
-      request_status: vacancy.status,
-      first_name: vacancy.first_name,
-      last_name: vacancy.last_name,
-      username: vacancy.username,
+      request_status: vacancy.status || null,
+      first_name: vacancy.first_name || null,
+      last_name: vacancy.last_name || null,
+      username: vacancy.username || null,
       title: xss(vacancy.title),
       description: xss(vacancy.description),
       skills: vacancy.skills
