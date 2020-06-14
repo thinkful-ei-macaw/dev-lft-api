@@ -470,58 +470,6 @@ describe('Projects Endpoints', function () {
       });
     });
   });
-
-  // PATCH api/projects/:project_id endpoint test
-
-  describe(`PATCH /api/projects/:project_id`, () => {
-    context('Given there are projects in the database', () => {
-      beforeEach('insert projects', () =>
-        helpers.seedProjectsTables(
-          db,
-          testUsers,
-          testProjects,
-          testVacancies,
-          testRequests,
-          testPosts,
-          testChats,
-          testMessages,
-          testNotifications
-        )
-      );
-
-      it('responds with 204 and updates the project', () => {
-        const testUser = testUsers[0];
-        const testProject = testProjects[0];
-        const idToUpdate = testProjects[0].id;
-        const updatedProject = {
-          name: 'test update project name',
-          description: 'test update project description'
-        };
-
-        const expectedProject = helpers.makeExpectedProjectByHandle(
-          testProject,
-          testVacancies,
-          testUser
-        );
-
-        expectedProject.name = updatedProject.name;
-        expectedProject.description = updatedProject.description;
-        expectedProject.userRole = 'owner';
-
-        return supertest(app)
-          .patch(`/api/projects/${idToUpdate}`)
-          .set('Authorization', helpers.makeAuthHeader(testUser))
-          .send(updatedProject)
-          .expect(204)
-          .then(() =>
-            supertest(app)
-              .get(`/api/projects/${expectedProject.handle}`)
-              .set('Authorization', helpers.makeAuthHeader(testUser))
-              .expect(expectedProject)
-          );
-      });
-    });
-  });
   // DELETE api/projects/:project_id endpoint test
 
   describe(`DELETE /api/projects/:project_id`, () => {
