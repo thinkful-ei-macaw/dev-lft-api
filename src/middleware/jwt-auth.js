@@ -1,12 +1,17 @@
 const AuthService = require('../auth/auth-service');
 
-function requireAuth(req, res, next) {
+async function requireAuth(req, res, next, block = true) {
   const authToken = req.get('Authorization') || '';
   const db = req.app.get('db');
 
   let bearerToken;
   if (!authToken.toLowerCase().startsWith('bearer ')) {
-    return res.status(401).json({ error: 'Missing bearer token' });
+    if (block) {
+      return res.status(401).json({ error: 'Missing bearer token' });
+    } else {
+      req.user = null;
+      return next();
+    }
   } else {
     bearerToken = authToken.slice(7, authToken.length);
   }
@@ -14,20 +19,26 @@ function requireAuth(req, res, next) {
   try {
     const payload = AuthService.verifyJwt(bearerToken);
     const username = payload.sub;
-    AuthService.getItemWhere(db, { username })
-      .then(user => {
-        if (!user)
-          return res.status(401).json({ error: 'Unauthorized request' });
+    const user = await AuthService.getItemWhere(db, { username });
+    if (block) {
+      if (!user) return res.status(401).json({ error: 'Unauthorized request' });
+      req.user = user;
+    } else {
+      req.user = user ? user : null;
+    }
 
-        req.user = user;
-        next();
-      })
-      .catch(next);
+    next();
   } catch (error) {
-    return res.status(401).json({ error: 'Unauthorized request' });
+    if (block) return res.status(401).json({ error: 'Unauthorized request' });
+    next(error);
   }
 }
 
+function checkAuth(req, res, next) {
+  return requireAuth(req, res, next, false);
+}
+
 module.exports = {
-  requireAuth
+  requireAuth,
+  checkAuth
 };

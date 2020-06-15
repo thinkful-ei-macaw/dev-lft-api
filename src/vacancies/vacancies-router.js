@@ -4,23 +4,28 @@ const RequestsService = require('../requests/requests-service');
 const VacancyService = require('./vacancies-service');
 const vacancyRouter = express.Router();
 const jsonParser = express.json();
-const { requireAuth } = require('../middleware/jwt-auth');
+const { requireAuth, checkAuth } = require('../middleware/jwt-auth');
 const {
   requireOwner,
   requireMember
 } = require('../middleware/user-role-verification');
 
-vacancyRouter.get('/:project_id', requireAuth, async (req, res, next) => {
+vacancyRouter.get('/:project_id', checkAuth, async (req, res, next) => {
   try {
     const db = req.app.get('db');
     const { project_id } = req.params;
-    const user_id = req.user.id;
-    const vacancies = await VacancyService.getVacancies(
-      db,
-      project_id,
-      user_id
-    );
-    res.status(200).json(vacancies.map(VacancyService.serializeVacancy));
+    const user_id = req.user ? req.user.id : null;
+    if (user_id) {
+      const vacancies = await VacancyService.getVacancies(
+        db,
+        project_id,
+        user_id
+      );
+      res.status(200).json(vacancies.map(VacancyService.serializeVacancy));
+    } else {
+      const vacancies = await VacancyService.getVacanciesNoAuth(db, project_id);
+      res.status(200).json(vacancies.map(VacancyService.serializeVacancy));
+    }
   } catch (error) {
     next(error);
   }

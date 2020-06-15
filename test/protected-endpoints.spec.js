@@ -76,16 +76,6 @@ describe('Protected Endpoints', () => {
       method: supertest(app).get
     },
     {
-      name: 'GET /api/projects/:project_id',
-      path: '/api/projects/1',
-      method: supertest(app).get
-    },
-    {
-      name: 'PATCH /api/projects/:project_id',
-      path: '/api/projects/1',
-      method: supertest(app).patch
-    },
-    {
       name: 'DELETE /api/projects/:project_id',
       path: '/api/projects/1',
       method: supertest(app).delete
@@ -133,11 +123,6 @@ describe('Protected Endpoints', () => {
       name: 'POST /api/vacancies/:project_id',
       path: '/api/vacancies/1',
       method: supertest(app).post
-    },
-    {
-      name: 'GET /api/vacancies/:project_id',
-      path: '/api/vacancies/1',
-      method: supertest(app).get
     },
     {
       name: 'PATCH /api/vacancies/:vacancy_id',

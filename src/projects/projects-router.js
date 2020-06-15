@@ -1,7 +1,7 @@
 const express = require('express');
 const ProjectsService = require('./projects-service');
 const VacanciesService = require('../vacancies/vacancies-service');
-const { requireAuth } = require('../middleware/jwt-auth');
+const { requireAuth, checkAuth } = require('../middleware/jwt-auth');
 
 const projectsRouter = express.Router();
 const bodyParser = express.json();
@@ -51,7 +51,7 @@ projectsRouter
     };
 
     for (const [key, value] of Object.entries(requiredFields)) {
-      if (value == null) {
+      if (!value) {
         return res
           .status(400)
           .json({ error: `Missing '${key}' in request body` });
@@ -168,10 +168,9 @@ projectsRouter
 
 projectsRouter
   .route('/:project_handle')
-  .all(requireAuth)
-  .get(async (req, res, next) => {
+  .get(checkAuth, async (req, res, next) => {
     const { project_handle } = req.params;
-    const user_id = req.user.id;
+    const user_id = req.user ? req.user.id : null;
 
     try {
       const project = await ProjectsService.getProjectByHandle(
@@ -187,18 +186,24 @@ projectsRouter
 
       /* Set property on project response that lets client know 
       if the user is the owner of this project */
-      const vacancy = await VacanciesService.findFilledVacancy(
-        req.app.get('db'),
-        project.id,
-        user_id
-      );
-      if (user_id === project.creator_id) {
-        project.userRole = 'owner';
-      } else if (vacancy.length) {
-        project.userRole = 'member';
+      if (user_id) {
+        const vacancy = await VacanciesService.findFilledVacancy(
+          req.app.get('db'),
+          project.id,
+          user_id
+        );
+
+        if (user_id === project.creator_id) {
+          project.userRole = 'owner';
+        } else if (vacancy.length) {
+          project.userRole = 'member';
+        } else {
+          project.userRole = 'user';
+        }
       } else {
         project.userRole = 'user';
       }
+
       let openCount = await ProjectsService.getOpenCount(
         req.app.get('db'),
         project.id
