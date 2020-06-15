@@ -7,6 +7,9 @@ const { requireAuth } = require('../middleware/jwt-auth');
 const chatsRouter = express.Router();
 const bodyParser = express.json();
 
+// WEBSOCKET CLIENTS
+const WebSocketClients = require('../websocket-clients');
+
 chatsRouter.use(requireAuth);
 
 chatsRouter
@@ -104,6 +107,17 @@ chatsRouter
           db,
           newMessage
         );
+
+        // WEBSOCKET TESTING
+        // If the recipient is connected via WebSocket,
+        // send them the message in real time
+        const connectedRecipient = WebSocketClients.getClient(
+          recipient_username
+        );
+        if (connectedRecipient !== undefined) {
+          connectedRecipient.ws.send(JSON.stringify(resultingMessage));
+        }
+
         return res.status(201).json({ resultingMessage });
       }
     } catch (e) {

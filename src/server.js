@@ -13,8 +13,22 @@ wss.on('connection', (ws, req) => {
   console.log('new websocket from', req.url);
   WebSocketClients.addClient(ws, req);
 
-  ws.on('message', msg => {
-    console.log(msg);
+  ws.on('message', message => {
+    /* If the client sends us a changeRoom status of true,
+    we will modify what type of messages they can accept from the
+    WebSocket. This will help us to not send messages that would
+    be irrelevant to them (e.g., if they are not in the chat 
+    component, all they need is a notification of a new message) */
+    console.log('message received');
+    const data = JSON.parse(message);
+    if (data.changeRoom === true) {
+      let user = WebSocketClients.getClient(data.username);
+      for (const value of ['receiveChats', 'receivePosts']) {
+        if (data[value] !== undefined) {
+          user[value] = data[value];
+        }
+      }
+    }
   });
 });
 
