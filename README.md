@@ -4,6 +4,16 @@
 
 Dev LFT is a platform that brings together software engineers, web developers and web designers to build perfect teams to conquer side projects.
 
+[Client](https://github.com/thinkful-ei-macaw/dev-lft)
+
+[Server](https://github.com/thinkful-ei-macaw/dev-lft-api)
+
+[Live](https://www.devlft.com)
+
+## Screenshots
+
+![Landing page and projects page](./screens.png)
+
 ## Installing
 
 Dev LFT requires Node.js v12.14+ and npm 6.14+ to run.
