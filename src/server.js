@@ -20,12 +20,12 @@ wss.on('connection', (ws, req) => {
     be irrelevant to them (e.g., if they are not in the chat 
     component, all they need is a notification of a new message) */
     console.log('message received');
-    const data = JSON.parse(message);
-    if (data.changeRoom === true) {
-      let user = WebSocketClients.getClient(data.username);
+    const messageData = JSON.parse(message);
+    if (messageData.changeRoom === true) {
+      let user = WebSocketClients.getClient(messageData.username);
       for (const value of ['receiveChats', 'receivePosts']) {
-        if (data[value] !== undefined) {
-          user[value] = data[value];
+        if (messageData[value] !== undefined) {
+          user[value] = messageData[value];
         }
       }
     }

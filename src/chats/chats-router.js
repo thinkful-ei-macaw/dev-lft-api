@@ -115,7 +115,17 @@ chatsRouter
           recipient_username
         );
         if (connectedRecipient !== undefined) {
-          connectedRecipient.ws.send(JSON.stringify(resultingMessage));
+          const chatMessage = {
+            ...resultingMessage,
+            author_username: req.user.username,
+            isAuthor: false
+          };
+          connectedRecipient.ws.send(
+            JSON.stringify({
+              messageType: 'chat',
+              content: ChatsService.serializeMessage(chatMessage)
+            })
+          );
         }
 
         return res.status(201).json({ resultingMessage });
