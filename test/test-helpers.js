@@ -341,11 +341,6 @@ function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
 }
 
 function makeExpectedProjects(projects, vacancies) {
-  // let filteredProjects = projects.filter(project => {
-  //   return vacancies.find(
-  //     vacancy => vacancy.project_id === project.id && vacancy.user_id == null
-  //   );
-  // });
   return projects.map(project => {
     let openVacancies = vacancies.filter(vacancy => {
       return vacancy.project_id === project.id && vacancy.user_id == null;
