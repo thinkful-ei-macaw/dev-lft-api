@@ -26,6 +26,7 @@ const requestsRouter = require('./requests/requests-router');
 const chatsRouter = require('./chats/chats-router');
 const postsRouter = require('./posts/posts-router');
 const notificationsRouter = require('./notifications/notifications-router');
+const wsAuthRouter = require('./wsauth/ws-auth-router');
 
 // set up routes
 const routes = [
@@ -36,7 +37,8 @@ const routes = [
   { url: '/api/vacancies', router: vacancyRouter },
   { url: '/api/chats', router: chatsRouter },
   { url: '/api/posts', router: postsRouter },
-  { url: '/api/notifications', router: notificationsRouter }
+  { url: '/api/notifications', router: notificationsRouter },
+  { url: '/api/ws/auth', router: wsAuthRouter }
 ];
 
 // add routes to app

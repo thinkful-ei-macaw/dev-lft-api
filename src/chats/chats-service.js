@@ -117,22 +117,31 @@ const ChatsService = {
   serializeChat(chat) {
     return {
       chat_id: chat.chat_id,
-      body: xss(chat.body),
-      request_id: chat.request_id,
-      request_status: chat.request_status,
-      date_created: chat.date_created,
-      project_name: chat.project_name,
-      isOwner: chat.project_is_creator,
-      isReply: chat.is_reply,
-      vacancy_name: chat.vacancy_name,
-      first_name: chat.first_name,
-      last_name: chat.last_name,
-      recipient_username: chat.recipient_username,
-      closed: chat.closed
+      closed_status: chat.closed,
+      messages: [
+        {
+          body: xss(chat.body),
+          date_created: chat.date_created,
+          isAuthor: !chat.is_reply
+        }
+      ],
+      project: {
+        project_name: chat.project_name,
+        isOwner: chat.project_is_creator,
+        vacancy_name: chat.vacancy_name,
+        request_id: chat.request_id,
+        request_status: chat.request_status
+      },
+      recipient: {
+        first_name: chat.first_name,
+        last_name: chat.last_name,
+        recipient_username: chat.recipient_username
+      }
     };
   },
   serializeMessage(message) {
     return {
+      chat_id: message.chat_id,
       body: xss(message.body),
       date_created: message.date_created,
       author_username: message.author_username,
