@@ -116,6 +116,7 @@ chatsRouter
         );
         if (connectedRecipient !== undefined) {
           const chatMessage = {
+            chat_id: chat.id,
             ...resultingMessage,
             author_username: req.user.username,
             isAuthor: false

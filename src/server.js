@@ -2,15 +2,23 @@ const app = require('./app');
 const knex = require('knex');
 const { PORT, DATABASE_URL } = require('./config');
 
-// Create an http websocket server
+// Connect to the database and set it on app
+const db = knex({
+  client: 'pg',
+  connection: DATABASE_URL
+});
+
+app.set('db', db);
+
+// Create a websocket server
 const http = require('http');
 const WebSocket = require('ws');
 const server = http.createServer(app);
 const WebSocketClients = require('./websocket-clients');
-const wss = new WebSocket.Server({ server });
+const WSAuthService = require('./wsauth/ws-auth-service');
+const wss = new WebSocket.Server({ noServer: true });
 
 wss.on('connection', (ws, req) => {
-  console.log('new websocket from', req.url);
   WebSocketClients.addClient(ws, req);
 
   ws.on('message', message => {
@@ -19,7 +27,6 @@ wss.on('connection', (ws, req) => {
     WebSocket. This will help us to not send messages that would
     be irrelevant to them (e.g., if they are not in the chat 
     component, all they need is a notification of a new message) */
-    console.log('message received');
     const messageData = JSON.parse(message);
     if (messageData.changeRoom === true) {
       let user = WebSocketClients.getClient(messageData.username);
@@ -32,12 +39,28 @@ wss.on('connection', (ws, req) => {
   });
 });
 
-const db = knex({
-  client: 'pg',
-  connection: DATABASE_URL
-});
+server.on('upgrade', async (req, socket, head) => {
+  // Authentication
+  try {
+    const clientTicket = req.url.slice(1);
+    const originalTicket = await WSAuthService.getItemWhere(db, {
+      ticket: clientTicket
+    });
 
-app.set('db', db);
+    if (!originalTicket) {
+      socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
+      socket.destroy();
+      return;
+    }
+
+    wss.handleUpgrade(req, socket, head, ws => {
+      wss.emit('connection', ws, req);
+    });
+  } catch (e) {
+    socket.destroy();
+    return;
+  }
+});
 
 server.listen(PORT, () => {
   console.log(`Server listening at http://localhost:${PORT}`);
