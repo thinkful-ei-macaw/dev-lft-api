@@ -1,10 +1,9 @@
 module.exports = {
   PORT: process.env.PORT || 8000,
   CLIENT_ORIGIN: [
-    'https://www.devlft.com',
-    'https://devlft.com',
-    'https://devlft.now.sh/',
-    'http://localhost:3000'
+    /^https:\/\/(www.)?devlft.com$/,
+    /^.*.dev-lft.vercel.app/,
+    /^http:\/\/localhost(:[0-9]+)?$/
   ],
   NODE_ENV: process.env.NODE_ENV || 'development',
   DATABASE_URL:
