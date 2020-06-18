@@ -19,6 +19,20 @@ class PostsService extends Service {
       .orderBy('posts.date_created', 'desc');
   }
 
+  getAllProjectUsers(db, project_id) {
+    return db
+      .raw(
+        `
+    SELECT DISTINCT(u.username) FROM users u 
+    INNER JOIN projects p ON p.id = ? 
+    INNER JOIN vacancies v ON v.project_id = p.id 
+    WHERE p.creator_id = u.id OR v.user_id = u.id
+    `,
+        [project_id]
+      )
+      .then(result => result.rows);
+  }
+
   validateMessage(message) {
     if (message.length > 280) {
       return 'message must be fewer than 280 characters';

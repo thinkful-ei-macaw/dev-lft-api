@@ -8,6 +8,8 @@ const postsRouter = express.Router();
 postsRouter.use(express.json());
 postsRouter.use(requireAuth);
 
+const WebSocketClients = require('../websocket-clients');
+
 postsRouter
   .route('/:project_id')
   .get(async (req, res, next) => {
@@ -68,6 +70,26 @@ postsRouter
         'post',
         project_id
       );
+
+      // WEBSOCKET TESTING
+      // If the recipient is connected via WebSocket,
+      // send them the post in real time
+      const projectUsers = await PostsService.getAllProjectUsers(
+        db,
+        project_id
+      );
+
+      projectUsers.forEach(user => {
+        let connected = WebSocketClients.getClient(user.username);
+        if (connected) {
+          connected.ws.send(
+            JSON.stringify({
+              messageType: 'post',
+              content: PostsService.serializePost(resultingPost, user_id)
+            })
+          );
+        }
+      });
 
       return res
         .status(201)
