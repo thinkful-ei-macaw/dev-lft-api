@@ -70,9 +70,11 @@ class PostsService extends Service {
       id: post.id,
       message: xss(post.message),
       date_created: post.date_created,
-      first_name: post.first_name,
-      last_name: post.last_name,
-      username: post.username,
+      author: {
+        first_name: post.first_name,
+        last_name: post.last_name,
+        username: post.username
+      },
       canEdit: post.username === username
     };
   }
