@@ -1,6 +1,7 @@
 const knex = require('knex');
 const app = require('../src/app');
 const helpers = require('./test-helpers');
+const supertest = require('supertest');
 
 describe('Protected Endpoints', () => {
   let db;
@@ -149,6 +150,14 @@ describe('Protected Endpoints', () => {
     }
   ];
 
+  const protectedWSAuth = [
+    {
+      name: 'GET /api/ws/auth',
+      path: '/api/ws/auth',
+      method: supertest(app).get
+    }
+  ];
+
   const protectedEndpoints = [
     ...protectedChats,
     ...protectedPosts,
@@ -156,7 +165,8 @@ describe('Protected Endpoints', () => {
     ...protectedRequests,
     ...protectedUsers,
     ...protectedVacancies,
-    ...protectedNotifications
+    ...protectedNotifications,
+    ...protectedWSAuth
   ];
 
   protectedEndpoints.forEach(endpoint => {

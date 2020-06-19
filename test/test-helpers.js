@@ -494,11 +494,13 @@ function makeExpectedPosts(user, posts, project_id) {
   return projPosts.map(post => {
     return {
       id: post.id,
-      username: user.username,
       message: post.message,
       date_created: post.date_created,
-      first_name: user.first_name,
-      last_name: user.last_name,
+      author: {
+        first_name: user.first_name,
+        last_name: user.last_name,
+        username: user.username
+      },
       canEdit: post.user_id === user.id
     };
   });
@@ -612,19 +614,27 @@ function makeExpectedChats(
     let recipient = users.find(user => user.id === chat.recipient_id);
 
     return {
-      body: message.body,
       chat_id: chat.id,
-      closed: false,
-      date_created: message.date_created,
-      first_name: recipient.first_name,
-      isOwner: project.creator_id === user_id,
-      isReply: message.author_id !== user_id,
-      last_name: recipient.last_name,
-      project_name: project.name,
-      recipient_username: recipient.username,
-      request_id: request.id,
-      request_status: request.status,
-      vacancy_name: vacancy.title
+      closed_status: false,
+      messages: [
+        {
+          body: message.body,
+          date_created: message.date_created,
+          isAuthor: message.author_id === user_id
+        }
+      ],
+      project: {
+        project_name: project.name,
+        isOwner: project.creator_id === user_id,
+        vacancy_name: vacancy.title,
+        request_id: request.id,
+        request_status: request.status
+      },
+      recipient: {
+        first_name: recipient.first_name,
+        last_name: recipient.last_name,
+        recipient_username: recipient.username
+      }
     };
   });
 }

@@ -19,6 +19,39 @@ class PostsService extends Service {
       .orderBy('posts.date_created', 'desc');
   }
 
+  getPostWithUser(db, post_id) {
+    return db
+      .raw(
+        `
+    SELECT p.id, 
+    p.project_id, 
+    p.user_id, 
+    p.message, 
+    p.date_created, u.first_name, u.last_name, u.username FROM posts p 
+    INNER JOIN users u on u.id = p.user_id 
+    WHERE p.id = ? 
+    LIMIT 1
+    `,
+        [post_id]
+      )
+      .then(result => result.rows[0]);
+  }
+
+  getAllProjectUsers(db, project_id) {
+    return db
+      .raw(
+        `
+    SELECT DISTINCT(u.username) FROM users u 
+    INNER JOIN projects p ON p.id = ? 
+    INNER JOIN vacancies v ON v.project_id = p.id 
+    WHERE p.creator_id = u.id OR v.user_id = u.id 
+    AND v.user_id IS NOT NULL
+    `,
+        [project_id]
+      )
+      .then(result => result.rows);
+  }
+
   validateMessage(message) {
     if (message.length > 280) {
       return 'message must be fewer than 280 characters';
@@ -32,15 +65,17 @@ class PostsService extends Service {
     }
   }
 
-  serializePost(post, user_id) {
+  serializePost(post, username) {
     return {
       id: post.id,
       message: xss(post.message),
       date_created: post.date_created,
-      first_name: post.first_name,
-      last_name: post.last_name,
-      username: post.username,
-      canEdit: post.user_id === user_id
+      author: {
+        first_name: post.first_name,
+        last_name: post.last_name,
+        username: post.username
+      },
+      canEdit: post.username === username
     };
   }
 }

@@ -7,7 +7,6 @@ const { requireAuth } = require('../middleware/jwt-auth');
 const chatsRouter = express.Router();
 const bodyParser = express.json();
 
-// WEBSOCKET CLIENTS
 const WebSocketClients = require('../websocket-clients');
 
 chatsRouter.use(requireAuth);

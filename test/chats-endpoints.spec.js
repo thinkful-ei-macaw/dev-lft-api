@@ -122,7 +122,7 @@ describe('Chats Endpoints', () => {
           .set('Authorization', helpers.makeAuthHeader(testUser))
           .expect(200)
           .expect(res => {
-            expect(res.body[0].body).to.eql(expectedMessage.body);
+            expect(res.body[0].messages[0].body).to.eql(expectedMessage.body);
           });
       });
     });
