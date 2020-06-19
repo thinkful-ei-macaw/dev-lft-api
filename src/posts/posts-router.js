@@ -18,11 +18,11 @@ postsRouter
 
     try {
       const allPosts = await PostsService.getPosts(db, project_id);
-      const user_id = req.user.id;
+      const username = req.user.username;
 
       res
         .status(200)
-        .json(allPosts.map(post => PostsService.serializePost(post, user_id)));
+        .json(allPosts.map(post => PostsService.serializePost(post, username)));
     } catch (error) {
       next(error);
     }
@@ -56,6 +56,10 @@ postsRouter
 
     try {
       const resultingPost = await PostsService.insertItem(db, newPost);
+      const resultingPostWithUser = await PostsService.getPostWithUser(
+        db,
+        resultingPost.id
+      );
 
       // send notification to project members
       const usersToNotify = await NotificationsService.findProjectUsers(
@@ -85,7 +89,10 @@ postsRouter
           connected.ws.send(
             JSON.stringify({
               messageType: 'post',
-              content: PostsService.serializePost(resultingPost, user_id)
+              content: PostsService.serializePost(
+                resultingPostWithUser,
+                connected.username
+              )
             })
           );
         }
@@ -93,7 +100,9 @@ postsRouter
 
       return res
         .status(201)
-        .json(PostsService.serializePost(resultingPost, user_id));
+        .json(
+          PostsService.serializePost(resultingPostWithUser, req.user.username)
+        );
     } catch (error) {
       next(error);
     }
@@ -123,6 +132,31 @@ postsRouter
 
       const updatedPost = { message };
       await PostsService.updateItem(db, post_id, updatedPost);
+
+      // WEBSOCKET TESTING
+      // If the recipient is connected via WebSocket,
+      // send them the post in real time
+      const resultingPost = await PostsService.getPostWithUser(db, post_id);
+      const projectUsers = await PostsService.getAllProjectUsers(
+        db,
+        resultingPost.project_id
+      );
+
+      projectUsers.forEach(user => {
+        let connected = WebSocketClients.getClient(user.username);
+        if (connected) {
+          connected.ws.send(
+            JSON.stringify({
+              messageType: 'post-patch',
+              content: PostsService.serializePost(
+                resultingPost,
+                connected.username
+              )
+            })
+          );
+        }
+      });
+
       return res.status(204).end();
     } catch (error) {
       next(error);
